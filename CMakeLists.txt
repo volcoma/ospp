@@ -1,0 +1,34 @@
+﻿cmake_minimum_required(VERSION 3.4.3)
+
+project(ospp)
+include(CTest)
+
+option(BUILD_OSPP_SHARED "Build as a shared library." ON)
+option(BUILD_OSPP_TESTS "Build the tests" ON)
+
+if(BUILD_OSPP_TESTS)
+	if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+	endif()
+	if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+		set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+	endif()
+	if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+		set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+	endif()
+endif()
+
+if(BUILD_OSPP_SHARED)
+	set(BUILD_SHARED_LIBS ON)
+else()
+	set(BUILD_SHARED_LIBS OFF)
+endif()
+
+
+add_subdirectory(3rdparty)
+add_subdirectory(ospp)
+
+
+if(BUILD_OSPP_TESTS)
+	add_subdirectory(tests)
+endif()
