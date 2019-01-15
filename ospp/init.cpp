@@ -1,6 +1,5 @@
 #include "init.h"
 
-
 #if defined(SDL_BACKEND)
 #include "impl/sdl/init.hpp"
 #define impl detail::sdl

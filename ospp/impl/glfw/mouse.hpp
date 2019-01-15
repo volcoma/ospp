@@ -11,7 +11,7 @@ namespace detail
 namespace glfw
 {
 
-//inline uint8_t to_impl(button b)
+// inline uint8_t to_impl(button b)
 //{
 //	switch(b)
 //	{
@@ -32,19 +32,19 @@ namespace glfw
 
 inline bool is_button_pressed(button b) noexcept
 {
-    
-//	auto impl_button = to_impl(b);
-//	return (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(impl_button)) != 0;
-    return false;
+
+	//	auto impl_button = to_impl(b);
+	//	return (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(impl_button)) != 0;
+	return false;
 }
 
 inline point get_position() noexcept
 {
-    return {};
-//	point result;
-//    glfwGetCursorPos()
-//	SDL_GetMouseState(&result.x, &result.y);
-//	return result;
+	return {};
+	//	point result;
+	//    glfwGetCursorPos()
+	//	SDL_GetMouseState(&result.x, &result.y);
+	//	return result;
 }
 }
 }

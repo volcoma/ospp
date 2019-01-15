@@ -41,7 +41,7 @@ auto display_mode::get_closest_mode(uint32_t width, uint32_t height, int index) 
 
 auto display_mode::get_closest_mode(const display_mode& to, int index) -> display_mode
 {
-    auto desktop_mode = get_desktop_mode(index);
+	auto desktop_mode = get_desktop_mode(index);
 	auto modes = get_available_modes(index);
 
 	uint32_t target_bpp{};
@@ -109,7 +109,7 @@ auto display_mode::get_closest_mode(const display_mode& to, int index) -> displa
 		}
 	}
 
-    display_mode closest{};
+	display_mode closest{};
 	if(match)
 	{
 		if(match->bpp)
@@ -156,7 +156,6 @@ auto display_mode::get_closest_mode(const display_mode& to, int index) -> displa
 			closest.h = 480;
 		}
 	}
-    return closest;
+	return closest;
 }
-
 }

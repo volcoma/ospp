@@ -36,7 +36,7 @@ inline auto get_native_window_handle(const SDL_SysWMinfo& wmi) noexcept -> nativ
 #elif defined(SDL_VIDEO_DRIVER_VIVANTE)
 	return (void*)(uintptr_t)wmi.info.vivante.window;
 #else
-	return {};
+	return nullptr;
 #endif
 }
 
@@ -48,7 +48,7 @@ inline auto get_native_display_handle(const SDL_SysWMinfo& wmi) noexcept -> nati
 #elif defined(SDL_VIDEO_DRIVER_WINRT)
 	return nullptr;
 #elif defined(SDL_VIDEO_DRIVER_X11)
-	return display;
+	return wmi.info.x11.display;
 #elif defined(SDL_VIDEO_DRIVER_DIRECTFB)
 	return nullptr;
 #elif defined(SDL_VIDEO_DRIVER_COCOA)
@@ -115,9 +115,10 @@ struct window_impl
 	constexpr static const auto centered = SDL_WINDOWPOS_CENTERED;
 
 public:
-	window_impl(const std::string& title, uint32_t width, uint32_t height, uint32_t flags)
-		: impl_(SDL_CreateWindow(title.c_str(), npos, npos, static_cast<int>(width), static_cast<int>(height),
-								 get_impl_flags(flags)))
+	window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
+		: impl_(SDL_CreateWindow(title.c_str(), pos.x == window::centered ? centered : pos.x,
+								 pos.y == window::centered ? centered : pos.y, static_cast<int>(size.w),
+								 static_cast<int>(size.h), get_impl_flags(flags)))
 	{
 		if(impl_ == nullptr)
 		{

@@ -22,7 +22,6 @@ inline auto from_impl(const GLFWvidmode& mode) -> display_mode
 	result.bpp = static_cast<uint32_t>(mode.redBits + mode.greenBits + mode.blueBits);
 	return result;
 }
-
 }
 
 inline auto number_of_video_displays() -> int
@@ -71,7 +70,6 @@ inline auto get_desktop_mode(int index = 0) -> display_mode
 
 	return {};
 }
-
 }
 }
 }

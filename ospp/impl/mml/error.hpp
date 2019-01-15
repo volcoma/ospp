@@ -9,7 +9,6 @@ namespace detail
 {
 namespace mml
 {
-
 }
 }
 }

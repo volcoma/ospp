@@ -1,9 +1,9 @@
 #pragma once
 #include "../../event.h"
 
-#include <deque>
-#include <cstring>
 #include "config.hpp"
+#include <cstring>
+#include <deque>
 
 namespace os
 {
@@ -144,6 +144,7 @@ inline event to_event(const SDL_Event& e)
 			break;
 		case SDL_MOUSEWHEEL:
 			ev.type = events::mouse_wheel;
+            //e.wheel.
 			break;
 
 		case SDL_FINGERDOWN:
@@ -177,14 +178,13 @@ inline event to_event(const SDL_Event& e)
 
 inline void pump_events() noexcept
 {
-    SDL_Event ev{};
-    while(SDL_PollEvent(&ev) != 0)
-    {
-        auto e = to_event(ev);
-        push_event(e);
-    }
+	SDL_Event ev{};
+	while(SDL_PollEvent(&ev) != 0)
+	{
+		auto e = to_event(ev);
+		push_event(e);
+	}
 }
-
 }
 }
 }

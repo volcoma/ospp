@@ -1,6 +1,5 @@
 #include "mouse.h"
 
-
 #if defined(SDL_BACKEND)
 #include "impl/sdl/mouse.hpp"
 #define impl detail::sdl

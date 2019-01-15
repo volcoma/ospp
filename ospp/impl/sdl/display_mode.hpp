@@ -65,7 +65,6 @@ inline auto get_desktop_mode(int index = 0) -> display_mode
 	}
 	return from_impl(result);
 }
-
 }
 }
 }

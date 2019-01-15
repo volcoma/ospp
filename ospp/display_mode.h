@@ -16,6 +16,6 @@ struct display_mode
 	uint32_t w{};			 /**< width, in screen coordinates */
 	uint32_t h{};			 /**< height, in screen coordinates */
 	uint32_t refresh_rate{}; /**< refresh rate (or zero for unspecified) */
-    uint32_t bpp{}; /**< bits per pixel */
+	uint32_t bpp{};			 /**< bits per pixel */
 };
 }

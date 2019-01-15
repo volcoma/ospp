@@ -1,7 +1,6 @@
 #include "event.h"
-#include <deque>
 #include <cstring>
-
+#include <deque>
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/event.hpp"
@@ -41,18 +40,15 @@ bool pop_event(event& e)
 }
 }
 
-
 bool poll_event(event& e) noexcept
 {
-    impl::pump_events();
+	impl::pump_events();
 
-    return pop_event(e);
+	return pop_event(e);
 }
-
 
 void push_event(const event& e)
 {
 	get_event_queue().push_back(e);
 }
-
 }

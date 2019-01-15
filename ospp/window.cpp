@@ -14,7 +14,6 @@ using impl_type = os::detail::glfw::window_impl;
 #error "unsupported backend"
 #endif
 
-
 #define this_impl get_impl(impl_.get())
 
 namespace os
@@ -26,22 +25,26 @@ impl_type* get_impl(void* window)
 }
 
 window::window(const std::string& title, const display_mode& display, uint32_t flags)
-	: window(title, display.w, display.h, flags)
+	: window(title, {centered, centered}, {display.w, display.h}, flags)
+{
+}
+window::window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t flags)
+	: window(title, {x, y}, {w, h}, flags)
 {
 }
 
-window::window(const std::string& title, uint32_t width, uint32_t height, uint32_t flags)
-	: impl_(std::make_shared<impl_type>(title, width, height, flags))
+window::window(const std::string& title, const point& pos, const area& size, uint32_t flags)
+	: impl_(std::make_shared<impl_type>(title, pos, size, flags))
 {
 }
 
 auto window::get_native_handle() const -> native_handle
 {
-    return this_impl->get_native_handle();
+	return this_impl->get_native_handle();
 }
 auto window::get_native_display() const -> native_display
 {
-    return this_impl->get_native_display();
+	return this_impl->get_native_display();
 }
 
 auto window::is_open() const noexcept -> bool
@@ -66,7 +69,7 @@ auto window::get_id() const noexcept -> uint32_t
 
 void window::set_size(uint32_t width, uint32_t height) noexcept
 {
-	this_impl->set_size({width, height});
+	set_size({width, height});
 }
 
 void window::set_size(const area& size) noexcept
@@ -96,7 +99,7 @@ auto window::get_maximum_size() const noexcept -> area
 
 void window::set_minimum_size(uint32_t width, uint32_t height) noexcept
 {
-	this_impl->set_minimum_size({width, height});
+	set_minimum_size({width, height});
 }
 
 void window::set_minimum_size(const area& size) noexcept
@@ -205,7 +208,7 @@ void window::set_mouse_position(const point& pos) noexcept
 
 void window::request_focus()
 {
-    this_impl->request_focus();
+	this_impl->request_focus();
 }
 
 void window::request_close() noexcept

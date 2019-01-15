@@ -22,7 +22,6 @@ inline auto from_impl(const ::mml::video_mode& mode) -> display_mode
 	result.refresh_rate = 0;
 	return result;
 }
-
 }
 
 inline int number_of_video_displays()
@@ -48,7 +47,6 @@ inline auto get_desktop_mode(int /*index = 0*/) -> display_mode
 	auto mode = ::mml::video_mode::get_desktop_mode();
 	return from_impl(mode);
 }
-
 }
 }
 }

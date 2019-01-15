@@ -102,15 +102,15 @@ struct mouse_motion_event
 
 struct event
 {
-    drop_event drop{};
-    text_input_event text{};
-    mouse_button_event button{};
-    window_event window{};
-    mouse_motion_event motion{};
+	drop_event drop{};
+	text_input_event text{};
+	mouse_button_event button{};
+	window_event window{};
+	mouse_motion_event motion{};
 
-    events type{};
+	events type{};
 
-    quit_event quit{};
+	quit_event quit{};
 };
 
 void push_event(const event& e);

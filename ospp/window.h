@@ -2,6 +2,7 @@
 #include "display_mode.h"
 #include "types.hpp"
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <string>
 
@@ -23,12 +24,14 @@ public:
 		minimized = 1 << 5,
 		maximized = 1 << 6,
 	};
+	constexpr static const auto centered = std::numeric_limits<int32_t>::max();
 
-	window(const std::string& title, const display_mode& display, uint32_t flags);
-	window(const std::string& title, uint32_t width, uint32_t height, uint32_t flags);
+	window(const std::string& title, const display_mode& display, uint32_t flags = 0);
+	window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t flags = 0);
+	window(const std::string& title, const point& pos, const area& size, uint32_t flags = 0);
 
-    auto get_native_handle() const -> native_handle;
-    auto get_native_display() const -> native_display;
+	auto get_native_handle() const -> native_handle;
+	auto get_native_display() const -> native_display;
 
 	auto is_open() const noexcept -> bool;
 	auto get_id() const noexcept -> uint32_t;
@@ -75,7 +78,7 @@ public:
 	void set_mouse_position(int32_t x, int32_t y) noexcept;
 	void set_mouse_position(const point& pos) noexcept;
 
-    void request_focus();
+	void request_focus();
 	void request_close() noexcept;
 
 private:

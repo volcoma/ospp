@@ -4,10 +4,10 @@
 
 #include "error.hpp"
 
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <algorithm>
 
 namespace os
 {
@@ -16,14 +16,136 @@ namespace detail
 namespace glfw
 {
 
+inline auto get_native_window_handle(GLFWwindow* window) noexcept -> native_handle
+{
+	(void)window;
+#if defined(GLFW_EXPOSE_NATIVE_WIN32)
+	return glfwGetWin32Window(window);
+#elif defined(GLFW_EXPOSE_NATIVE_X11)
+	return (void*)(uintptr_t)glfwGetX11Window(window);
+#elif defined(GLFW_EXPOSE_NATIVE_COCOA)
+	return glfwGetCocoaWindow(window);
+#elif defined(GLFW_EXPOSE_NATIVE_WAYLAND)
+	return glfwGetWaylandWindow(window);
+#else
+	return nullptr;
+#endif
+}
+
+inline auto get_native_display_handle() noexcept -> native_display
+{
+#if defined(GLFW_EXPOSE_NATIVE_WIN32)
+	return nullptr;
+#elif defined(GLFW_EXPOSE_NATIVE_X11)
+	return (void*)(uintptr_t)glfwGetX11Display();
+#elif defined(GLFW_EXPOSE_NATIVE_COCOA)
+	return nullptr;
+#elif defined(GLFW_EXPOSE_NATIVE_WAYLAND)
+	return glfwGetWaylandDisplay();
+#else
+	return nullptr;
+#endif
+}
+inline bool glfwSetWindowCenter(GLFWwindow* window)
+{
+	if(!window)
+		return false;
+
+	int sx = 0, sy = 0;
+	int px = 0, py = 0;
+	int mx = 0, my = 0;
+	int monitor_count = 0;
+	int best_area = 0;
+	int final_x = 0, final_y = 0;
+
+	glfwGetWindowSize(window, &sx, &sy);
+	glfwGetWindowPos(window, &px, &py);
+
+	// Iterate throug all monitors
+	GLFWmonitor** m = glfwGetMonitors(&monitor_count);
+	if(!m)
+		return false;
+
+	for(int j = 0; j < monitor_count; ++j)
+	{
+
+		glfwGetMonitorPos(m[j], &mx, &my);
+		const GLFWvidmode* mode = glfwGetVideoMode(m[j]);
+		if(!mode)
+			continue;
+
+		// Get intersection of two rectangles - screen and window
+		int minX = std::max(mx, px);
+		int minY = std::max(my, py);
+
+		int maxX = std::min(mx + mode->width, px + sx);
+		int maxY = std::min(my + mode->height, py + sy);
+
+		// Calculate area of the intersection
+		int area = std::max(maxX - minX, 0) * std::max(maxY - minY, 0);
+
+		// If its bigger than actual (window covers more space on this monitor)
+		if(area > best_area)
+		{
+			// Calculate proper position in this monitor
+			final_x = mx + (mode->width - sx) / 2;
+			final_y = my + (mode->height - sy) / 2;
+
+			best_area = area;
+		}
+	}
+
+	// We found something
+	if(best_area)
+		glfwSetWindowPos(window, final_x, final_y);
+
+	// Something is wrong - current window has NOT any intersection with any monitors. Move it to the default
+	// one.
+	else
+	{
+		GLFWmonitor* primary = glfwGetPrimaryMonitor();
+		if(primary)
+		{
+			const GLFWvidmode* desktop = glfwGetVideoMode(primary);
+
+			if(desktop)
+				glfwSetWindowPos(window, (desktop->width - sx) / 2, (desktop->height - sy) / 2);
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+
+	return true;
+}
+
 inline auto create_impl(const std::string& title, uint32_t width, uint32_t height, uint32_t flags)
 	-> GLFWwindow*
 {
+
+	// NO CLIENT API. This library's purpose is to just
+	// wrap window and input.
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+	auto visible = flags & window::hidden ? GLFW_FALSE : GLFW_TRUE;
+	glfwWindowHint(GLFW_VISIBLE, visible);
+
+	auto decorated = flags & window::borderless ? GLFW_FALSE : GLFW_TRUE;
+	glfwWindowHint(GLFW_DECORATED, decorated);
+
+	auto resizable = flags & window::resizable ? GLFW_TRUE : GLFW_FALSE;
+	glfwWindowHint(GLFW_RESIZABLE, resizable);
+
+	auto maximized = flags & window::maximized ? GLFW_TRUE : GLFW_FALSE;
+	glfwWindowHint(GLFW_MAXIMIZED, maximized);
+
 	GLFWmonitor* monitor = nullptr;
 	if(flags & window::fullscreen)
 	{
 		monitor = glfwGetPrimaryMonitor();
 	}
+
 	if(flags & window::fullscreen_desktop)
 	{
 		monitor = glfwGetPrimaryMonitor();
@@ -33,26 +155,8 @@ inline auto create_impl(const std::string& title, uint32_t width, uint32_t heigh
 		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
 		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-	}
-	if(flags & window::hidden)
-	{
-		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-	}
-	if(flags & window::borderless)
-	{
-		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-	}
-	if(flags & window::resizable)
-	{
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-	}
-	if(flags & window::minimized)
-	{
-	}
-	if(flags & window::maximized)
-	{
-		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	}
 
 	auto window =
@@ -71,79 +175,79 @@ struct window_deleter
 	}
 };
 
-
 class window_impl;
 
 inline auto get_windows() noexcept -> std::vector<window_impl*>&
 {
-    static std::vector<window_impl*> windows;
-    return windows;
+	static std::vector<window_impl*> windows;
+	return windows;
 }
 
 inline uint32_t register_window(window_impl* impl)
 {
-    static uint32_t id{0};
-    auto& windows = get_windows();
-    windows.emplace_back(impl);
-    return ++id;
+	static uint32_t id{0};
+	auto& windows = get_windows();
+	windows.emplace_back(impl);
+	return ++id;
 }
 
 inline void unregister_window(uint32_t id)
 {
-    auto& windows = get_windows();
-    windows.erase(std::remove_if(std::begin(windows), std::end(windows), [id](const auto& win)
-    {
-        return win->get_id() == id;
-    }), std::end(windows));
+	auto& windows = get_windows();
+	windows.erase(std::remove_if(std::begin(windows), std::end(windows),
+								 [id](const auto& win) { return win->get_id() == id; }),
+				  std::end(windows));
 }
 
-using on_window_create = void (*)(GLFWwindow *);
+using on_window_create = void (*)(GLFWwindow*);
 inline on_window_create& on_win_create()
 {
-    static on_window_create callback = nullptr;
-    return callback;
+	static on_window_create callback = nullptr;
+	return callback;
 }
 
 struct window_impl
 {
 
 public:
-	window_impl(const std::string& title, uint32_t width, uint32_t height, uint32_t flags)
-        : impl_(create_impl(title, width, height, flags))
+	window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
+		: impl_(create_impl(title, size.w, size.h, flags))
 	{
 		if(impl_ == nullptr)
 		{
 			OS_GLFW_ERROR_HANDLER_VOID();
 		}
+		title_ = title;
+		id_ = register_window(this);
 
-        id_ = register_window(this);
+		glfwSetWindowUserPointer(impl_.get(), this);
 
-        glfwSetWindowUserPointer(impl_.get(), this);
+		auto callback = on_win_create();
+		if(callback)
+		{
+			callback(impl_.get());
+		}
 
-        auto callback = on_win_create();
-        if(callback)
-        {
-            callback(impl_.get());
-        }
+		set_position(pos);
 	}
 
-    ~window_impl()
-    {
-        unregister_window(id_);
-    }
+	~window_impl()
+	{
+		unregister_window(id_);
+	}
 
-    auto get_impl() -> GLFWwindow*
-    {
-        return impl_.get();
-    }
+	auto get_impl() -> GLFWwindow*
+	{
+		return impl_.get();
+	}
 
 	auto get_native_handle() const -> native_handle
 	{
-		return {};
+		return get_native_window_handle(impl_.get());
 	}
 	auto get_native_display() const -> native_display
 	{
-		return {};
+		return get_native_display_handle();
 	}
 
 	auto is_open() const noexcept -> bool
@@ -161,7 +265,7 @@ public:
 		return 1.0f;
 	}
 
-	void set_brightness(float bright)
+	void set_brightness(float)
 	{
 	}
 
@@ -207,7 +311,14 @@ public:
 
 	void set_position(const point& pos) noexcept
 	{
-		glfwSetWindowPos(impl_.get(), static_cast<int>(pos.x), static_cast<int>(pos.y));
+		if(pos.x == window::centered && pos.y == window::centered)
+		{
+			glfwSetWindowCenter(impl_.get());
+		}
+		else
+		{
+			glfwSetWindowPos(impl_.get(), static_cast<int>(pos.x), static_cast<int>(pos.y));
+		}
 	}
 
 	auto get_position() noexcept -> point
@@ -223,11 +334,12 @@ public:
 
 	auto get_title() const noexcept -> std::string
 	{
-		return {};
+		return title_;
 	}
 
 	void set_title(const std::string& str) noexcept
 	{
+		title_ = str;
 		glfwSetWindowTitle(impl_.get(), str.c_str());
 	}
 
@@ -259,21 +371,31 @@ public:
 	{
 	}
 
-	void set_border(bool b) noexcept
+	void set_border(bool) noexcept
 	{
 	}
 
 	void set_fullscreen(bool b)
 	{
-		//        auto monitor = glfwGetPrimaryMonitor();
-		//        auto mode = glfwGetVideoMode(monitor);
+		auto monitor = glfwGetPrimaryMonitor();
+		auto mode = glfwGetVideoMode(monitor);
+		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-		//        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-		//        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-		//        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-		//        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-		//		glfwSetWindowMonitor(impl_.get(), monitor, 0, 0, mode->width, mode->height,
-		//mode->refreshRate);
+		if(b)
+		{
+			size_before_fullscreen_ = get_size();
+			pos_before_fullscreen_ = get_position();
+			glfwSetWindowMonitor(impl_.get(), monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+		}
+		else
+		{
+			glfwSetWindowMonitor(impl_.get(), nullptr, pos_before_fullscreen_.x, pos_before_fullscreen_.y,
+								 int(size_before_fullscreen_.w), int(size_before_fullscreen_.h),
+								 mode->refreshRate);
+		}
 	}
 
 	void set_opacity(float opacity)
@@ -288,7 +410,7 @@ public:
 
 	void grab_input(bool b) noexcept
 	{
-		glfwSetInputMode(impl_.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(impl_.get(), GLFW_CURSOR, b ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 	}
 
 	bool is_input_grabbed() const noexcept
@@ -306,32 +428,36 @@ public:
 		glfwSetCursorPos(impl_.get(), static_cast<double>(pos.x), static_cast<double>(pos.y));
 	}
 
-    auto get_mouse_position() const
-    {
-        point result;
-        double x{};
-        double y{};
-        glfwGetCursorPos(impl_.get(), &x, &y);
-        result.x = static_cast<int32_t>(x);
-        result.y = static_cast<int32_t>(y);
-        return result;
-    }
+	auto get_mouse_position() const
+	{
+		point result;
+		double x{};
+		double y{};
+		glfwGetCursorPos(impl_.get(), &x, &y);
+		result.x = static_cast<int32_t>(x);
+		result.y = static_cast<int32_t>(y);
+		return result;
+	}
 
-    void set_recieved_close_event(bool b) noexcept
-    {
-        recieved_close_event_ = b;
-    }
-    auto recieved_close_event() const noexcept -> bool
-    {
-        return recieved_close_event_;
-    }
+	void set_recieved_close_event(bool b) noexcept
+	{
+		recieved_close_event_ = b;
+	}
+	auto recieved_close_event() const noexcept -> bool
+	{
+		return recieved_close_event_;
+	}
 
 private:
-    uint32_t id_{};
+	uint32_t id_{};
 	area min_size_{};
 	area max_size_{};
+	point pos_before_fullscreen_{};
+	area size_before_fullscreen_{};
+
+	std::string title_{};
 	std::unique_ptr<GLFWwindow, window_deleter> impl_;
-    bool recieved_close_event_{false};
+	bool recieved_close_event_{false};
 };
 }
 }

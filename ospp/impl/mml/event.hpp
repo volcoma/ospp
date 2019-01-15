@@ -5,18 +5,17 @@
 
 #include "config.hpp"
 
+#include <algorithm>
 #include <codecvt>
 #include <cstring>
 #include <deque>
 #include <locale>
-#include <algorithm>
 namespace os
 {
 namespace detail
 {
 namespace mml
 {
-
 
 inline mouse::button to_mouse_button(::mml::mouse::button id)
 {
@@ -59,6 +58,8 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 			ev.type = events::window;
 			ev.window.window_id = window_id;
 			ev.window.type = window_event_id::resized;
+			ev.window.data1 = static_cast<int32_t>(e.size.width);
+			ev.window.data2 = static_cast<int32_t>(e.size.height);
 			break;
 		case ::mml::platform_event::lost_focus:
 			ev.type = events::window;
@@ -80,12 +81,13 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 			ev.window.window_id = window_id;
 			ev.window.type = window_event_id::leave;
 			break;
-			//		case events::key_down:
-			//			break;
-			//		case events::key_up:
-			//			break;
-			//		case events::text_editing:
-			//			break;
+		case ::mml::platform_event::key_pressed:
+			ev.type = events::key_down;
+			break;
+		case ::mml::platform_event::key_released:
+			ev.type = events::key_up;
+			break;
+
 		case ::mml::platform_event::text_entered:
 			ev.type = events::text_input;
 			ev.window.window_id = window_id;
@@ -114,23 +116,21 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 			ev.motion.x = e.mouse_move.x;
 			ev.motion.y = e.mouse_move.y;
 			break;
-			//		case SDL_MOUSEWHEEL:
-			//			ev.type = events::mouse_wheel;
-			//			break;
+		case ::mml::platform_event::mouse_wheel_scrolled:
+			ev.type = events::mouse_wheel;
+			// e.mouse_wheel_scroll
+			break;
 
-			//		case SDL_FINGERDOWN:
-			//			ev.type = events::finger_down;
-			//			break;
-			//		case SDL_FINGERUP:
-			//			ev.type = events::finger_up;
+		case ::mml::platform_event::touch_began:
+			ev.type = events::finger_down;
+			break;
+		case ::mml::platform_event::touch_ended:
+			ev.type = events::finger_up;
 
-			//			break;
-			//		case SDL_FINGERMOTION:
-			//			ev.type = events::finger_motion;
-			//			break;
-			//		case SDL_CLIPBOARDUPDATE:
-			//			ev.type = events::clipboard_update;
-			//			break;
+			break;
+		case ::mml::platform_event::touch_moved:
+			ev.type = events::finger_motion;
+			break;
 
 		default:
 			ev.type = events::unkwnown;
@@ -141,7 +141,7 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 
 inline void pump_events() noexcept
 {
-    auto& windows = get_windows();
+	auto& windows = get_windows();
 	for(auto& window : windows)
 	{
 		auto& impl = window->get_impl();
@@ -149,18 +149,18 @@ inline void pump_events() noexcept
 		::mml::platform_event ev;
 		if(impl.poll_event(ev))
 		{
-            if(ev.type == ::mml::platform_event::closed)
-            {
-                window->set_recieved_close_event(true);
-            }
+			if(ev.type == ::mml::platform_event::closed)
+			{
+				window->set_recieved_close_event(true);
+			}
 			auto e = to_event(ev, window->get_id());
 
-            push_event(e);
+			push_event(e);
 		}
 	}
 
-    auto all_closed =
-		std::all_of(std::begin(windows), std::end(windows), [](const auto& e) { return e->recieved_close_event(); });
+	auto all_closed = std::all_of(std::begin(windows), std::end(windows),
+								  [](const auto& e) { return e->recieved_close_event(); });
 	if(all_closed)
 	{
 		event ev;
@@ -168,7 +168,6 @@ inline void pump_events() noexcept
 		push_event(ev);
 	}
 }
-
 }
 }
 }

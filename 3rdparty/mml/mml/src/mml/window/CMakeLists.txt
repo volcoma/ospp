@@ -137,3 +137,9 @@ if(NOT BUILD_SHARED_LIBS)
 else()
 	target_compile_definitions(mml-window PRIVATE MML_API_EXPORTS)
 endif()
+
+set_target_properties(mml-window PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)

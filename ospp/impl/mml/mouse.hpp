@@ -11,7 +11,7 @@ namespace detail
 namespace mml
 {
 
-inline::mml::mouse::button to_impl(button b)
+inline ::mml::mouse::button to_impl(button b)
 {
 	switch(b)
 	{
@@ -33,15 +33,15 @@ inline::mml::mouse::button to_impl(button b)
 inline bool is_button_pressed(button b) noexcept
 {
 	auto impl_button = to_impl(b);
-    return ::mml::mouse::is_button_pressed(impl_button);
+	return ::mml::mouse::is_button_pressed(impl_button);
 }
 
 inline point get_position() noexcept
 {
-    auto pos = ::mml::mouse::get_position();
+	auto pos = ::mml::mouse::get_position();
 	point result;
-    result.x = pos[0];
-    result.y = pos[1];
+	result.x = pos[0];
+	result.y = pos[1];
 	return result;
 }
 }

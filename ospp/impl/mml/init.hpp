@@ -17,5 +17,4 @@ inline auto init() -> int
 }
 }
 }
-
 }

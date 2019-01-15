@@ -21,11 +21,10 @@ inline auto init() -> int
 		OS_GLFW_ERROR_HANDLER(result);
 	}
 
-    on_win_create() = set_callbacks;
+	on_win_create() = set_callbacks;
 
 	return 0;
 }
 }
 }
-
 }

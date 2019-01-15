@@ -1,8 +1,10 @@
 #pragma once
 #include "../../event.h"
 
+#include <codecvt>
 #include <cstring>
 #include <deque>
+#include <locale>
 
 #include "window.hpp"
 
@@ -90,26 +92,6 @@ inline mouse::button_state to_mouse_button_state(int id)
 //	event ev;
 //	switch(e.type)
 //	{
-//		case SDL_QUIT:
-//			ev.type = events::quit;
-//			break;
-//		case SDL_APP_TERMINATING:
-//			ev.type = events::app_terminating;
-//			break;
-//		case SDL_APP_LOWMEMORY:
-//			ev.type = events::app_low_memory;
-//			break;
-//		case SDL_APP_WILLENTERBACKGROUND:
-//			ev.type = events::app_will_enter_background;
-//			break;
-//		case SDL_APP_DIDENTERBACKGROUND:
-//			ev.type = events::app_did_enter_background;
-//			break;
-//		case SDL_APP_WILLENTERFOREGROUND:
-//			ev.type = events::app_will_enter_foreground;
-//			break;
-//		case SDL_APP_DIDENTERFOREGROUND:
-//			ev.type = events::app_did_enter_foreground;
 //			break;
 //		case SDL_WINDOWEVENT:
 //			ev.type = events::window;
@@ -124,33 +106,6 @@ inline mouse::button_state to_mouse_button_state(int id)
 //			//			break;
 //			//		case events::text_editing:
 //			//			break;
-//		case SDL_TEXTINPUT:
-//			ev.type = events::text_input;
-//			ev.window.window_id = e.text.windowID;
-//			ev.text.text_utf8 = e.text.text;
-//			break;
-//		case SDL_MOUSEBUTTONDOWN:
-//			ev.type = events::mouse_button;
-//			ev.button.window_id = e.button.windowID;
-//			ev.button.button = to_mouse_button(e.button.button);
-//			ev.button.state = mouse::button_state::pressed;
-//			ev.button.x = e.button.x;
-//			ev.button.y = e.button.y;
-//			break;
-//		case SDL_MOUSEBUTTONUP:
-//			ev.type = events::mouse_button;
-//			ev.button.window_id = e.button.windowID;
-//			ev.button.button = to_mouse_button(e.button.button);
-//			ev.button.state = mouse::button_state::released;
-//			ev.button.x = e.button.x;
-//			ev.button.y = e.button.y;
-//			break;
-//		case SDL_MOUSEMOTION:
-//			ev.type = events::mouse_motion;
-//			ev.motion.window_id = e.motion.windowID;
-//			ev.motion.x = e.motion.x;
-//			ev.motion.y = e.motion.y;
-//			break;
 //		case SDL_MOUSEWHEEL:
 //			ev.type = events::mouse_wheel;
 //			break;
@@ -198,6 +153,58 @@ inline void set_callbacks(GLFWwindow* window)
 		push_event(ev);
 	});
 
+	glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int w, int h) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		event ev;
+		ev.type = events::window;
+		ev.window.window_id = impl->get_id();
+		ev.window.type = window_event_id::resized;
+		ev.window.data1 = static_cast<int32_t>(w);
+		ev.window.data2 = static_cast<int32_t>(h);
+
+		push_event(ev);
+	});
+
+	glfwSetWindowPosCallback(window, [](GLFWwindow* window, int x, int y) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		event ev;
+		ev.type = events::window;
+		ev.window.window_id = impl->get_id();
+		ev.window.type = window_event_id::moved;
+		ev.window.data1 = static_cast<int32_t>(x);
+		ev.window.data2 = static_cast<int32_t>(y);
+
+		push_event(ev);
+	});
+
+	glfwSetWindowMaximizeCallback(window, [](GLFWwindow* window, int mode) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		event ev;
+		ev.type = events::window;
+		ev.window.window_id = impl->get_id();
+		ev.window.type = mode == GLFW_TRUE ? window_event_id::maximized : window_event_id::restored;
+
+		push_event(ev);
+	});
+
+	glfwSetCursorEnterCallback(window, [](GLFWwindow* window, int mode) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		event ev;
+		ev.type = events::window;
+		ev.window.window_id = impl->get_id();
+		ev.window.type = mode == GLFW_TRUE ? window_event_id::enter : window_event_id::leave;
+
+		push_event(ev);
+	});
+
 	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y) {
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
@@ -214,17 +221,54 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
-        auto pos = impl->get_mouse_position();
+		auto pos = impl->get_mouse_position();
 
 		event ev;
 		ev.type = events::mouse_button;
 		ev.button.window_id = impl->get_id();
 		ev.button.button = to_mouse_button(button);
 		ev.button.state = to_mouse_button_state(action);
-        ev.button.x = pos.x;
-        ev.button.y = pos.y;
+		ev.button.x = pos.x;
+		ev.button.y = pos.y;
 
 		push_event(ev);
+	});
+
+	glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffs, double yoffs) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		event ev;
+
+		ev.type = events::mouse_wheel;
+		// ev.wheel.window_id = impl->get_id();
+		// ev.window.type = mode == GLFW_TRUE ? window_event_id::maximized : window_event_id::restored;
+
+		push_event(ev);
+	});
+
+	glfwSetCharModsCallback(window, [](GLFWwindow* window, unsigned int unicode_codepoint, int mod) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		event ev;
+		ev.type = events::text_input;
+		ev.text.window_id = impl->get_id();
+		ev.text.text_utf8 =
+			std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.to_bytes(unicode_codepoint);
+
+		push_event(ev);
+
+	});
+	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		event ev;
+		ev.type = action == GLFW_RELEASE ? events::key_up : events::key_down;
+
+		push_event(ev);
+
 	});
 
 	glfwSetDropCallback(window, [](GLFWwindow* window, int count, const char** paths) {
@@ -249,8 +293,8 @@ inline void pump_events() noexcept
 	glfwPollEvents();
 
 	auto& windows = get_windows();
-	auto all_closed =
-		std::all_of(std::begin(windows), std::end(windows), [](const auto& e) { return e->recieved_close_event(); });
+	auto all_closed = std::all_of(std::begin(windows), std::end(windows),
+								  [](const auto& e) { return e->recieved_close_event(); });
 	if(all_closed)
 	{
 		event ev;

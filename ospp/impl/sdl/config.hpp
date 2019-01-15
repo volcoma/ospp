@@ -6,26 +6,26 @@
  * penalty in compilation speeds.
  */
 #define SDL_MAIN_HANDLED
-#if defined(__has_include)
-#if __has_include(<SDL2/SDL.h>)
-#include <SDL2/SDL.h>
-#elif __has_include(<SDL/SDL.h>)
-#include <SDL/SDL.h>
-#elif __has_include(<SDL.h>)
+//#if defined(__has_include)
+//#if __has_include(<SDL2/SDL.h>)
+//#include <SDL2/SDL.h>
+//#elif __has_include(<SDL/SDL.h>)
+//#include <SDL/SDL.h>
+//#elif __has_include(<SDL.h>)
+//#include <SDL.h>
+//#endif
+//#else
 #include <SDL.h>
-#endif
-#else
-#include <SDL.h>
-#endif
+//#endif
 
-#if defined(__has_include)
-#if __has_include(<SDL2/SDL_syswm.h>)
-#include <SDL2/SDL_syswm.h>
-#elif __has_include(<SDL/SDL_syswm.h>)
-#include <SDL/SDL_syswm.h>
-#elif __has_include(<SDL_syswm.h>)
+//#if defined(__has_include)
+//#if __has_include(<SDL2/SDL_syswm.h>)
+//#include <SDL2/SDL_syswm.h>
+//#elif __has_include(<SDL/SDL_syswm.h>)
+//#include <SDL/SDL_syswm.h>
+//#elif __has_include(<SDL_syswm.h>)
+//#include <SDL_syswm.h>
+//#endif
+//#else
 #include <SDL_syswm.h>
-#endif
-#else
-#include <SDL_syswm.h>
-#endif
+//#endif
