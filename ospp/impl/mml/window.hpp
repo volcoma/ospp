@@ -96,7 +96,7 @@ public:
 
 	auto get_native_handle() const -> native_handle
 	{
-		return impl_.native_handle();
+		return (void*)(uintptr_t)impl_.native_handle();
 	}
 	auto get_native_display() const -> native_display
 	{
