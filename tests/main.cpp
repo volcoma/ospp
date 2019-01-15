@@ -1,17 +1,40 @@
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <ospp/event.h>
 #include <ospp/init.h>
 #include <ospp/window.h>
 #include <thread>
 
 using namespace std::chrono_literals;
+
+void print(const os::display_mode& mode)
+{
+	std::cout << "w : " << mode.w << std::endl;
+	std::cout << "h : " << mode.h << std::endl;
+	std::cout << "bpp : " << mode.bpp << std::endl;
+	std::cout << "refresh rate : " << mode.refresh_rate << std::endl;
+}
+
 int main()
 {
 	os::init();
 
+	auto desktop_mode = os::display_mode::get_desktop_mode();
+	std::cout << "-------------------------" << std::endl;
+	std::cout << "desktop mode:" << std::endl;
+	print(desktop_mode);
+	std::cout << "-------------------------" << std::endl;
+
 	auto modes = os::display_mode::get_available_modes();
-	auto mode = os::display_mode::get_desktop_mode();
+	std::cout << "available modes:" << std::endl;
+	for(const auto& mode : modes)
+	{
+		std::cout << "-------------------------" << std::endl;
+		print(mode);
+	}
+	std::cout << "-------------------------" << std::endl;
+
 	std::vector<os::window> windows = {{"win 1", os::window::centered, os::window::centered, 500, 500}};
 
 	auto sz = windows[0].get_size();
