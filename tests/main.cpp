@@ -3,8 +3,8 @@
 #include <iostream>
 #include <ospp/event.h>
 #include <ospp/init.h>
-#include <ospp/window.h>
 #include <ospp/keyboard.h>
+#include <ospp/window.h>
 #include <thread>
 
 using namespace std::chrono_literals;
@@ -37,7 +37,7 @@ int main()
 	std::cout << "-------------------------" << std::endl;
 	std::vector<os::window> windows = {{"win 1", os::window::centered, os::window::centered, 500, 500}};
 
-    os::start_text_input();
+	os::start_text_input();
 	auto sz = windows[0].get_size();
 
 	bool full = false;
@@ -63,21 +63,21 @@ int main()
 								  std::end(windows));
 				}
 			}
-            if(e.type == os::events::mouse_wheel)
-            {
-                std::cout << "x : " << e.wheel.x << std::endl;
-                std::cout << "y : " << e.wheel.y << std::endl;
-            }
-            if(e.type == os::events::key_down)
+			if(e.type == os::events::mouse_wheel)
+			{
+				std::cout << "x : " << e.wheel.x << std::endl;
+				std::cout << "y : " << e.wheel.y << std::endl;
+			}
+			if(e.type == os::events::key_down)
 			{
 				std::cout << os::key::to_string(e.key.code) << std::endl;
 			}
 			if(e.type == os::events::text_input)
 			{
-//				full = !full;
-//				windows[0].set_fullscreen(full);
-//				int a = 0;
-//				a++;
+				//				full = !full;
+				//				windows[0].set_fullscreen(full);
+				//				int a = 0;
+				//				a++;
 			}
 		}
 
