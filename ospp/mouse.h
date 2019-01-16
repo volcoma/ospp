@@ -16,13 +16,6 @@ enum class button
 	button_count ///< Keep last -- the total number of mouse buttons
 };
 
-enum class button_state
-{
-	none,
-	pressed,
-	released
-};
-
 bool is_button_pressed(button b) noexcept;
 
 point get_position() noexcept;

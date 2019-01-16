@@ -11,6 +11,25 @@ namespace detail
 namespace sdl
 {
 
+inline button from_impl(uint8_t id)
+{
+	switch(id)
+	{
+		case SDL_BUTTON_LEFT:
+			return button::left;
+		case SDL_BUTTON_RIGHT:
+			return button::right;
+		case SDL_BUTTON_MIDDLE:
+			return button::middle;
+		case SDL_BUTTON_X1:
+			return button::x1;
+		case SDL_BUTTON_X2:
+			return button::x2;
+		default:
+			return button::none;
+	}
+}
+
 inline uint8_t to_impl(button b)
 {
 	switch(b)

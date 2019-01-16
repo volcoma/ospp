@@ -1,7 +1,9 @@
 #pragma once
 #include "../../event.h"
 
-#include "config.hpp"
+#include "mouse.hpp"
+#include "keyboard.hpp"
+
 #include <cstring>
 #include <deque>
 
@@ -49,33 +51,6 @@ inline window_event_id to_window_event_id(uint8_t id)
 	return window_event_id::none;
 }
 
-inline mouse::button to_mouse_button(uint8_t id)
-{
-	switch(id)
-	{
-		case SDL_BUTTON_LEFT:
-			return mouse::button::left;
-		case SDL_BUTTON_RIGHT:
-			return mouse::button::right;
-		case SDL_BUTTON_MIDDLE:
-			return mouse::button::middle;
-		case SDL_BUTTON_X1:
-			return mouse::button::x1;
-		case SDL_BUTTON_X2:
-			return mouse::button::x2;
-		default:
-			return mouse::button::none;
-	}
-}
-
-//	key_down = SDL_KEYDOWN,
-//	key_up = SDL_KEYUP,
-//	text_editing = SDL_TEXTEDITING,
-
-//	finger_down = SDL_FINGERDOWN,
-//	finger_up = SDL_FINGERUP,
-//	finger_motion = SDL_FINGERMOTION,
-
 inline event to_event(const SDL_Event& e)
 {
 	event ev;
@@ -109,12 +84,16 @@ inline event to_event(const SDL_Event& e)
 			ev.window.data1 = e.window.data1;
 			ev.window.data2 = e.window.data2;
 			break;
-			//		case events::key_down:
-			//			break;
-			//		case events::key_up:
-			//			break;
-			//		case events::text_editing:
-			//			break;
+		case SDL_KEYDOWN:
+			ev.type = events::key_down;
+            ev.key.window_id = e.key.windowID;
+            ev.key.code = detail::sdl::from_key_impl(e.key.keysym.sym);
+			break;
+		case SDL_KEYUP:
+			ev.type = events::key_up;
+            ev.key.window_id = e.key.windowID;
+            ev.key.code = detail::sdl::from_key_impl(e.key.keysym.sym);
+			break;
 		case SDL_TEXTINPUT:
 			ev.type = events::text_input;
 			ev.window.window_id = e.text.windowID;
@@ -123,16 +102,16 @@ inline event to_event(const SDL_Event& e)
 		case SDL_MOUSEBUTTONDOWN:
 			ev.type = events::mouse_button;
 			ev.button.window_id = e.button.windowID;
-			ev.button.button = to_mouse_button(e.button.button);
-			ev.button.state = mouse::button_state::pressed;
+			ev.button.button = mouse::detail::sdl::from_impl(e.button.button);
+			ev.button.state_id = state::pressed;
 			ev.button.x = e.button.x;
 			ev.button.y = e.button.y;
 			break;
 		case SDL_MOUSEBUTTONUP:
 			ev.type = events::mouse_button;
 			ev.button.window_id = e.button.windowID;
-			ev.button.button = to_mouse_button(e.button.button);
-			ev.button.state = mouse::button_state::released;
+			ev.button.button = mouse::detail::sdl::from_impl(e.button.button);
+			ev.button.state_id = state::released;
 			ev.button.x = e.button.x;
 			ev.button.y = e.button.y;
 			break;
@@ -144,15 +123,16 @@ inline event to_event(const SDL_Event& e)
 			break;
 		case SDL_MOUSEWHEEL:
 			ev.type = events::mouse_wheel;
-            //e.wheel.
+			ev.wheel.window_id = e.wheel.windowID;
+			ev.wheel.which = e.wheel.which;
+			ev.wheel.x = static_cast<double>(e.wheel.x);
+			ev.wheel.y = static_cast<double>(e.wheel.y);
 			break;
-
 		case SDL_FINGERDOWN:
 			ev.type = events::finger_down;
 			break;
 		case SDL_FINGERUP:
 			ev.type = events::finger_up;
-
 			break;
 		case SDL_FINGERMOTION:
 			ev.type = events::finger_motion;

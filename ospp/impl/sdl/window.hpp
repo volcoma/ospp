@@ -109,7 +109,7 @@ struct window_deleter
 	}
 };
 
-struct window_impl
+class window_impl
 {
 	constexpr static const auto npos = SDL_WINDOWPOS_UNDEFINED;
 	constexpr static const auto centered = SDL_WINDOWPOS_CENTERED;

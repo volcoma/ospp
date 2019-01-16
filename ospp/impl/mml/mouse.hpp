@@ -11,6 +11,25 @@ namespace detail
 namespace mml
 {
 
+inline button from_impl(::mml::mouse::button id)
+{
+	switch(id)
+	{
+		case ::mml::mouse::button::left:
+			return button::left;
+		case ::mml::mouse::button::right:
+			return button::right;
+		case ::mml::mouse::button::middle:
+			return button::middle;
+		case ::mml::mouse::button::x_button1:
+			return button::x1;
+		case ::mml::mouse::button::x_button2:
+			return button::x2;
+		default:
+			return button::none;
+	}
+}
+
 inline ::mml::mouse::button to_impl(button b)
 {
 	switch(b)

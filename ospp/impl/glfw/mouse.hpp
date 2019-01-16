@@ -11,6 +11,20 @@ namespace detail
 namespace glfw
 {
 
+inline button from_impl(int id)
+{
+	switch(id)
+	{
+		case GLFW_MOUSE_BUTTON_LEFT:
+			return button::left;
+		case GLFW_MOUSE_BUTTON_RIGHT:
+			return button::right;
+		case GLFW_MOUSE_BUTTON_MIDDLE:
+			return button::middle;
+		default:
+			return button::none;
+	}
+}
 // inline uint8_t to_impl(button b)
 //{
 //	switch(b)

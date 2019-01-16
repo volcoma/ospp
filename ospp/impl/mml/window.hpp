@@ -2,7 +2,7 @@
 
 #include "../../window.h"
 
-#include <mml/window/window.hpp>
+#include "config.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -163,7 +163,9 @@ public:
 			impl_.set_position({int32_t(desktop.w / 2 - sz.w / 2), int32_t(desktop.h / 2 - sz.h / 2)});
 		}
 		else
+		{
 			impl_.set_position({pos.x, pos.y});
+		}
 	}
 
 	auto get_position() noexcept -> point

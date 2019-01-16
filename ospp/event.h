@@ -1,4 +1,5 @@
 #pragma once
+#include "keyboard.h"
 #include "mouse.h"
 #include <chrono>
 #include <cstdint>
@@ -60,6 +61,13 @@ enum class events : uint32_t
 	drop_file
 };
 
+enum class state : uint8_t
+{
+	none,
+	pressed,
+	released
+};
+
 struct quit_event
 {
 };
@@ -87,10 +95,10 @@ struct text_input_event
 struct mouse_button_event
 {
 	uint32_t window_id{};
-	mouse::button button{};		 /**< The mouse button index */
-	mouse::button_state state{}; /**< ::pressed or ::released */
-	int32_t x{};				 /**< X coordinate, relative to window */
-	int32_t y{};				 /**< Y coordinate, relative to window */
+	mouse::button button{}; /**< The mouse button index */
+	state state_id{};		/**< ::pressed or ::released */
+	int32_t x{};			/**< X coordinate, relative to window */
+	int32_t y{};			/**< Y coordinate, relative to window */
 };
 
 struct mouse_motion_event
@@ -100,14 +108,30 @@ struct mouse_motion_event
 	int32_t y{}; /**< Y coordinate, relative to window */
 };
 
+struct mouse_wheel_event
+{
+	uint32_t window_id{};
+	uint32_t which{}; /**< The mouse instance id */
+	double x{};		  /**< The amount scrolled horizontally, positive to the right and negative to the left */
+	double y{};		  /**< The amount scrolled vertically, positive away from the user */
+};
+
+struct key_event
+{
+    uint32_t window_id{};
+	key::code code{}; ///< Code of the key that has been pressed
+	uint8_t repeat{}; /**< Non-zero if this is a key repeat */
+};
+
 struct event
 {
 	drop_event drop{};
 	text_input_event text{};
+	mouse_wheel_event wheel{};
 	mouse_button_event button{};
 	window_event window{};
 	mouse_motion_event motion{};
-
+	key_event key{};
 	events type{};
 
 	quit_event quit{};

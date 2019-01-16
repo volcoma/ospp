@@ -4,13 +4,13 @@ set(target_name ospp)
 
 add_library(${target_name} ${libsrc})
 
-#target_compile_definitions(${target_name} PRIVATE GLFW_BACKEND)
 target_compile_definitions(${target_name} PRIVATE SDL_BACKEND)
+#target_compile_definitions(${target_name} PRIVATE GLFW_BACKEND)
 #target_compile_definitions(${target_name} PRIVATE MML_BACKEND)
 
 target_link_libraries(${target_name} PRIVATE SDL2)
-target_link_libraries(${target_name} PRIVATE mml-window)
 target_link_libraries(${target_name} PRIVATE glfw)
+target_link_libraries(${target_name} PRIVATE mml-window)
 
 if(WIN32)
 	target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_WIN32)

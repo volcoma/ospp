@@ -1,12 +1,14 @@
 #pragma once
 #include "../../event.h"
 
+#include "window.hpp"
+#include "mouse.hpp"
+#include "keyboard.hpp"
+
 #include <codecvt>
 #include <cstring>
 #include <deque>
 #include <locale>
-
-#include "window.hpp"
 
 namespace os
 {
@@ -15,129 +17,20 @@ namespace detail
 namespace glfw
 {
 
-// inline window_event_id to_window_event_id(uint8_t id)
-//{
-//	switch(id)
-//	{
-//		case SDL_WINDOWEVENT_SHOWN:
-//			return window_event_id::shown;
-//		case SDL_WINDOWEVENT_HIDDEN:
-//			return window_event_id::hidden;
-//		case SDL_WINDOWEVENT_EXPOSED:
-//			return window_event_id::exposed;
-//		case SDL_WINDOWEVENT_MOVED:
-//			return window_event_id::moved;
-//		case SDL_WINDOWEVENT_RESIZED:
-//			return window_event_id::resized;
-//		case SDL_WINDOWEVENT_SIZE_CHANGED:
-//			return window_event_id::size_changed;
-//		case SDL_WINDOWEVENT_MAXIMIZED:
-//			return window_event_id::maximized;
-//		case SDL_WINDOWEVENT_MINIMIZED:
-//			return window_event_id::minimized;
-//		case SDL_WINDOWEVENT_RESTORED:
-//			return window_event_id::restored;
-//		case SDL_WINDOWEVENT_ENTER:
-//			return window_event_id::enter;
-//		case SDL_WINDOWEVENT_LEAVE:
-//			return window_event_id::leave;
-//		case SDL_WINDOWEVENT_FOCUS_GAINED:
-//			return window_event_id::focus_gained;
-//		case SDL_WINDOWEVENT_FOCUS_LOST:
-//			return window_event_id::focus_lost;
-//		case SDL_WINDOWEVENT_CLOSE:
-//			return window_event_id::close;
-//	}
-
-//	return window_event_id::none;
-//}
-
-inline mouse::button to_mouse_button(int id)
-{
-	switch(id)
-	{
-		case GLFW_MOUSE_BUTTON_LEFT:
-			return mouse::button::left;
-		case GLFW_MOUSE_BUTTON_RIGHT:
-			return mouse::button::right;
-		case GLFW_MOUSE_BUTTON_MIDDLE:
-			return mouse::button::middle;
-		default:
-			return mouse::button::none;
-	}
-}
-inline mouse::button_state to_mouse_button_state(int id)
+inline state to_state(int id)
 {
 	switch(id)
 	{
 		case GLFW_RELEASE:
-			return mouse::button_state::released;
+			return state::released;
 		case GLFW_PRESS:
-			return mouse::button_state::pressed;
+			return state::pressed;
 
 		default:
-			return mouse::button_state::none;
+			return state::none;
 	}
 }
-////	key_down = SDL_KEYDOWN,
-////	key_up = SDL_KEYUP,
-////	text_editing = SDL_TEXTEDITING,
 
-////	finger_down = SDL_FINGERDOWN,
-////	finger_up = SDL_FINGERUP,
-////	finger_motion = SDL_FINGERMOTION,
-
-// inline event to_event(const SDL_Event& e)
-//{
-//	event ev;
-//	switch(e.type)
-//	{
-//			break;
-//		case SDL_WINDOWEVENT:
-//			ev.type = events::window;
-//			ev.window.window_id = e.window.windowID;
-//			ev.window.type = to_window_event_id(e.window.event);
-//			ev.window.data1 = e.window.data1;
-//			ev.window.data2 = e.window.data2;
-//			break;
-//			//		case events::key_down:
-//			//			break;
-//			//		case events::key_up:
-//			//			break;
-//			//		case events::text_editing:
-//			//			break;
-//		case SDL_MOUSEWHEEL:
-//			ev.type = events::mouse_wheel;
-//			break;
-
-//		case SDL_FINGERDOWN:
-//			ev.type = events::finger_down;
-//			break;
-//		case SDL_FINGERUP:
-//			ev.type = events::finger_up;
-
-//			break;
-//		case SDL_FINGERMOTION:
-//			ev.type = events::finger_motion;
-//			break;
-//		case SDL_CLIPBOARDUPDATE:
-//			ev.type = events::clipboard_update;
-//			break;
-//		case SDL_DROPFILE:
-//			ev.type = events::drop_file;
-//			ev.drop.window_id = e.drop.windowID;
-//			if(e.drop.file != nullptr)
-//			{
-//				ev.drop.file = e.drop.file;
-//				SDL_free(e.drop.file);
-//			}
-//			break;
-//		default:
-//			ev.type = events::unkwnown;
-//	}
-
-//	return ev;
-//}
 inline void set_callbacks(GLFWwindow* window)
 {
 	glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
@@ -226,8 +119,8 @@ inline void set_callbacks(GLFWwindow* window)
 		event ev;
 		ev.type = events::mouse_button;
 		ev.button.window_id = impl->get_id();
-		ev.button.button = to_mouse_button(button);
-		ev.button.state = to_mouse_button_state(action);
+		ev.button.button = mouse::detail::glfw::from_impl(button);
+		ev.button.state_id = to_state(action);
 		ev.button.x = pos.x;
 		ev.button.y = pos.y;
 
@@ -239,15 +132,15 @@ inline void set_callbacks(GLFWwindow* window)
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
 		event ev;
-
 		ev.type = events::mouse_wheel;
-		// ev.wheel.window_id = impl->get_id();
-		// ev.window.type = mode == GLFW_TRUE ? window_event_id::maximized : window_event_id::restored;
+		ev.wheel.window_id = impl->get_id();
+		ev.wheel.x = xoffs;
+		ev.wheel.y = yoffs;
 
 		push_event(ev);
 	});
 
-	glfwSetCharModsCallback(window, [](GLFWwindow* window, unsigned int unicode_codepoint, int mod) {
+	glfwSetCharModsCallback(window, [](GLFWwindow* window, unsigned int unicode_codepoint, int) {
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
@@ -266,7 +159,8 @@ inline void set_callbacks(GLFWwindow* window)
 
 		event ev;
 		ev.type = action == GLFW_RELEASE ? events::key_up : events::key_down;
-
+        ev.key.window_id = impl->get_id();
+        ev.key.code = detail::glfw::from_key_impl(key);
 		push_event(ev);
 
 	});

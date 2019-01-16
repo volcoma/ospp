@@ -206,7 +206,7 @@ inline on_window_create& on_win_create()
 	return callback;
 }
 
-struct window_impl
+class window_impl
 {
 
 public:

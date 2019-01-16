@@ -1,9 +1,9 @@
 #pragma once
 #include "../../event.h"
 
+#include "keyboard.hpp"
+#include "mouse.hpp"
 #include "window.hpp"
-
-#include "config.hpp"
 
 #include <algorithm>
 #include <codecvt>
@@ -16,33 +16,6 @@ namespace detail
 {
 namespace mml
 {
-
-inline mouse::button to_mouse_button(::mml::mouse::button id)
-{
-	switch(id)
-	{
-		case ::mml::mouse::button::left:
-			return mouse::button::left;
-		case ::mml::mouse::button::right:
-			return mouse::button::right;
-		case ::mml::mouse::button::middle:
-			return mouse::button::middle;
-		case ::mml::mouse::button::x_button1:
-			return mouse::button::x1;
-		case ::mml::mouse::button::x_button2:
-			return mouse::button::x2;
-		default:
-			return mouse::button::none;
-	}
-}
-
-////	key_down = SDL_KEYDOWN,
-////	key_up = SDL_KEYUP,
-////	text_editing = SDL_TEXTEDITING,
-
-////	finger_down = SDL_FINGERDOWN,
-////	finger_up = SDL_FINGERUP,
-////	finger_motion = SDL_FINGERMOTION,
 
 inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 {
@@ -83,9 +56,13 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 			break;
 		case ::mml::platform_event::key_pressed:
 			ev.type = events::key_down;
+			ev.key.window_id = window_id;
+			ev.key.code = detail::mml::from_key_impl(e.key.code);
 			break;
 		case ::mml::platform_event::key_released:
 			ev.type = events::key_up;
+			ev.key.window_id = window_id;
+			ev.key.code = detail::mml::from_key_impl(e.key.code);
 			break;
 
 		case ::mml::platform_event::text_entered:
@@ -97,16 +74,16 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 		case ::mml::platform_event::mouse_button_pressed:
 			ev.type = events::mouse_button;
 			ev.button.window_id = window_id;
-			ev.button.button = to_mouse_button(e.mouse_button.button);
-			ev.button.state = mouse::button_state::pressed;
+			ev.button.button = mouse::detail::mml::from_impl(e.mouse_button.button);
+			ev.button.state_id = state::pressed;
 			ev.button.x = e.mouse_button.x;
 			ev.button.y = e.mouse_button.y;
 			break;
 		case ::mml::platform_event::mouse_button_released:
 			ev.type = events::mouse_button;
 			ev.button.window_id = window_id;
-			ev.button.button = to_mouse_button(e.mouse_button.button);
-			ev.button.state = mouse::button_state::released;
+			ev.button.button = mouse::detail::mml::from_impl(e.mouse_button.button);
+			ev.button.state_id = state::released;
 			ev.button.x = e.mouse_button.x;
 			ev.button.y = e.mouse_button.y;
 			break;
@@ -118,7 +95,16 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 			break;
 		case ::mml::platform_event::mouse_wheel_scrolled:
 			ev.type = events::mouse_wheel;
-			// e.mouse_wheel_scroll
+			ev.wheel.window_id = window_id;
+			switch(e.mouse_wheel_scroll.wheel)
+			{
+				case ::mml::mouse::horizontal_wheel:
+					ev.wheel.x = static_cast<double>(e.mouse_wheel_scroll.delta);
+					break;
+				case ::mml::mouse::vertical_wheel:
+					ev.wheel.y = static_cast<double>(e.mouse_wheel_scroll.delta);
+					break;
+			}
 			break;
 
 		case ::mml::platform_event::touch_began:
