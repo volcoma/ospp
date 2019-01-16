@@ -68,12 +68,16 @@ int main()
                 std::cout << "x : " << e.wheel.x << std::endl;
                 std::cout << "y : " << e.wheel.y << std::endl;
             }
+            if(e.type == os::events::key_down)
+			{
+				std::cout << os::key::to_string(e.key.code) << std::endl;
+			}
 			if(e.type == os::events::text_input)
 			{
-				full = !full;
-				windows[0].set_fullscreen(full);
-				int a = 0;
-				a++;
+//				full = !full;
+//				windows[0].set_fullscreen(full);
+//				int a = 0;
+//				a++;
 			}
 		}
 
