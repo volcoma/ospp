@@ -1,6 +1,6 @@
 #include "../../keyboard.h"
 
-#include "config.hpp"
+#include <mml/window/window.hpp>
 
 namespace os
 {
@@ -9,7 +9,7 @@ namespace detail
 namespace mml
 {
 
-inline os::key::code from_key_impl(::mml::keyboard::key code)
+inline os::key::code from_layout_independent_impl(::mml::keyboard::key code)
 {
 	switch(code)
 	{
@@ -105,7 +105,7 @@ inline os::key::code from_key_impl(::mml::keyboard::key code)
 	}
 }
 
-inline ::mml::keyboard::key to_key_impl(os::key::code code)
+inline ::mml::keyboard::key to_layout_independent_impl(os::key::code code)
 {
 	switch(code)
 	{
@@ -205,7 +205,7 @@ namespace key
 {
 inline os::key::code from_string(const std::string&) noexcept
 {
-	return from_key_impl(::mml::keyboard::Unknown);
+	return from_layout_independent_impl(::mml::keyboard::Unknown);
 }
 
 inline std::string to_string(os::key::code key_code) noexcept
@@ -215,7 +215,7 @@ inline std::string to_string(os::key::code key_code) noexcept
 
 inline bool is_pressed(os::key::code key_code) noexcept
 {
-	return ::mml::keyboard::is_key_pressed(to_key_impl(key_code));
+	return ::mml::keyboard::is_key_pressed(to_layout_independent_impl(key_code));
 }
 }
 

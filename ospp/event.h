@@ -118,9 +118,13 @@ struct mouse_wheel_event
 
 struct key_event
 {
-    uint32_t window_id{};
+	uint32_t window_id{};
 	key::code code{}; ///< Code of the key that has been pressed
 	uint8_t repeat{}; /**< Non-zero if this is a key repeat */
+	bool alt{};		  ///< Is the Alt key pressed?
+	bool ctrl{};	  ///< Is the Control key pressed?
+	bool shift{};	 ///< Is the Shift key pressed?
+	bool system{};	///< Is the System key pressed?
 };
 
 struct event

@@ -57,12 +57,20 @@ inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
 		case ::mml::platform_event::key_pressed:
 			ev.type = events::key_down;
 			ev.key.window_id = window_id;
-			ev.key.code = detail::mml::from_key_impl(e.key.code);
+			ev.key.code = detail::mml::from_layout_independent_impl(e.key.code);
+			ev.key.alt = e.key.alt;
+			ev.key.ctrl = e.key.control;
+			ev.key.shift = e.key.shift;
+			ev.key.system = e.key.system;
 			break;
 		case ::mml::platform_event::key_released:
 			ev.type = events::key_up;
 			ev.key.window_id = window_id;
-			ev.key.code = detail::mml::from_key_impl(e.key.code);
+			ev.key.code = detail::mml::from_layout_independent_impl(e.key.code);
+			ev.key.alt = e.key.alt;
+			ev.key.ctrl = e.key.control;
+			ev.key.shift = e.key.shift;
+			ev.key.system = e.key.system;
 			break;
 
 		case ::mml::platform_event::text_entered:

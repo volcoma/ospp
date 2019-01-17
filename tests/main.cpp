@@ -70,8 +70,27 @@ int main()
 			}
 			if(e.type == os::events::key_down)
 			{
-				std::cout << os::key::to_string(e.key.code) << std::endl;
+                std::cout << "key down" << std::endl;
+                std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
+                std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
+                std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
+                std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
+                std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
+
+                std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
+
 			}
+            if(e.type == os::events::key_up)
+			{
+                std::cout << "key up" << std::endl;
+                std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
+                std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
+                std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
+                std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
+                std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
+
+                std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
+            }
 			if(e.type == os::events::text_input)
 			{
 				//				full = !full;

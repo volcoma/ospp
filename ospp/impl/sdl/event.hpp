@@ -1,8 +1,8 @@
 #pragma once
 #include "../../event.h"
 
-#include "mouse.hpp"
 #include "keyboard.hpp"
+#include "mouse.hpp"
 
 #include <cstring>
 #include <deque>
@@ -86,13 +86,21 @@ inline event to_event(const SDL_Event& e)
 			break;
 		case SDL_KEYDOWN:
 			ev.type = events::key_down;
-            ev.key.window_id = e.key.windowID;
-            ev.key.code = detail::sdl::from_key_impl(e.key.keysym.sym);
+			ev.key.window_id = e.key.windowID;
+			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
+			ev.key.alt = e.key.keysym.mod & KMOD_ALT;
+			ev.key.ctrl = e.key.keysym.mod & KMOD_CTRL;
+			ev.key.shift = e.key.keysym.mod & KMOD_SHIFT;
+			ev.key.system = e.key.keysym.mod & KMOD_GUI;
 			break;
 		case SDL_KEYUP:
 			ev.type = events::key_up;
-            ev.key.window_id = e.key.windowID;
-            ev.key.code = detail::sdl::from_key_impl(e.key.keysym.sym);
+			ev.key.window_id = e.key.windowID;
+			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
+			ev.key.alt = e.key.keysym.mod & KMOD_ALT;
+			ev.key.ctrl = e.key.keysym.mod & KMOD_CTRL;
+			ev.key.shift = e.key.keysym.mod & KMOD_SHIFT;
+			ev.key.system = e.key.keysym.mod & KMOD_GUI;
 			break;
 		case SDL_TEXTINPUT:
 			ev.type = events::text_input;

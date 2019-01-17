@@ -1,9 +1,9 @@
 #pragma once
 #include "../../event.h"
 
-#include "window.hpp"
-#include "mouse.hpp"
 #include "keyboard.hpp"
+#include "mouse.hpp"
+#include "window.hpp"
 
 #include <codecvt>
 #include <cstring>
@@ -159,8 +159,12 @@ inline void set_callbacks(GLFWwindow* window)
 
 		event ev;
 		ev.type = action == GLFW_RELEASE ? events::key_up : events::key_down;
-        ev.key.window_id = impl->get_id();
-        ev.key.code = detail::glfw::from_key_impl(key);
+		ev.key.window_id = impl->get_id();
+		ev.key.code = detail::glfw::from_layout_independent_impl(key);
+		ev.key.alt = mods & GLFW_MOD_ALT;
+		ev.key.ctrl = mods & GLFW_MOD_CONTROL;
+		ev.key.shift = mods & GLFW_MOD_SHIFT;
+		ev.key.system = mods & GLFW_MOD_SUPER;
 		push_event(ev);
 
 	});
