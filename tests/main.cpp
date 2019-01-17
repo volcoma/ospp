@@ -63,6 +63,11 @@ int main()
 								  std::end(windows));
 				}
 			}
+            if(e.type == os::events::mouse_motion)
+            {
+                std::cout << "x : " << e.motion.x << std::endl;
+				std::cout << "y : " << e.motion.y << std::endl;
+            }
 			if(e.type == os::events::mouse_wheel)
 			{
 				std::cout << "x : " << e.wheel.x << std::endl;
@@ -98,8 +103,12 @@ int main()
 				//				int a = 0;
 				//				a++;
 			}
+
 		}
 
+        auto pos = os::mouse::get_position();
+        std::cout << "x : " << pos.x << std::endl;
+        std::cout << "y : " << pos.y << std::endl;
 		std::this_thread::sleep_for(16ms);
 	}
 	os::shutdown();

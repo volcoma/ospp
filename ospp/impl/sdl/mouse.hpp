@@ -52,14 +52,18 @@ inline uint8_t to_impl(button b)
 inline bool is_button_pressed(button b) noexcept
 {
 	auto impl_button = to_impl(b);
-	return (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(impl_button)) != 0;
+	return (SDL_GetGlobalMouseState(nullptr, nullptr) & SDL_BUTTON(impl_button)) != 0;
 }
 
 inline point get_position() noexcept
 {
 	point result;
-	SDL_GetMouseState(&result.x, &result.y);
+	SDL_GetGlobalMouseState(&result.x, &result.y);
 	return result;
+}
+inline void set_position(const point& pos) noexcept
+{
+	SDL_WarpMouseGlobal(pos.x, pos.y);
 }
 }
 }

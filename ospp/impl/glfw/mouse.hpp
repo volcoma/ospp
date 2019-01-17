@@ -60,6 +60,10 @@ inline point get_position() noexcept
 	//	SDL_GetMouseState(&result.x, &result.y);
 	//	return result;
 }
+
+inline void set_position(const point& pos) noexcept
+{
+}
 }
 }
 }

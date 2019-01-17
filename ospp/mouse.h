@@ -1,5 +1,6 @@
 #pragma once
 #include "types.hpp"
+#include "window.h"
 
 namespace os
 {
@@ -19,5 +20,10 @@ enum class button
 bool is_button_pressed(button b) noexcept;
 
 point get_position() noexcept;
+point get_position(const window& win) noexcept;
+
+void set_position(const point& pos) noexcept;
+void set_position(const point& pos, const window& win) noexcept;
+
 } // mouse
 }

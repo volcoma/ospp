@@ -27,5 +27,20 @@ point get_position() noexcept
 {
 	return impl::get_position();
 }
+
+point get_position(const window& win) noexcept
+{
+	return impl::get_position();
+}
+
+void set_position(const point& pos) noexcept
+{
+	impl::set_position(pos);
+}
+
+void set_position(const point& pos, const window& win) noexcept
+{
+	impl::set_position(pos);
+}
 }
 }

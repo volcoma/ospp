@@ -63,6 +63,11 @@ inline point get_position() noexcept
 	result.y = pos[1];
 	return result;
 }
+
+inline void set_position(const point& pos) noexcept
+{
+	::mml::mouse::set_position({pos.x, pos.y});
+}
 }
 }
 }
