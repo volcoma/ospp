@@ -1,6 +1,6 @@
 #pragma once
 #include "../../mouse.h"
-#include "config.hpp"
+#include "window.hpp"
 
 namespace os
 {
@@ -61,9 +61,25 @@ inline point get_position() noexcept
 	SDL_GetGlobalMouseState(&result.x, &result.y);
 	return result;
 }
+
+inline point get_position(const os::detail::sdl::window_impl& win) noexcept
+{
+    point relative_point;
+    auto global_point = get_position();
+    auto window_pos = win.get_position();
+    relative_point.x = global_point.x - window_pos.x;
+    relative_point.y = global_point.y - window_pos.y;
+    return relative_point;
+}
+
 inline void set_position(const point& pos) noexcept
 {
 	SDL_WarpMouseGlobal(pos.x, pos.y);
+}
+
+inline void set_position(const point& pos, const os::detail::sdl::window_impl& win) noexcept
+{
+	SDL_WarpMouseInWindow(win.get_impl(), pos.x, pos.y);
 }
 }
 }

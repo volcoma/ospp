@@ -114,7 +114,7 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
-		auto pos = impl->get_mouse_position();
+		auto pos = mouse::detail::glfw::get_position(*impl);
 
 		event ev;
 		ev.type = events::mouse_button;

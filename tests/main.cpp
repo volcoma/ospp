@@ -82,11 +82,11 @@ int main()
                 std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
                 std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-                std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
+                //std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
 
-                if(e.key.code == os::key::a)
+                if(e.key.code == os::key::k)
                 {
-
+                    std::cout << "screen keyboard : " << std::boolalpha << os::has_screen_keyboard() << std::endl;
                 }
 
 			}
@@ -99,14 +99,14 @@ int main()
                 std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
                 std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-                std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
+                //std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
             }
 			if(e.type == os::events::text_input)
 			{
-				//				full = !full;
-				//				windows[0].set_fullscreen(full);
-				//				int a = 0;
-				//				a++;
+								full = !full;
+								windows[0].set_fullscreen(full);
+								int a = 0;
+								a++;
 			}
 
 		}

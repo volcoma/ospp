@@ -1,6 +1,6 @@
 #pragma once
 #include "../../mouse.h"
-#include "config.hpp"
+#include "window.hpp"
 
 namespace os
 {
@@ -46,24 +46,28 @@ inline button from_impl(int id)
 
 inline bool is_button_pressed(button b) noexcept
 {
-
-	//	auto impl_button = to_impl(b);
-	//	return (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(impl_button)) != 0;
 	return false;
 }
 
 inline point get_position() noexcept
 {
 	return {};
-	//	point result;
-	//    glfwGetCursorPos()
-	//	SDL_GetMouseState(&result.x, &result.y);
-	//	return result;
+}
+
+inline point get_position(const os::detail::glfw::window_impl& win) noexcept
+{
+	return {};
 }
 
 inline void set_position(const point& pos) noexcept
 {
 }
+
+inline void set_position(const point& pos, const os::detail::glfw::window_impl& win) noexcept
+{
+    //glfwSetCursorPos(impl_.get(), static_cast<double>(pos.x), static_cast<double>(pos.y));
+}
+
 }
 }
 }

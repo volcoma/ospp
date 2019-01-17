@@ -423,22 +423,6 @@ public:
 		glfwFocusWindow(impl_.get());
 	}
 
-	void set_mouse_position(const point& pos) noexcept
-	{
-		glfwSetCursorPos(impl_.get(), static_cast<double>(pos.x), static_cast<double>(pos.y));
-	}
-
-	auto get_mouse_position() const
-	{
-		point result;
-		double x{};
-		double y{};
-		glfwGetCursorPos(impl_.get(), &x, &y);
-		result.x = static_cast<int32_t>(x);
-		result.y = static_cast<int32_t>(y);
-		return result;
-	}
-
 	void set_recieved_close_event(bool b) noexcept
 	{
 		recieved_close_event_ = b;

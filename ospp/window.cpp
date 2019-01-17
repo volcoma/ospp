@@ -196,15 +196,6 @@ bool window::is_input_grabbed() const noexcept
 {
 	return this_impl->is_input_grabbed();
 }
-void window::set_mouse_position(int32_t x, int32_t y) noexcept
-{
-	set_mouse_position({x, y});
-}
-
-void window::set_mouse_position(const point& pos) noexcept
-{
-	this_impl->set_mouse_position(pos);
-}
 
 void window::request_focus()
 {

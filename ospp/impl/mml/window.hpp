@@ -89,7 +89,12 @@ public:
 		unregister_window(id_);
 	}
 
-	auto get_impl() -> ::mml::window&
+	auto get_impl() const -> const ::mml::window&
+	{
+		return impl_;
+	}
+
+    auto get_impl() -> ::mml::window&
 	{
 		return impl_;
 	}
@@ -250,11 +255,6 @@ public:
 	void request_focus()
 	{
 		impl_.request_focus();
-	}
-
-	void set_mouse_position(const point& pos) noexcept
-	{
-		::mml::mouse::set_position({pos.x, pos.y}, impl_);
 	}
 
 	void set_recieved_close_event(bool b) noexcept

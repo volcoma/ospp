@@ -75,9 +75,6 @@ public:
 	void grab_input(bool b = true) noexcept;
 	auto is_input_grabbed() const noexcept -> bool;
 
-	void set_mouse_position(int32_t x, int32_t y) noexcept;
-	void set_mouse_position(const point& pos) noexcept;
-
 	void request_focus();
 	void request_close() noexcept;
 

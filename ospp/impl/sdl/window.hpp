@@ -126,6 +126,11 @@ public:
 		}
 	}
 
+    auto get_impl() const noexcept -> SDL_Window*
+    {
+        return impl_.get();
+    }
+
 	auto get_native_handle() const -> native_handle
 	{
 		SDL_SysWMinfo wmi;
@@ -225,7 +230,7 @@ public:
 		SDL_SetWindowPosition(impl_.get(), static_cast<int>(pos.x), static_cast<int>(pos.y));
 	}
 
-	auto get_position() noexcept -> point
+	auto get_position() const noexcept -> point
 	{
 		point result;
 		int x{};
@@ -330,6 +335,13 @@ public:
 	{
 		SDL_WarpMouseInWindow(impl_.get(), static_cast<int>(pos.x), static_cast<int>(pos.y));
 	}
+
+    point get_mouse_position() noexcept
+    {
+        point result{};
+        SDL_GetMouseState(&result.x, &result.y);
+        return result;
+    }
 
 private:
 	std::unique_ptr<SDL_Window, window_deleter> impl_;

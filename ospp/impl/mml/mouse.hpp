@@ -1,6 +1,6 @@
 #pragma once
 #include "../../mouse.h"
-#include "config.hpp"
+#include "window.hpp"
 
 namespace os
 {
@@ -63,10 +63,23 @@ inline point get_position() noexcept
 	result.y = pos[1];
 	return result;
 }
+inline point get_position(const os::detail::mml::window_impl& win) noexcept
+{
+    auto pos = ::mml::mouse::get_position(win.get_impl());
+    point result;
+	result.x = pos[0];
+	result.y = pos[1];
+	return result;
+}
 
 inline void set_position(const point& pos) noexcept
 {
-	::mml::mouse::set_position({pos.x, pos.y});
+	::mml::mouse::set_position({{pos.x, pos.y}});
+}
+
+inline void set_position(const point& pos, const os::detail::mml::window_impl& win) noexcept
+{
+	::mml::mouse::set_position({{pos.x, pos.y}}, win.get_impl());
 }
 }
 }
