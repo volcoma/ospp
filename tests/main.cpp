@@ -65,8 +65,8 @@ int main()
 			}
             if(e.type == os::events::mouse_motion)
             {
-                std::cout << "x : " << e.motion.x << std::endl;
-				std::cout << "y : " << e.motion.y << std::endl;
+                //std::cout << "x : " << e.motion.x << std::endl;
+				//std::cout << "y : " << e.motion.y << std::endl;
             }
 			if(e.type == os::events::mouse_wheel)
 			{
@@ -83,6 +83,11 @@ int main()
                 std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
                 std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
+
+                if(e.key.code == os::key::a)
+                {
+
+                }
 
 			}
             if(e.type == os::events::key_up)
@@ -106,9 +111,9 @@ int main()
 
 		}
 
-        auto pos = os::mouse::get_position();
-        std::cout << "x : " << pos.x << std::endl;
-        std::cout << "y : " << pos.y << std::endl;
+        //auto pos = os::mouse::get_position();
+        //std::cout << "x : " << pos.x << std::endl;
+        //std::cout << "y : " << pos.y << std::endl;
 		std::this_thread::sleep_for(16ms);
 	}
 	os::shutdown();
