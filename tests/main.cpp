@@ -1,10 +1,12 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <ospp/clipboard.h>
 #include <ospp/event.h>
 #include <ospp/init.h>
 #include <ospp/keyboard.h>
 #include <ospp/window.h>
+
 #include <thread>
 
 using namespace std::chrono_literals;
@@ -63,11 +65,14 @@ int main()
 								  std::end(windows));
 				}
 			}
-            if(e.type == os::events::mouse_motion)
-            {
-                //std::cout << "x : " << e.motion.x << std::endl;
-				//std::cout << "y : " << e.motion.y << std::endl;
-            }
+			if(e.type == os::events::mouse_motion)
+			{
+//				std::cout << "x1 : " << e.motion.x << std::endl;
+//				std::cout << "y1 : " << e.motion.y << std::endl;
+//				auto pos = os::mouse::get_position(windows[0]);
+//				std::cout << "x2 : " << pos.x << std::endl;
+//				std::cout << "y2 : " << pos.y << std::endl;
+			}
 			if(e.type == os::events::mouse_wheel)
 			{
 				std::cout << "x : " << e.wheel.x << std::endl;
@@ -75,45 +80,49 @@ int main()
 			}
 			if(e.type == os::events::key_down)
 			{
-                std::cout << "key down" << std::endl;
-                std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
-                std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
-                std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
-                std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
-                std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
+				std::cout << "key down" << std::endl;
+				std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
+				std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
+				std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
+				std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
+				std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-                //std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
+				// std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
+				// std::endl;
 
-                if(e.key.code == os::key::k)
-                {
-                    std::cout << "screen keyboard : " << std::boolalpha << os::has_screen_keyboard() << std::endl;
-                }
+				if(e.key.code == os::key::k)
+				{
+					std::cout << "screen keyboard : " << std::boolalpha << os::has_screen_keyboard()
+							  << std::endl;
+				}
+				if(e.key.code == os::key::g)
+				{
+                    auto text = os::clipboard::get_text();
+					std::cout << "clipboard text : " << text << std::endl;
+				}
 
 			}
-            if(e.type == os::events::key_up)
+			if(e.type == os::events::key_up)
 			{
-                std::cout << "key up" << std::endl;
-                std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
-                std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
-                std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
-                std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
-                std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
+				std::cout << "key up" << std::endl;
+				std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
+				std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
+				std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
+				std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
+				std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-                //std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) << std::endl;
-            }
+				// std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
+				// std::endl;
+			}
 			if(e.type == os::events::text_input)
 			{
-								full = !full;
-								windows[0].set_fullscreen(full);
-								int a = 0;
-								a++;
-			}
 
+			}
 		}
 
-        //auto pos = os::mouse::get_position();
-        //std::cout << "x : " << pos.x << std::endl;
-        //std::cout << "y : " << pos.y << std::endl;
+		// auto pos = os::mouse::get_position();
+		// std::cout << "x : " << pos.x << std::endl;
+		// std::cout << "y : " << pos.y << std::endl;
 		std::this_thread::sleep_for(16ms);
 	}
 	os::shutdown();

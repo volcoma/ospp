@@ -236,16 +236,16 @@ public:
 		unregister_window(id_);
 	}
 
-	auto get_impl() -> GLFWwindow*
+	auto get_impl() const noexcept -> GLFWwindow*
 	{
 		return impl_.get();
 	}
 
-	auto get_native_handle() const -> native_handle
+	auto get_native_handle() const noexcept -> native_handle
 	{
 		return get_native_window_handle(impl_.get());
 	}
-	auto get_native_display() const -> native_display
+	auto get_native_display() const noexcept -> native_display
 	{
 		return get_native_display_handle();
 	}

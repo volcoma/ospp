@@ -157,6 +157,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
+		(void)scancode;
 		event ev;
 		ev.type = action == GLFW_RELEASE ? events::key_up : events::key_down;
 		ev.key.window_id = impl->get_id();
@@ -180,7 +181,6 @@ inline void set_callbacks(GLFWwindow* window)
 		for(int i = 0; i < count; ++i)
 		{
 			ev.drop.file = paths[i];
-
 			push_event(ev);
 		}
 	});

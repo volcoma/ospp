@@ -8,11 +8,9 @@ namespace os
 {
 
 // using finger = SDL_Finger;
-// using keyboard_event = SDL_KeyboardEvent;
-// using mouse_wheel_event = SDL_MouseWheelEvent;
 // using touch_finger_event = SDL_TouchFingerEvent;
 
-enum class window_event_id : uint32_t
+enum class window_event_id : uint8_t
 {
 	none = 0,
 	shown,
@@ -31,7 +29,7 @@ enum class window_event_id : uint32_t
 	close
 };
 
-enum class events : uint32_t
+enum class events : uint8_t
 {
 	unkwnown = 0,
 	quit,
@@ -95,10 +93,10 @@ struct text_input_event
 struct mouse_button_event
 {
 	uint32_t window_id{};
-	mouse::button button{}; /**< The mouse button index */
-	state state_id{};		/**< ::pressed or ::released */
 	int32_t x{};			/**< X coordinate, relative to window */
 	int32_t y{};			/**< Y coordinate, relative to window */
+	mouse::button button{}; /**< The mouse button index */
+	state state_id{};		/**< ::pressed or ::released */
 };
 
 struct mouse_motion_event
@@ -119,12 +117,12 @@ struct mouse_wheel_event
 struct key_event
 {
 	uint32_t window_id{};
-	key::code code{}; ///< Code of the key that has been pressed
+	key::code code{}; /**< Code of the key that has been pressed */
 	uint8_t repeat{}; /**< Non-zero if this is a key repeat */
-	bool alt{};		  ///< Is the Alt key pressed?
-	bool ctrl{};	  ///< Is the Control key pressed?
-	bool shift{};	 ///< Is the Shift key pressed?
-	bool system{};	///< Is the System key pressed?
+	bool alt{};		  /**< Is the Alt key pressed? */
+	bool ctrl{};	  /**< Is the Control key pressed? */
+	bool shift{};	 /**< Is the Shift key pressed? */
+	bool system{};	/**< Is the System key pressed? */
 };
 
 struct event
@@ -134,10 +132,9 @@ struct event
 	mouse_wheel_event wheel{};
 	mouse_button_event button{};
 	window_event window{};
-	mouse_motion_event motion{};
 	key_event key{};
+	mouse_motion_event motion{};
 	events type{};
-
 	quit_event quit{};
 };
 

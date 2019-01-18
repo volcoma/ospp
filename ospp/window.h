@@ -78,6 +78,8 @@ public:
 	void request_focus();
 	void request_close() noexcept;
 
+	auto get_impl() const noexcept -> void*;
+
 private:
 	std::shared_ptr<void> impl_;
 };

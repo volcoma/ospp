@@ -15,6 +15,12 @@
 
 namespace os
 {
+using window_impl = impl::window_impl;
+
+const window_impl& to_impl(const window& win)
+{
+	return *reinterpret_cast<window_impl*>(win.get_impl());
+}
 namespace mouse
 {
 
@@ -30,7 +36,7 @@ point get_position() noexcept
 
 point get_position(const window& win) noexcept
 {
-	return impl::get_position();
+	return impl::get_position(to_impl(win));
 }
 
 void set_position(const point& pos) noexcept
@@ -40,7 +46,7 @@ void set_position(const point& pos) noexcept
 
 void set_position(const point& pos, const window& win) noexcept
 {
-	impl::set_position(pos);
+	impl::set_position(pos, to_impl(win));
 }
 }
 }

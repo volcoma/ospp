@@ -2,13 +2,13 @@
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/keyboard.hpp"
-#define impl detail::sdl
+#define impl os::detail::sdl
 #elif defined(MML_BACKEND)
 #include "impl/mml/keyboard.hpp"
-#define impl detail::mml
+#define impl os::detail::mml
 #elif defined(GLFW_BACKEND)
 #include "impl/glfw/keyboard.hpp"
-#define impl detail::glfw
+#define impl os::detail::glfw
 #else
 #error "unsupported backend"
 #endif

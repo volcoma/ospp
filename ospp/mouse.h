@@ -6,7 +6,7 @@ namespace os
 {
 namespace mouse
 {
-enum class button
+enum class button : uint8_t
 {
 	none,
 	left,

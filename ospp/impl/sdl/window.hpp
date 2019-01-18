@@ -126,10 +126,10 @@ public:
 		}
 	}
 
-    auto get_impl() const noexcept -> SDL_Window*
-    {
-        return impl_.get();
-    }
+	auto get_impl() const noexcept -> SDL_Window*
+	{
+		return impl_.get();
+	}
 
 	auto get_native_handle() const -> native_handle
 	{
@@ -336,12 +336,12 @@ public:
 		SDL_WarpMouseInWindow(impl_.get(), static_cast<int>(pos.x), static_cast<int>(pos.y));
 	}
 
-    point get_mouse_position() noexcept
-    {
-        point result{};
-        SDL_GetMouseState(&result.x, &result.y);
-        return result;
-    }
+	point get_mouse_position() noexcept
+	{
+		point result{};
+		SDL_GetMouseState(&result.x, &result.y);
+		return result;
+	}
 
 private:
 	std::unique_ptr<SDL_Window, window_deleter> impl_;

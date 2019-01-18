@@ -14,12 +14,12 @@ using impl_type = os::detail::glfw::window_impl;
 #error "unsupported backend"
 #endif
 
-#define this_impl get_impl(impl_.get())
+#define this_impl to_impl(impl_.get())
 
 namespace os
 {
 
-impl_type* get_impl(void* window)
+impl_type* to_impl(void* window)
 {
 	return reinterpret_cast<impl_type*>(window);
 }
@@ -209,5 +209,10 @@ void window::request_close() noexcept
 	e.window.type = window_event_id::close;
 	e.window.window_id = get_id();
 	push_event(e);
+}
+
+auto window::get_impl() const noexcept -> void*
+{
+	return this_impl;
 }
 }

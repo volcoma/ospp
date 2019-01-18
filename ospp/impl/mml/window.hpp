@@ -94,14 +94,14 @@ public:
 		return impl_;
 	}
 
-    auto get_impl() -> ::mml::window&
+	auto get_impl() -> ::mml::window&
 	{
 		return impl_;
 	}
 
 	auto get_native_handle() const -> native_handle
 	{
-		return (void*)(uintptr_t)impl_.native_handle();
+		return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(impl_.native_handle()));
 	}
 	auto get_native_display() const -> native_display
 	{

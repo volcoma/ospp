@@ -64,12 +64,13 @@ inline point get_position() noexcept
 
 inline point get_position(const os::detail::sdl::window_impl& win) noexcept
 {
-    point relative_point;
-    auto global_point = get_position();
-    auto window_pos = win.get_position();
-    relative_point.x = global_point.x - window_pos.x;
-    relative_point.y = global_point.y - window_pos.y;
-    return relative_point;
+	SDL_PumpEvents();
+	point relative_point;
+	auto global_point = get_position();
+	auto window_pos = win.get_position();
+	relative_point.x = global_point.x - window_pos.x;
+	relative_point.y = global_point.y - window_pos.y;
+	return relative_point;
 }
 
 inline void set_position(const point& pos) noexcept
