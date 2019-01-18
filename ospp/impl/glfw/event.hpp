@@ -46,6 +46,32 @@ inline void set_callbacks(GLFWwindow* window)
 		push_event(ev);
 	});
 
+	glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
+		auto user_data = glfwGetWindowUserPointer(window);
+		auto impl = reinterpret_cast<window_impl*>(user_data);
+
+		auto& focused_win = get_focused_win();
+		if(focused == GL_TRUE)
+		{
+			focused_win = impl;
+		}
+		else
+		{
+			// only if this was the focused one
+			if(focused_win == impl)
+			{
+				focused_win = nullptr;
+			}
+		}
+
+		event ev;
+		ev.type = events::window;
+		ev.window.window_id = impl->get_id();
+		ev.window.type = focused == GL_TRUE ? window_event_id::focus_gained : window_event_id::focus_lost;
+
+		push_event(ev);
+	});
+
 	glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int w, int h) {
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);

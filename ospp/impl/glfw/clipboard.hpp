@@ -24,7 +24,6 @@ inline std::string get_text() noexcept
 }
 inline void set_text(const std::string& text)
 {
-    glfwCreateCursor(nullptr, 2, 2)
 	glfwSetClipboardString(nullptr, text.c_str());
 }
 }

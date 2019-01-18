@@ -1,7 +1,9 @@
 #pragma once
 #include "../../keyboard.h"
 
-#include "config.hpp"
+#include "window.hpp"
+
+#include <map>
 
 namespace os
 {
@@ -501,25 +503,54 @@ inline int32_t to_layout_independent_impl(key::code code)
 namespace key
 {
 
-inline os::key::code from_string(const std::string&) noexcept
+inline os::key::code from_string(const std::string& str) noexcept
 {
-	return from_layout_independent_impl(GLFW_KEY_UNKNOWN);
+	const static std::map<std::string, os::key::code> key_map = []() {
+		std::map<std::string, os::key::code> result;
+
+		using type = std::underlying_type_t<os::key::code>;
+		for(type i = 0; i < os::key::code::count; ++i)
+		{
+			auto key_code = static_cast<os::key::code>(i);
+			result.emplace(to_string(key_code), key_code);
+		}
+
+		return result;
+	}();
+
+	auto it = key_map.find(str);
+	if(it != std::end(key_map))
+	{
+		return it->second;
+	}
+
+	return os::key::code::unknown;
 }
 
 inline std::string to_string(os::key::code key_code) noexcept
 {
-	auto name = glfwGetKeyName(to_layout_independent_impl(key_code), 0);
+	auto key_impl = to_layout_independent_impl(key_code);
+	auto scan_impl = glfwGetKeyScancode(key_impl);
+	auto name = glfwGetKeyName(key_impl, scan_impl);
 	if(name != nullptr)
 	{
 		return name;
 	}
+
 	return {};
 }
 
 inline bool is_pressed(os::key::code key_code) noexcept
 {
-	// TODO get focused window from somewhere
-	return glfwGetKey(nullptr, to_layout_independent_impl(key_code)) == GLFW_PRESS;
+	auto impl_key = to_layout_independent_impl(key_code);
+
+	auto& focused_win = os::detail::glfw::get_focused_win();
+	if(focused_win)
+	{
+		auto state = glfwGetKey(focused_win->get_impl(), impl_key);
+		return state != GLFW_RELEASE;
+	}
+	return false;
 }
 }
 

@@ -166,6 +166,13 @@ inline auto create_impl(const std::string& title, uint32_t width, uint32_t heigh
 
 	return window;
 }
+class window_impl;
+
+inline window_impl*& get_focused_win() noexcept
+{
+	static window_impl* win{nullptr};
+	return win;
+}
 
 struct window_deleter
 {
@@ -174,8 +181,6 @@ struct window_deleter
 		glfwDestroyWindow(window);
 	}
 };
-
-class window_impl;
 
 inline auto get_windows() noexcept -> std::vector<window_impl*>&
 {
@@ -234,6 +239,12 @@ public:
 	~window_impl()
 	{
 		unregister_window(id_);
+
+		auto& focused = get_focused_win();
+		if(focused == this)
+		{
+			focused = nullptr;
+		}
 	}
 
 	auto get_impl() const noexcept -> GLFWwindow*

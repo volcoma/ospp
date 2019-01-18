@@ -15,7 +15,6 @@ namespace sdl
 {
 inline std::string get_text() noexcept
 {
-    SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW)
 	auto text = SDL_GetClipboardText();
 	if(text)
 	{

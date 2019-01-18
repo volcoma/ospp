@@ -79,6 +79,7 @@ public:
 	window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
 		: impl_(::mml::video_mode(size.w, size.h), title, get_impl_flags(flags))
 		, title_(title)
+		, style_(get_impl_flags(flags))
 	{
 		id_ = register_window(this);
 		set_position(pos);
@@ -222,12 +223,40 @@ public:
 	{
 	}
 
-	void set_border(bool) noexcept
+	void set_border(bool b) noexcept
 	{
+		// these will invalidate the native_handle
+
+		//		auto sz = get_size();
+		//		windowed_mode_.width = sz.w;
+		//		windowed_mode_.height = sz.h;
+
+		//		if(b)
+		//		{
+		//			impl_.create(::mml::video_mode::get_desktop_mode(), title_, style_ &
+		//~::mml::style::titlebar);
+		//		}
+		//		else
+		//		{
+		//			impl_.create(::mml::video_mode::get_desktop_mode(), title_, style_);
+		//		}
 	}
 
-	void set_fullscreen(bool)
+	void set_fullscreen(bool b)
 	{
+		// these will invalidate the native_handle
+
+		//		if(b)
+		//		{
+		//			auto sz = get_size();
+		//			windowed_mode_.width = sz.w;
+		//			windowed_mode_.height = sz.h;
+		//			impl_.create(::mml::video_mode::get_desktop_mode(), title_, ::mml::style::none);
+		//		}
+		//		else
+		//		{
+		//			impl_.create(windowed_mode_, title_, style_);
+		//		}
 	}
 
 	void set_opacity(float opacity)
@@ -268,7 +297,9 @@ public:
 
 private:
 	::mml::window impl_;
+	::mml::video_mode windowed_mode_;
 	std::string title_{};
+	uint32_t style_{0};
 	uint32_t id_{0};
 	float opacity_{1.0f};
 	bool grabbed_{false};

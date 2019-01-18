@@ -44,6 +44,16 @@ int main()
 
 	bool full = false;
 	bool running = true;
+
+    for(const auto& str : {"a", "b", "c", "d", "e"})
+    {
+        auto key_code = os::key::from_string(str);
+        auto key_str = os::key::to_string(key_code);
+
+        std::cout << "key from_string : " << key_str << std::endl;
+
+    }
+
 	while(running)
 	{
 
@@ -87,8 +97,8 @@ int main()
 				std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
 				std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-				// std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
-				// std::endl;
+				std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
+				std::endl;
 
 				if(e.key.code == os::key::k)
 				{
@@ -101,6 +111,12 @@ int main()
 					std::cout << "clipboard text : " << text << std::endl;
 				}
 
+                if(e.key.code == os::key::f)
+                {
+                    full = !full;
+                    windows[0].set_fullscreen(full);
+                }
+
 			}
 			if(e.type == os::events::key_up)
 			{
@@ -111,13 +127,10 @@ int main()
 				std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
 				std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-				// std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
-				// std::endl;
+				std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
+				std::endl;
 			}
-			if(e.type == os::events::text_input)
-			{
 
-			}
 		}
 
 		// auto pos = os::mouse::get_position();
