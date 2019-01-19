@@ -52,6 +52,15 @@ public:
 	{
 	}
 
+	cursor_impl(const image& img, const point& hotspot)
+	{
+		GLFWimage image{};
+		image.pixels = (unsigned char*)img.pixels.data();
+		image.width = static_cast<int>(img.size.w);
+		image.height = static_cast<int>(img.size.h);
+		impl_.reset(glfwCreateCursor(&image, hotspot.x, hotspot.y));
+	}
+
 	auto get_impl() const noexcept -> GLFWcursor*
 	{
 		return impl_.get();

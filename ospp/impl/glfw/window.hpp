@@ -450,6 +450,15 @@ public:
 		glfwSetInputMode(impl_.get(), GLFW_CURSOR, show ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
 
+	void set_icon(const image& img) noexcept
+	{
+		GLFWimage image{};
+		image.pixels = (unsigned char*)img.pixels.data();
+		image.width = static_cast<int>(img.size.w);
+		image.height = static_cast<int>(img.size.h);
+		glfwSetWindowIcon(impl_.get(), 1, &image);
+	}
+
 private:
 	uint32_t id_{};
 	area min_size_{};

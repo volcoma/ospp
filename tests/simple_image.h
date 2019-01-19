@@ -58,7 +58,16 @@ static const char *arrow[] =
 };
 // clang-format on
 
-static os::image parse_image(const uint8_t* data, const uint8_t* mask, int w, int h)
+struct simple_image
+{
+	std::vector<uint8_t> pixels;
+	uint32_t w{};
+	uint32_t h{};
+	int32_t hot_x{};
+	int32_t hot_y{};
+};
+
+static simple_image parse_image(const uint8_t* data, const uint8_t* mask, int w, int h, int hot_x, int hot_y)
 {
 	int x, y;
 	uint32_t* pixel;
@@ -70,10 +79,12 @@ static os::image parse_image(const uint8_t* data, const uint8_t* mask, int w, in
 	/* Make sure the width is a multiple of 8 */
 	w = ((w + 7) & ~7);
 
-	os::image image;
+	simple_image image;
 	image.pixels.resize(32 * 32 * 4, 0);
-	image.size.w = w;
-	image.size.h = h;
+	image.w = w;
+	image.h = h;
+	image.hot_x = hot_x;
+	image.hot_y = hot_y;
 
 	uint32_t pitch = 32 * 4;
 	for(y = 0; y < h; ++y)
@@ -102,11 +113,12 @@ static os::image parse_image(const uint8_t* data, const uint8_t* mask, int w, in
 	return image;
 }
 
-static os::image load_cursor_image(const char* image[])
+static simple_image load_cursor_image(const char* image[])
 {
 	int i, row, col;
 	uint8_t data[4 * 32];
 	uint8_t mask[4 * 32];
+	int hot_x, hot_y;
 	i = -1;
 	for(row = 0; row < 32; ++row)
 	{
@@ -137,7 +149,8 @@ static os::image load_cursor_image(const char* image[])
 		}
 	}
 
-	return parse_image(data, mask, 32, 32);
+	sscanf(image[4 + row], "%d,%d", &hot_x, &hot_y);
+	return parse_image(data, mask, 32, 32, hot_x, hot_y);
 }
 
 void print(const os::display_mode& mode)
@@ -187,7 +200,7 @@ int main()
 		os::cursor cursor_arrow(os::cursor::arrow);
 		os::cursor cursor_ibeam(os::cursor::ibeam);
 		auto image = load_cursor_image(arrow);
-		os::cursor cursor_image(image);
+		os::cursor cursor_image(image.pixels.data(), {image.w, image.h}, {image.hot_x, image.hot_y});
 
 		while(running)
 		{
@@ -213,14 +226,11 @@ int main()
 				}
 				if(e.type == os::events::mouse_motion)
 				{
-					if(os::key::is_pressed(os::key::lshift))
-					{
-						std::cout << "x1 : " << e.motion.x << std::endl;
-						std::cout << "y1 : " << e.motion.y << std::endl;
-						auto pos = os::mouse::get_position(windows[0]);
-						std::cout << "x2 : " << pos.x << std::endl;
-						std::cout << "y2 : " << pos.y << std::endl;
-					}
+					//					std::cout << "x1 : " << e.motion.x << std::endl;
+					//					std::cout << "y1 : " << e.motion.y << std::endl;
+					//					auto pos = os::mouse::get_position(windows[0]);
+					//					std::cout << "x2 : " << pos.x << std::endl;
+					//					std::cout << "y2 : " << pos.y << std::endl;
 				}
 				if(e.type == os::events::mouse_wheel)
 				{
@@ -250,34 +260,29 @@ int main()
 						std::cout << "clipboard text : " << text << std::endl;
 					}
 
-					if(e.key.code == os::key::digit1)
+					if(e.key.code == os::key::f)
 					{
 						full = !full;
 						windows[0].set_fullscreen(full);
 					}
-					if(e.key.code == os::key::digit2)
+					if(e.key.code == os::key::t)
 					{
 						windows[0].set_cursor(cursor_arrow);
 					}
-					if(e.key.code == os::key::digit3)
+					if(e.key.code == os::key::y)
 					{
 						windows[0].set_cursor(cursor_image);
 					}
-					if(e.key.code == os::key::digit4)
+					if(e.key.code == os::key::v)
 					{
 						show = !show;
 						windows[0].show_cursor(show);
 					}
 
-					if(e.key.code == os::key::digit5)
+					if(e.key.code == os::key::b)
 					{
 						grab = !grab;
 						windows[0].grab_input(grab);
-					}
-
-					if(e.key.code == os::key::digit6)
-					{
-						windows[0].set_icon(image);
 					}
 				}
 				if(e.type == os::events::key_up)
@@ -294,6 +299,9 @@ int main()
 				}
 			}
 
+			// auto pos = os::mouse::get_position();
+			// std::cout << "x : " << pos.x << std::endl;
+			// std::cout << "y : " << pos.y << std::endl;
 			std::this_thread::sleep_for(16ms);
 		}
 	}

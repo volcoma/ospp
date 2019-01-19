@@ -312,6 +312,11 @@ public:
 		impl_.set_mouse_cursor_visible(show);
 	}
 
+	void set_icon(const image& img)
+	{
+		impl_.set_icon(img.size.w, img.size.h, img.pixels.data());
+	}
+
 private:
 	::mml::window impl_;
 	std::string title_{};

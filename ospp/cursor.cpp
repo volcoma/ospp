@@ -28,6 +28,11 @@ cursor::cursor(cursor::type system_type)
 {
 }
 
+cursor::cursor(const image& img, const point& hotspot)
+	: impl_(std::make_shared<impl_type>(img, hotspot))
+{
+}
+
 auto cursor::get_impl() const noexcept -> void*
 {
 	return impl_.get();

@@ -347,6 +347,20 @@ public:
 		SDL_ShowCursor(show ? SDL_TRUE : SDL_FALSE);
 	}
 
+	void set_icon(const image& img)
+	{
+		auto surface =
+			SDL_CreateRGBSurfaceFrom((void*)img.pixels.data(), int(img.size.w), int(img.size.h), 32,
+									 int(img.size.w * 4), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+		if(!surface)
+		{
+			OS_SDL_ERROR_HANDLER_VOID();
+		}
+
+		SDL_SetWindowIcon(impl_.get(), surface);
+		SDL_FreeSurface(surface);
+	}
+
 private:
 	std::unique_ptr<SDL_Window, window_deleter> impl_;
 };

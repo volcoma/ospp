@@ -54,6 +54,12 @@ public:
 		impl_.load_from_system(to_impl(system_type));
 	}
 
+	cursor_impl(const image& img, const point& hotspot)
+	{
+		impl_.load_from_pixels(img.pixels.data(), {{img.size.w, img.size.h}},
+							   {{uint32_t(hotspot.x), uint32_t(hotspot.y)}});
+	}
+
 	auto get_impl() const noexcept -> const ::mml::cursor&
 	{
 		return impl_;

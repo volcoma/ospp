@@ -221,6 +221,11 @@ void window::show_cursor(bool show) noexcept
 	this_impl->show_cursor(show);
 }
 
+void window::set_icon(const image& img)
+{
+	this_impl->set_icon(img);
+}
+
 auto window::get_impl() const noexcept -> void*
 {
 	return this_impl;

@@ -1,5 +1,5 @@
-#ifndef MML_WINDOW_HPP
-#define MML_WINDOW_HPP
+#ifndef MML_WINDOW_INCLUDES_HPP
+#define MML_WINDOW_INCLUDES_HPP
 
 ////////////////////////////////////////////////////////////
 // Headers
@@ -14,10 +14,9 @@
 #include <mml/window/sensor.hpp>
 #include <mml/window/touch.hpp>
 #include <mml/window/video_mode.hpp>
+#include <mml/window/clipboard.hpp>
 #include <mml/window/window.hpp>
 #include <mml/window/window_handle.hpp>
 #include <mml/window/window_style.hpp>
-
-
 
 #endif // MML_WINDOW_HPP
