@@ -13,7 +13,7 @@ namespace detail
 {
 namespace mml
 {
-inline std::string get_text() noexcept
+inline auto get_text() noexcept -> std::string
 {
 	return ::mml::clipboard::get_string();
 }

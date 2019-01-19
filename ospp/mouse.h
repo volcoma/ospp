@@ -17,13 +17,13 @@ enum class button : uint8_t
 	button_count ///< Keep last -- the total number of mouse buttons
 };
 
-bool is_button_pressed(button b) noexcept;
+auto is_button_pressed(button b) noexcept -> bool;
 
-point get_position() noexcept;
-point get_position(const window& win) noexcept;
+auto get_position() noexcept -> point;
+auto get_position(const window& relative_to) noexcept -> point;
 
 void set_position(const point& pos) noexcept;
-void set_position(const point& pos, const window& win) noexcept;
+void set_position(const point& pos, const window& relative_to) noexcept;
 
 } // mouse
 }

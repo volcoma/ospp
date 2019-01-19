@@ -10,7 +10,7 @@ namespace detail
 namespace sdl
 {
 
-inline std::string last_error()
+inline auto last_error() -> std::string
 {
 	const char* result = SDL_GetError();
 	SDL_ClearError();
@@ -35,8 +35,7 @@ public:
 #define OS_SDL_ERROR_HANDLER_NO_RET()                                                                        \
 	do                                                                                                       \
 	{                                                                                                        \
-		::SDL_Log("%s", SDL_GetError());                                                                     \
-		SDL_ClearError();                                                                                    \
+		::SDL_Log("%s", last_error().c_str());                                                               \
 	} while(0)
 #define OS_SDL_ERROR_HANDLER_VOID()                                                                          \
 	do                                                                                                       \

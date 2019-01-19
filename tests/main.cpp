@@ -2,6 +2,7 @@
 #include <chrono>
 #include <iostream>
 #include <ospp/clipboard.h>
+#include <ospp/cursor.h>
 #include <ospp/event.h>
 #include <ospp/init.h>
 #include <ospp/keyboard.h>
@@ -23,121 +24,145 @@ int main()
 {
 	os::init();
 
-	auto desktop_mode = os::display_mode::get_desktop_mode();
-	std::cout << "-------------------------" << std::endl;
-	std::cout << "desktop mode:" << std::endl;
-	print(desktop_mode);
-	std::cout << "-------------------------" << std::endl;
-
-	auto modes = os::display_mode::get_available_modes();
-	std::cout << "available modes:" << std::endl;
-	for(const auto& mode : modes)
 	{
+		auto desktop_mode = os::display_mode::get_desktop_mode();
 		std::cout << "-------------------------" << std::endl;
-		print(mode);
-	}
-	std::cout << "-------------------------" << std::endl;
-	std::vector<os::window> windows = {{"win 1", os::window::centered, os::window::centered, 500, 500}};
+		std::cout << "desktop mode:" << std::endl;
+		print(desktop_mode);
+		std::cout << "-------------------------" << std::endl;
 
-	os::start_text_input();
-	auto sz = windows[0].get_size();
-
-	bool full = false;
-	bool running = true;
-
-    for(const auto& str : {"a", "b", "c", "d", "e"})
-    {
-        auto key_code = os::key::from_string(str);
-        auto key_str = os::key::to_string(key_code);
-
-        std::cout << "key from_string : " << key_str << std::endl;
-
-    }
-
-	while(running)
-	{
-
-		os::event e{};
-		while(os::poll_event(e))
+		auto modes = os::display_mode::get_available_modes();
+		std::cout << "available modes:" << std::endl;
+		for(const auto& mode : modes)
 		{
-			if(e.type == os::events::quit)
+			std::cout << "-------------------------" << std::endl;
+			print(mode);
+		}
+		std::cout << "-------------------------" << std::endl;
+		std::vector<os::window> windows = {{"win 1", os::window::centered, os::window::centered, 500, 500}};
+
+		os::start_text_input();
+
+		bool full = false;
+		bool show = true;
+		bool grab = false;
+
+		bool running = true;
+
+		for(const auto& str : {"a", "b", "c", "d", "e"})
+		{
+			auto key_code = os::key::from_string(str);
+			auto key_str = os::key::to_string(key_code);
+
+			std::cout << "key from_string : " << key_str << std::endl;
+		}
+		os::cursor cursor_arrow(os::cursor::arrow);
+		os::cursor cursor_ibeam(os::cursor::ibeam);
+
+		while(running)
+		{
+
+			os::event e{};
+			while(os::poll_event(e))
 			{
-				running = false;
-				break;
-			}
-			if(e.type == os::events::window)
-			{
-				if(e.window.type == os::window_event_id::close)
+				if(e.type == os::events::quit)
 				{
-					auto id = e.window.window_id;
-					windows.erase(std::remove_if(std::begin(windows), std::end(windows),
-												 [id](const auto& window) { return window.get_id() == id; }),
-								  std::end(windows));
+					running = false;
+					break;
 				}
-			}
-			if(e.type == os::events::mouse_motion)
-			{
-//				std::cout << "x1 : " << e.motion.x << std::endl;
-//				std::cout << "y1 : " << e.motion.y << std::endl;
-//				auto pos = os::mouse::get_position(windows[0]);
-//				std::cout << "x2 : " << pos.x << std::endl;
-//				std::cout << "y2 : " << pos.y << std::endl;
-			}
-			if(e.type == os::events::mouse_wheel)
-			{
-				std::cout << "x : " << e.wheel.x << std::endl;
-				std::cout << "y : " << e.wheel.y << std::endl;
-			}
-			if(e.type == os::events::key_down)
-			{
-				std::cout << "key down" << std::endl;
-				std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
-				std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
-				std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
-				std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
-				std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
-
-				std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
-				std::endl;
-
-				if(e.key.code == os::key::k)
+				if(e.type == os::events::window)
 				{
-					std::cout << "screen keyboard : " << std::boolalpha << os::has_screen_keyboard()
+					if(e.window.type == os::window_event_id::close)
+					{
+						auto id = e.window.window_id;
+						windows.erase(
+							std::remove_if(std::begin(windows), std::end(windows),
+										   [id](const auto& window) { return window.get_id() == id; }),
+							std::end(windows));
+					}
+				}
+				if(e.type == os::events::mouse_motion)
+				{
+//					std::cout << "x1 : " << e.motion.x << std::endl;
+//					std::cout << "y1 : " << e.motion.y << std::endl;
+//					auto pos = os::mouse::get_position(windows[0]);
+//					std::cout << "x2 : " << pos.x << std::endl;
+//					std::cout << "y2 : " << pos.y << std::endl;
+				}
+				if(e.type == os::events::mouse_wheel)
+				{
+					std::cout << "x : " << e.wheel.x << std::endl;
+					std::cout << "y : " << e.wheel.y << std::endl;
+				}
+				if(e.type == os::events::key_down)
+				{
+					std::cout << "key down" << std::endl;
+					std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
+					std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
+					std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
+					std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
+					std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
+
+					std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code)
+							  << std::endl;
+
+					if(e.key.code == os::key::k)
+					{
+						std::cout << "screen keyboard : " << std::boolalpha << os::has_screen_keyboard()
+								  << std::endl;
+					}
+					if(e.key.code == os::key::g)
+					{
+						auto text = os::clipboard::get_text();
+						std::cout << "clipboard text : " << text << std::endl;
+					}
+
+					if(e.key.code == os::key::f)
+					{
+						full = !full;
+						windows[0].set_fullscreen(full);
+					}
+					if(e.key.code == os::key::t)
+					{
+						windows[0].set_cursor(cursor_arrow);
+					}
+					if(e.key.code == os::key::y)
+					{
+						windows[0].set_cursor(cursor_ibeam);
+					}
+					if(e.key.code == os::key::v)
+					{
+						show = !show;
+						windows[0].show_cursor(show);
+					}
+
+					if(e.key.code == os::key::b)
+					{
+						grab = !grab;
+						windows[0].grab_input(grab);
+					}
+				}
+				if(e.type == os::events::key_up)
+				{
+					std::cout << "key up" << std::endl;
+					std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
+					std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
+					std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
+					std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
+					std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
+
+					std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code)
 							  << std::endl;
 				}
-				if(e.key.code == os::key::g)
-				{
-                    auto text = os::clipboard::get_text();
-					std::cout << "clipboard text : " << text << std::endl;
-				}
-
-                if(e.key.code == os::key::f)
-                {
-                    full = !full;
-                    windows[0].set_fullscreen(full);
-                }
-
-			}
-			if(e.type == os::events::key_up)
-			{
-				std::cout << "key up" << std::endl;
-				std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
-				std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
-				std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
-				std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
-				std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
-
-				std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code) <<
-				std::endl;
 			}
 
+			// auto pos = os::mouse::get_position();
+			// std::cout << "x : " << pos.x << std::endl;
+			// std::cout << "y : " << pos.y << std::endl;
+			std::this_thread::sleep_for(16ms);
 		}
-
-		// auto pos = os::mouse::get_position();
-		// std::cout << "x : " << pos.x << std::endl;
-		// std::cout << "y : " << pos.y << std::endl;
-		std::this_thread::sleep_for(16ms);
 	}
+
 	os::shutdown();
 	return 0;
 }

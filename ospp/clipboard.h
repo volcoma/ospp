@@ -6,8 +6,7 @@ namespace os
 namespace clipboard
 {
 
-std::string get_text() noexcept;
+auto get_text() noexcept -> std::string;
 void set_text(const std::string& text);
-
 }
 }

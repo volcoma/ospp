@@ -17,7 +17,7 @@ namespace detail
 namespace mml
 {
 
-inline event to_event(const ::mml::platform_event& e, uint32_t window_id)
+inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> event
 {
 	event ev;
 	switch(e.type)

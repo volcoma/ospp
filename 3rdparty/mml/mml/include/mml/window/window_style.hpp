@@ -1,6 +1,7 @@
 #ifndef MML_WINDOWSTYLE_HPP
 #define MML_WINDOWSTYLE_HPP
 
+#include <cstdint>
 
 namespace mml
 {
@@ -11,7 +12,7 @@ namespace style
     /// \brief Enumeration of the window styles
     ///
     ////////////////////////////////////////////////////////////
-    enum
+    enum : uint32_t
     {
         none       = 0,      ///< No border / title bar (this flag and all others are mutually exclusive)
         titlebar   = 1 << 0, ///< Title bar + fixed border

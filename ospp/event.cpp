@@ -20,13 +20,13 @@ namespace os
 namespace
 {
 
-std::deque<event>& get_event_queue()
+auto get_event_queue() -> std::deque<event>&
 {
 	static std::deque<event> event_queue;
 	return event_queue;
 }
 
-bool pop_event(event& e)
+auto pop_event(event& e) -> bool
 {
 	auto& event_queue = get_event_queue();
 	// Pop the first event of the queue, if it is not empty
@@ -40,7 +40,7 @@ bool pop_event(event& e)
 }
 }
 
-bool poll_event(event& e) noexcept
+auto poll_event(event& e) noexcept -> bool
 {
 	impl::pump_events();
 

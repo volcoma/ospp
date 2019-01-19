@@ -13,7 +13,7 @@ namespace detail
 {
 namespace glfw
 {
-inline std::string get_text() noexcept
+inline auto get_text() noexcept -> std::string
 {
 	auto text = glfwGetClipboardString(nullptr);
 	if(text)

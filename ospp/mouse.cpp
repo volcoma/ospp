@@ -15,28 +15,23 @@
 
 namespace os
 {
-using window_impl = impl::window_impl;
 
-const window_impl& to_impl(const window& win)
-{
-	return *reinterpret_cast<window_impl*>(win.get_impl());
-}
 namespace mouse
 {
 
-bool is_button_pressed(button b) noexcept
+auto is_button_pressed(button b) noexcept -> bool
 {
 	return impl::is_button_pressed(b);
 }
 
-point get_position() noexcept
+auto get_position() noexcept -> point
 {
 	return impl::get_position();
 }
 
-point get_position(const window& win) noexcept
+auto get_position(const window& relative_to) noexcept -> point
 {
-	return impl::get_position(to_impl(win));
+	return impl::get_position(relative_to);
 }
 
 void set_position(const point& pos) noexcept
@@ -44,9 +39,9 @@ void set_position(const point& pos) noexcept
 	impl::set_position(pos);
 }
 
-void set_position(const point& pos, const window& win) noexcept
+void set_position(const point& pos, const window& relative_to) noexcept
 {
-	impl::set_position(pos, to_impl(win));
+	impl::set_position(pos, relative_to);
 }
 }
 }

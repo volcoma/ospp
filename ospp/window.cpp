@@ -19,7 +19,7 @@ using impl_type = os::detail::glfw::window_impl;
 namespace os
 {
 
-impl_type* to_impl(void* window)
+inline auto to_impl(void* window) -> impl_type*
 {
 	return reinterpret_cast<impl_type*>(window);
 }
@@ -209,6 +209,16 @@ void window::request_close() noexcept
 	e.window.type = window_event_id::close;
 	e.window.window_id = get_id();
 	push_event(e);
+}
+
+void window::set_cursor(const cursor& c) noexcept
+{
+	this_impl->set_cursor(c);
+}
+
+void window::show_cursor(bool show) noexcept
+{
+	this_impl->show_cursor(show);
 }
 
 auto window::get_impl() const noexcept -> void*

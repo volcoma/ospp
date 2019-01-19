@@ -10,7 +10,7 @@ namespace detail
 namespace mml
 {
 
-inline key::code from_layout_independent_impl(::mml::keyboard::key code)
+inline auto from_layout_independent_impl(::mml::keyboard::key code) -> key::code
 {
 	switch(code)
 	{
@@ -222,7 +222,7 @@ inline key::code from_layout_independent_impl(::mml::keyboard::key code)
 	}
 }
 
-inline ::mml::keyboard::key to_layout_independent_impl(key::code code)
+inline auto to_layout_independent_impl(key::code code) -> ::mml::keyboard::key
 {
 	switch(code)
 	{
@@ -434,23 +434,23 @@ inline ::mml::keyboard::key to_layout_independent_impl(key::code code)
 
 namespace key
 {
-inline os::key::code from_string(const std::string&) noexcept
+inline auto from_string(const std::string&) noexcept -> os::key::code
 {
 	return from_layout_independent_impl(::mml::keyboard::Unknown);
 }
 
-inline std::string to_string(os::key::code) noexcept
+inline auto to_string(os::key::code) noexcept -> std::string
 {
 	return {};
 }
 
-inline bool is_pressed(os::key::code key_code) noexcept
+inline auto is_pressed(os::key::code key_code) noexcept -> bool
 {
 	return ::mml::keyboard::is_key_pressed(to_layout_independent_impl(key_code));
 }
 }
 
-inline bool has_screen_keyboard() noexcept
+inline auto has_screen_keyboard() noexcept -> bool
 {
 	return false;
 }

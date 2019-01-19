@@ -23,7 +23,7 @@ else()
 	target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_X11)
 endif()
 
-
+target_compile_definitions(${target_name} PRIVATE OS_NO_EXCEPTIONS)
 
 target_include_directories(${target_name}
     PUBLIC

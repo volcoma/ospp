@@ -2,6 +2,7 @@
 
 #include "../../window.h"
 
+#include "cursor.hpp"
 #include "error.hpp"
 
 #include <algorithm>
@@ -15,6 +16,11 @@ namespace detail
 {
 namespace glfw
 {
+
+inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
+{
+	return *reinterpret_cast<cursor_impl*>(c.get_impl());
+}
 
 inline auto get_native_window_handle(GLFWwindow* window) noexcept -> native_handle
 {
@@ -168,7 +174,7 @@ inline auto create_impl(const std::string& title, uint32_t width, uint32_t heigh
 }
 class window_impl;
 
-inline window_impl*& get_focused_win() noexcept
+inline auto get_focused_win() noexcept -> window_impl*&
 {
 	static window_impl* win{nullptr};
 	return win;
@@ -188,7 +194,7 @@ inline auto get_windows() noexcept -> std::vector<window_impl*>&
 	return windows;
 }
 
-inline uint32_t register_window(window_impl* impl)
+inline auto register_window(window_impl* impl) -> uint32_t
 {
 	static uint32_t id{0};
 	auto& windows = get_windows();
@@ -205,7 +211,7 @@ inline void unregister_window(uint32_t id)
 }
 
 using on_window_create = void (*)(GLFWwindow*);
-inline on_window_create& on_win_create()
+inline auto on_win_create() -> on_window_create&
 {
 	static on_window_create callback = nullptr;
 	return callback;
@@ -434,13 +440,14 @@ public:
 		glfwFocusWindow(impl_.get());
 	}
 
-	void set_recieved_close_event(bool b) noexcept
+	void set_cursor(const cursor& c) noexcept
 	{
-		recieved_close_event_ = b;
+		glfwSetCursor(impl_.get(), to_cursor_impl(c).get_impl());
 	}
-	auto recieved_close_event() const noexcept -> bool
+
+	void show_cursor(bool show) noexcept
 	{
-		return recieved_close_event_;
+		glfwSetInputMode(impl_.get(), GLFW_CURSOR, show ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
 
 private:
@@ -452,7 +459,6 @@ private:
 
 	std::string title_{};
 	std::unique_ptr<GLFWwindow, window_deleter> impl_;
-	bool recieved_close_event_{false};
 };
 }
 }

@@ -2,6 +2,7 @@
 
 #include "../../window.h"
 
+#include "cursor.hpp"
 #include "error.hpp"
 
 #include <cstdint>
@@ -14,6 +15,11 @@ namespace detail
 {
 namespace sdl
 {
+inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
+{
+	return *reinterpret_cast<cursor_impl*>(c.get_impl());
+}
+
 inline auto get_native_window_handle(const SDL_SysWMinfo& wmi) noexcept -> native_handle
 {
 	(void)wmi;
@@ -331,16 +337,14 @@ public:
 		}
 	}
 
-	void set_mouse_position(const point& pos) noexcept
+	void set_cursor(const cursor& c) noexcept
 	{
-		SDL_WarpMouseInWindow(impl_.get(), static_cast<int>(pos.x), static_cast<int>(pos.y));
+		SDL_SetCursor(to_cursor_impl(c).get_impl());
 	}
 
-	point get_mouse_position() noexcept
+	void show_cursor(bool show) noexcept
 	{
-		point result{};
-		SDL_GetMouseState(&result.x, &result.y);
-		return result;
+		SDL_ShowCursor(show ? SDL_TRUE : SDL_FALSE);
 	}
 
 private:

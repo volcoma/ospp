@@ -18,14 +18,14 @@ namespace os
 namespace clipboard
 {
 
-std::string get_text() noexcept
+auto get_text() noexcept -> std::string
 {
-    return impl::get_text();
+	return impl::get_text();
 }
 
 void set_text(const std::string& text)
 {
-    impl::set_text(text);
+	impl::set_text(text);
 }
 }
 }

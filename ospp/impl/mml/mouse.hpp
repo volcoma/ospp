@@ -10,8 +10,12 @@ namespace detail
 {
 namespace mml
 {
-
-inline button from_impl(::mml::mouse::button id)
+using window_impl = os::detail::mml::window_impl;
+inline auto to_win_impl(const window& win) -> const window_impl&
+{
+	return *reinterpret_cast<window_impl*>(win.get_impl());
+}
+inline auto from_impl(::mml::mouse::button id) -> button
 {
 	switch(id)
 	{
@@ -30,7 +34,7 @@ inline button from_impl(::mml::mouse::button id)
 	}
 }
 
-inline ::mml::mouse::button to_impl(button b)
+inline auto to_impl(button b) -> ::mml::mouse::button
 {
 	switch(b)
 	{
@@ -49,13 +53,13 @@ inline ::mml::mouse::button to_impl(button b)
 	}
 }
 
-inline bool is_button_pressed(button b) noexcept
+inline auto is_button_pressed(button b) noexcept -> bool
 {
 	auto impl_button = to_impl(b);
 	return ::mml::mouse::is_button_pressed(impl_button);
 }
 
-inline point get_position() noexcept
+inline auto get_position() noexcept -> point
 {
 	auto pos = ::mml::mouse::get_position();
 	point result;
@@ -63,9 +67,9 @@ inline point get_position() noexcept
 	result.y = pos[1];
 	return result;
 }
-inline point get_position(const os::detail::mml::window_impl& win) noexcept
+inline auto get_position(const window& relative_to) noexcept -> point
 {
-	auto pos = ::mml::mouse::get_position(win.get_impl());
+	auto pos = ::mml::mouse::get_position(to_win_impl(relative_to).get_impl());
 	point result;
 	result.x = pos[0];
 	result.y = pos[1];
@@ -77,9 +81,9 @@ inline void set_position(const point& pos) noexcept
 	::mml::mouse::set_position({{pos.x, pos.y}});
 }
 
-inline void set_position(const point& pos, const os::detail::mml::window_impl& win) noexcept
+inline void set_position(const point& pos, const window& relative_to) noexcept
 {
-	::mml::mouse::set_position({{pos.x, pos.y}}, win.get_impl());
+	::mml::mouse::set_position({{pos.x, pos.y}}, to_win_impl(relative_to).get_impl());
 }
 }
 }

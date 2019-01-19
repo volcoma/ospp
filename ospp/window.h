@@ -1,4 +1,5 @@
 #pragma once
+#include "cursor.h"
 #include "display_mode.h"
 #include "types.hpp"
 #include <cstdint>
@@ -11,7 +12,7 @@ namespace os
 using native_handle = void*;
 using native_display = void*;
 
-struct window
+class window
 {
 public:
 	enum : uint32_t
@@ -77,6 +78,9 @@ public:
 
 	void request_focus();
 	void request_close() noexcept;
+
+	void set_cursor(const cursor& c) noexcept;
+	void show_cursor(bool show) noexcept;
 
 	auto get_impl() const noexcept -> void*;
 

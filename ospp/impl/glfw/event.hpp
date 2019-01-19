@@ -17,7 +17,7 @@ namespace detail
 namespace glfw
 {
 
-inline state to_state(int id)
+inline auto to_state(int id) -> state
 {
 	switch(id)
 	{
@@ -36,7 +36,6 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
-		impl->set_recieved_close_event(true);
 
 		event ev;
 		ev.type = events::window;
@@ -140,7 +139,13 @@ inline void set_callbacks(GLFWwindow* window)
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
-		auto pos = mouse::detail::glfw::get_position(*impl);
+
+		point pos{};
+		double x{};
+		double y{};
+		glfwGetCursorPos(impl->get_impl(), &x, &y);
+		pos.x = static_cast<int32_t>(x);
+		pos.y = static_cast<int32_t>(y);
 
 		event ev;
 		ev.type = events::mouse_button;
@@ -218,7 +223,7 @@ inline void pump_events() noexcept
 
 	auto& windows = get_windows();
 	auto all_closed = std::all_of(std::begin(windows), std::end(windows),
-								  [](const auto& e) { return e->recieved_close_event(); });
+								  [](const auto& e) { return glfwWindowShouldClose(e->get_impl()); });
 	if(all_closed)
 	{
 		event ev;

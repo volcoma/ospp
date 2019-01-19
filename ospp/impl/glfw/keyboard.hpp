@@ -12,7 +12,7 @@ namespace detail
 namespace glfw
 {
 
-inline key::code from_layout_independent_impl(int32_t code)
+inline auto from_layout_independent_impl(int32_t code) -> key::code
 {
 	switch(code)
 	{
@@ -256,7 +256,7 @@ inline key::code from_layout_independent_impl(int32_t code)
 	}
 }
 
-inline int32_t to_layout_independent_impl(key::code code)
+inline auto to_layout_independent_impl(key::code code) -> int32_t
 {
 	switch(code)
 	{
@@ -503,7 +503,7 @@ inline int32_t to_layout_independent_impl(key::code code)
 namespace key
 {
 
-inline os::key::code from_string(const std::string& str) noexcept
+inline auto from_string(const std::string& str) noexcept -> os::key::code
 {
 	const static std::map<std::string, os::key::code> key_map = []() {
 		std::map<std::string, os::key::code> result;
@@ -527,7 +527,7 @@ inline os::key::code from_string(const std::string& str) noexcept
 	return os::key::code::unknown;
 }
 
-inline std::string to_string(os::key::code key_code) noexcept
+inline auto to_string(os::key::code key_code) noexcept -> std::string
 {
 	auto key_impl = to_layout_independent_impl(key_code);
 	auto scan_impl = glfwGetKeyScancode(key_impl);
@@ -540,7 +540,7 @@ inline std::string to_string(os::key::code key_code) noexcept
 	return {};
 }
 
-inline bool is_pressed(os::key::code key_code) noexcept
+inline auto is_pressed(os::key::code key_code) noexcept -> bool
 {
 	auto impl_key = to_layout_independent_impl(key_code);
 
@@ -554,7 +554,7 @@ inline bool is_pressed(os::key::code key_code) noexcept
 }
 }
 
-inline bool has_screen_keyboard() noexcept
+inline auto has_screen_keyboard() noexcept -> bool
 {
 	return false;
 }
@@ -567,7 +567,7 @@ inline void stop_text_input() noexcept
 {
 }
 
-inline bool is_text_input_active() noexcept
+inline auto is_text_input_active() noexcept -> bool
 {
 	return false;
 }

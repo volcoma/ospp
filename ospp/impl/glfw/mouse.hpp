@@ -10,8 +10,12 @@ namespace detail
 {
 namespace glfw
 {
-
-inline button from_impl(int id)
+using window_impl = os::detail::glfw::window_impl;
+inline auto to_win_impl(const window& win) -> const window_impl&
+{
+	return *reinterpret_cast<window_impl*>(win.get_impl());
+}
+inline auto from_impl(int id) -> button
 {
 	switch(id)
 	{
@@ -29,7 +33,7 @@ inline button from_impl(int id)
 			return button::none;
 	}
 }
-inline int to_impl(button b)
+inline auto to_impl(button b) -> int
 {
 	switch(b)
 	{
@@ -48,7 +52,7 @@ inline int to_impl(button b)
 	}
 }
 
-inline bool is_button_pressed(button b) noexcept
+inline auto is_button_pressed(button b) noexcept -> bool
 {
 	auto impl_button = to_impl(b);
 
@@ -60,37 +64,43 @@ inline bool is_button_pressed(button b) noexcept
 	return false;
 }
 
-inline point get_position(const os::detail::glfw::window_impl& win) noexcept
+inline auto get_position(const window& win) noexcept -> point
 {
 	point result{};
 	double x{};
 	double y{};
-	glfwGetCursorPos(win.get_impl(), &x, &y);
+	glfwGetCursorPos(to_win_impl(win).get_impl(), &x, &y);
 	result.x = static_cast<int32_t>(x);
 	result.y = static_cast<int32_t>(y);
 	return result;
 }
 
-inline point get_position() noexcept
+inline auto get_position() noexcept -> point
 {
 	auto& focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
-		return get_position(*focused_win);
+		point result{};
+		double x{};
+		double y{};
+		glfwGetCursorPos(focused_win->get_impl(), &x, &y);
+		result.x = static_cast<int32_t>(x);
+		result.y = static_cast<int32_t>(y);
+		return result;
 	}
 	return {};
 }
 
-inline void set_position(const point& pos, const os::detail::glfw::window_impl& win) noexcept
+inline void set_position(const point& pos, const window& win) noexcept
 {
-	glfwSetCursorPos(win.get_impl(), static_cast<double>(pos.x), static_cast<double>(pos.y));
+	glfwSetCursorPos(to_win_impl(win).get_impl(), static_cast<double>(pos.x), static_cast<double>(pos.y));
 }
 inline void set_position(const point& pos) noexcept
 {
 	auto& focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
-		set_position(pos, *focused_win);
+		glfwSetCursorPos(focused_win->get_impl(), static_cast<double>(pos.x), static_cast<double>(pos.y));
 	}
 }
 }

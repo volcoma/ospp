@@ -10,7 +10,7 @@ namespace detail
 namespace glfw
 {
 
-inline std::string last_error()
+inline auto last_error() -> std::string
 {
 	const char* result = nullptr;
 	glfwGetError(&result);

@@ -3,6 +3,7 @@
 #include "../../window.h"
 
 #include "config.hpp"
+#include "cursor.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -16,6 +17,10 @@ namespace detail
 {
 namespace mml
 {
+inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
+{
+	return *reinterpret_cast<cursor_impl*>(c.get_impl());
+}
 
 inline auto get_impl_flags(uint32_t flags) -> uint32_t
 {
@@ -27,12 +32,14 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	if(flags & window::fullscreen_desktop)
 	{
 		result |= ::mml::style::fullscreen;
+		result &= ~::mml::style::titlebar;
 	}
 	if(flags & window::hidden)
 	{
 	}
 	if(flags & window::borderless)
 	{
+		result = ::mml::style::none;
 	}
 	if(flags & window::resizable)
 	{
@@ -56,7 +63,7 @@ inline auto get_windows() noexcept -> std::vector<window_impl*>&
 	return windows;
 }
 
-inline uint32_t register_window(window_impl* impl)
+inline auto register_window(window_impl* impl) -> uint32_t
 {
 	static uint32_t id{0};
 	auto& windows = get_windows();
@@ -295,10 +302,20 @@ public:
 		return recieved_close_event_;
 	}
 
+	void set_cursor(const cursor& c) noexcept
+	{
+		impl_.set_mouse_cursor(to_cursor_impl(c).get_impl());
+	}
+
+	void show_cursor(bool show) noexcept
+	{
+		impl_.set_mouse_cursor_visible(show);
+	}
+
 private:
 	::mml::window impl_;
-	::mml::video_mode windowed_mode_;
 	std::string title_{};
+	::mml::video_mode windowed_mode_;
 	uint32_t style_{0};
 	uint32_t id_{0};
 	float opacity_{1.0f};

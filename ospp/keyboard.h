@@ -254,18 +254,18 @@ enum code : int32_t
 	count
 };
 
-os::key::code from_string(const std::string& str) noexcept;
+auto from_string(const std::string& str) noexcept -> os::key::code;
 
-std::string to_string(os::key::code key_code) noexcept;
+auto to_string(os::key::code key_code) noexcept -> std::string;
 
-bool is_pressed(os::key::code key_code) noexcept;
+auto is_pressed(os::key::code key_code) noexcept -> bool;
 } // key
 
-bool has_screen_keyboard() noexcept;
+auto has_screen_keyboard() noexcept -> bool;
 
 void start_text_input() noexcept;
 
 void stop_text_input() noexcept;
 
-bool is_text_input_active() noexcept;
+auto is_text_input_active() noexcept -> bool;
 }

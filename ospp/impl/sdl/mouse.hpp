@@ -10,8 +10,13 @@ namespace detail
 {
 namespace sdl
 {
+using window_impl = os::detail::sdl::window_impl;
+inline auto to_win_impl(const window& win) -> const window_impl&
+{
+	return *reinterpret_cast<window_impl*>(win.get_impl());
+}
 
-inline button from_impl(uint8_t id)
+inline auto from_impl(uint8_t id) -> button
 {
 	switch(id)
 	{
@@ -30,7 +35,7 @@ inline button from_impl(uint8_t id)
 	}
 }
 
-inline uint8_t to_impl(button b)
+inline auto to_impl(button b) -> uint8_t
 {
 	switch(b)
 	{
@@ -49,28 +54,27 @@ inline uint8_t to_impl(button b)
 	}
 }
 
-inline bool is_button_pressed(button b) noexcept
+inline auto is_button_pressed(button b) noexcept -> bool
 {
 	auto impl_button = to_impl(b);
 	return (SDL_GetGlobalMouseState(nullptr, nullptr) & SDL_BUTTON(impl_button)) != 0;
 }
 
-inline point get_position() noexcept
+inline auto get_position() noexcept -> point
 {
 	point result;
 	SDL_GetGlobalMouseState(&result.x, &result.y);
 	return result;
 }
 
-inline point get_position(const os::detail::sdl::window_impl& win) noexcept
+inline point get_position(const window& relative_to) noexcept
 {
-	SDL_PumpEvents();
-	point relative_point;
-	auto global_point = get_position();
-	auto window_pos = win.get_position();
-	relative_point.x = global_point.x - window_pos.x;
-	relative_point.y = global_point.y - window_pos.y;
-	return relative_point;
+	point relative_pos;
+	auto global_pos = get_position();
+	auto window_pos = to_win_impl(relative_to).get_position();
+	relative_pos.x = global_pos.x - window_pos.x;
+	relative_pos.y = global_pos.y - window_pos.y;
+	return relative_pos;
 }
 
 inline void set_position(const point& pos) noexcept
@@ -78,9 +82,9 @@ inline void set_position(const point& pos) noexcept
 	SDL_WarpMouseGlobal(pos.x, pos.y);
 }
 
-inline void set_position(const point& pos, const os::detail::sdl::window_impl& win) noexcept
+inline void set_position(const point& pos, const window& relative_to) noexcept
 {
-	SDL_WarpMouseInWindow(win.get_impl(), pos.x, pos.y);
+	SDL_WarpMouseInWindow(to_win_impl(relative_to).get_impl(), pos.x, pos.y);
 }
 }
 }

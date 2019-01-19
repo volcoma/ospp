@@ -10,7 +10,7 @@ namespace detail
 namespace sdl
 {
 
-inline key::code from_layout_independent_impl(SDL_Scancode code)
+inline auto from_layout_independent_impl(SDL_Scancode code) -> key::code
 {
 	switch(code)
 	{
@@ -106,7 +106,6 @@ inline key::code from_layout_independent_impl(SDL_Scancode code)
 			return key::rightbracket;
 		case SDL_SCANCODE_BACKSLASH:
 			return key::backslash;
-
 		case SDL_SCANCODE_NONUSHASH:
 			return key::nonushash;
 		case SDL_SCANCODE_SEMICOLON:
@@ -506,7 +505,7 @@ inline key::code from_layout_independent_impl(SDL_Scancode code)
 	}
 }
 
-inline SDL_Scancode to_layout_independent_impl(key::code code)
+inline auto to_layout_independent_impl(key::code code) -> SDL_Scancode
 {
 	switch(code)
 	{
@@ -602,7 +601,6 @@ inline SDL_Scancode to_layout_independent_impl(key::code code)
 			return SDL_SCANCODE_RIGHTBRACKET;
 		case key::backslash:
 			return SDL_SCANCODE_BACKSLASH;
-
 		case key::nonushash:
 			return SDL_SCANCODE_NONUSHASH;
 		case key::semicolon:
@@ -1005,17 +1003,17 @@ inline SDL_Scancode to_layout_independent_impl(key::code code)
 namespace key
 {
 
-inline os::key::code from_string(const std::string& str) noexcept
+inline auto from_string(const std::string& str) noexcept -> os::key::code
 {
 	return from_layout_independent_impl(SDL_GetScancodeFromName(str.c_str()));
 }
 
-inline std::string to_string(os::key::code key_code) noexcept
+inline auto to_string(os::key::code key_code) noexcept -> std::string
 {
 	return SDL_GetScancodeName(to_layout_independent_impl(key_code));
 }
 
-inline bool is_pressed(os::key::code key_code) noexcept
+inline auto is_pressed(os::key::code key_code) noexcept -> bool
 {
 	int num_keys{0};
 	const auto* data = SDL_GetKeyboardState(&num_keys);
@@ -1028,7 +1026,7 @@ inline bool is_pressed(os::key::code key_code) noexcept
 }
 }
 
-inline bool has_screen_keyboard() noexcept
+inline auto has_screen_keyboard() noexcept -> bool
 {
 	return SDL_HasScreenKeyboardSupport() == SDL_TRUE;
 }
@@ -1043,7 +1041,7 @@ inline void stop_text_input() noexcept
 	SDL_StopTextInput();
 }
 
-inline bool is_text_input_active() noexcept
+inline auto is_text_input_active() noexcept -> bool
 {
 	return SDL_IsTextInputActive() == SDL_TRUE;
 }

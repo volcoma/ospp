@@ -14,7 +14,7 @@ namespace detail
 namespace sdl
 {
 
-inline window_event_id to_window_event_id(uint8_t id)
+inline auto to_window_event_id(uint8_t id) -> window_event_id
 {
 	switch(id)
 	{
@@ -51,7 +51,7 @@ inline window_event_id to_window_event_id(uint8_t id)
 	return window_event_id::none;
 }
 
-inline event to_event(const SDL_Event& e)
+inline auto to_event(const SDL_Event& e) -> event
 {
 	event ev;
 	switch(e.type)
