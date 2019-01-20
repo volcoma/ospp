@@ -1,12 +1,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
-#include <ospp/clipboard.h>
-#include <ospp/cursor.h>
-#include <ospp/event.h>
-#include <ospp/init.h>
-#include <ospp/keyboard.h>
-#include <ospp/window.h>
+#include <ospp/os.h>
 
 #include <thread>
 
@@ -60,8 +55,6 @@ static const char *arrow[] =
 
 static os::image parse_image(const uint8_t* data, const uint8_t* mask, int w, int h)
 {
-	int x, y;
-	uint32_t* pixel;
 	uint8_t datab = 0, maskb = 0;
 	const uint32_t black = 0xFF000000;
 	const uint32_t white = 0xFFFFFFFF;
@@ -72,14 +65,14 @@ static os::image parse_image(const uint8_t* data, const uint8_t* mask, int w, in
 
 	os::image image;
 	image.pixels.resize(32 * 32 * 4, 0);
-	image.size.w = w;
-	image.size.h = h;
+	image.size.w = static_cast<uint32_t>(w);
+	image.size.h = static_cast<uint32_t>(h);
 
 	uint32_t pitch = 32 * 4;
-	for(y = 0; y < h; ++y)
+	for(int y = 0; y < h; ++y)
 	{
-		pixel = reinterpret_cast<uint32_t*>(image.pixels.data() + y * pitch);
-		for(x = 0; x < w; ++x)
+		auto pixel = reinterpret_cast<uint32_t*>(image.pixels.data() + y * pitch);
+		for(int x = 0; x < w; ++x)
 		{
 			if((x % 8) == 0)
 			{
@@ -227,6 +220,18 @@ int main()
 					std::cout << "x : " << e.wheel.x << std::endl;
 					std::cout << "y : " << e.wheel.y << std::endl;
 				}
+				if(e.type == os::events::key_up)
+				{
+					std::cout << "key up" << std::endl;
+					std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
+					std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
+					std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
+					std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
+					std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
+
+					std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code)
+							  << std::endl;
+				}
 				if(e.type == os::events::key_down)
 				{
 					std::cout << "key down" << std::endl;
@@ -279,18 +284,6 @@ int main()
 					{
 						windows[0].set_icon(image);
 					}
-				}
-				if(e.type == os::events::key_up)
-				{
-					std::cout << "key up" << std::endl;
-					std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
-					std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
-					std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
-					std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
-					std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
-
-					std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code)
-							  << std::endl;
 				}
 			}
 
