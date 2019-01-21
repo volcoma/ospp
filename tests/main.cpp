@@ -160,7 +160,8 @@ int main()
 			print(mode);
 		}
 		std::cout << "-------------------------" << std::endl;
-		os::window window{"win 1", os::window::centered, os::window::centered, 500, 500, os::window::resizable};
+		os::window window{"win 1", os::window::centered, os::window::centered, 500,
+						  500,	 os::window::resizable};
 
 		bool full = false;
 		bool show = true;
@@ -188,6 +189,7 @@ int main()
 			{
 				if(e.type == os::events::quit)
 				{
+					std::cout << "quit (all windows were closed)" << std::endl;
 					running = false;
 					break;
 				}
@@ -195,6 +197,7 @@ int main()
 				{
 					if(e.window.type == os::window_event_id::close)
 					{
+						std::cout << "window close" << std::endl;
 					}
 				}
 				if(e.type == os::events::mouse_motion)
@@ -222,8 +225,8 @@ int main()
 					std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
 					std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-					std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code)
-							  << std::endl;
+					std::cout << "keyboard state check pressed : " << std::boolalpha
+							  << os::key::is_pressed(e.key.code) << std::endl;
 				}
 				if(e.type == os::events::key_down)
 				{
@@ -234,8 +237,8 @@ int main()
 					std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
 					std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
 
-					std::cout << "pressed : " << std::boolalpha << os::key::is_pressed(e.key.code)
-							  << std::endl;
+					std::cout << "keyboard state check pressed : " << std::boolalpha
+							  << os::key::is_pressed(e.key.code) << std::endl;
 
 					if(e.key.code == os::key::k)
 					{

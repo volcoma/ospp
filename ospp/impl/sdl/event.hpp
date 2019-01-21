@@ -105,7 +105,7 @@ inline auto to_event(const SDL_Event& e) -> event
 		case SDL_TEXTINPUT:
 			ev.type = events::text_input;
 			ev.text.window_id = e.text.windowID;
-			ev.text.text_utf8 = e.text.text;
+			ev.text.text = e.text.text;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			ev.type = events::mouse_button;

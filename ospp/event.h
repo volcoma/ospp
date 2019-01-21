@@ -86,7 +86,7 @@ struct drop_event
 
 struct text_input_event
 {
-	std::string text_utf8{}; /**< The input text */
+	std::string text{}; /**< The input text (utf8)*/
 	uint32_t window_id{};
 };
 
@@ -141,6 +141,6 @@ struct event
 
 void push_event(const event& e);
 
-bool poll_event(event& e) noexcept;
+auto poll_event(event& e) noexcept -> bool;
 
 } // sdl
