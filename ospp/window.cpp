@@ -204,7 +204,7 @@ void window::request_focus()
 
 void window::request_close() noexcept
 {
-	event e;
+	event e{};
 	e.type = events::window;
 	e.window.type = window_event_id::close;
 	e.window.window_id = get_id();

@@ -37,7 +37,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::window;
 		ev.window.window_id = impl->get_id();
 		ev.window.type = window_event_id::close;
@@ -63,7 +63,7 @@ inline void set_callbacks(GLFWwindow* window)
 			}
 		}
 
-		event ev;
+		event ev{};
 		ev.type = events::window;
 		ev.window.window_id = impl->get_id();
 		ev.window.type = focused == GL_TRUE ? window_event_id::focus_gained : window_event_id::focus_lost;
@@ -75,7 +75,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::window;
 		ev.window.window_id = impl->get_id();
 		ev.window.type = window_event_id::resized;
@@ -89,7 +89,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::window;
 		ev.window.window_id = impl->get_id();
 		ev.window.type = window_event_id::moved;
@@ -103,7 +103,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::window;
 		ev.window.window_id = impl->get_id();
 		ev.window.type = mode == GLFW_TRUE ? window_event_id::maximized : window_event_id::restored;
@@ -115,7 +115,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::window;
 		ev.window.window_id = impl->get_id();
 		ev.window.type = mode == GLFW_TRUE ? window_event_id::enter : window_event_id::leave;
@@ -127,7 +127,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::mouse_motion;
 		ev.motion.window_id = impl->get_id();
 		ev.motion.x = static_cast<int32_t>(x);
@@ -147,7 +147,7 @@ inline void set_callbacks(GLFWwindow* window)
 		pos.x = static_cast<int32_t>(x);
 		pos.y = static_cast<int32_t>(y);
 
-		event ev;
+		event ev{};
 		ev.type = events::mouse_button;
 		ev.button.window_id = impl->get_id();
 		ev.button.button = mouse::detail::glfw::from_impl(button);
@@ -162,7 +162,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::mouse_wheel;
 		ev.wheel.window_id = impl->get_id();
 		ev.wheel.x = xoffs;
@@ -175,7 +175,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::text_input;
 		ev.text.window_id = impl->get_id();
 		ev.text.text_utf8 =
@@ -189,7 +189,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
 		(void)scancode;
-		event ev;
+		event ev{};
 		ev.type = action == GLFW_RELEASE ? events::key_up : events::key_down;
 		ev.key.window_id = impl->get_id();
 		ev.key.code = detail::glfw::from_layout_independent_impl(key);
@@ -205,7 +205,7 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev;
+		event ev{};
 		ev.type = events::drop_file;
 		ev.drop.window_id = impl->get_id();
 
@@ -226,7 +226,7 @@ inline void pump_events() noexcept
 								  [](const auto& e) { return glfwWindowShouldClose(e->get_impl()); });
 	if(all_closed)
 	{
-		event ev;
+		event ev{};
 		ev.type = events::quit;
 		push_event(ev);
 	}

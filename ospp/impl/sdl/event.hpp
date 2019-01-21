@@ -53,7 +53,7 @@ inline auto to_window_event_id(uint8_t id) -> window_event_id
 
 inline auto to_event(const SDL_Event& e) -> event
 {
-	event ev;
+	event ev{};
 	switch(e.type)
 	{
 		case SDL_QUIT:
@@ -104,7 +104,7 @@ inline auto to_event(const SDL_Event& e) -> event
 			break;
 		case SDL_TEXTINPUT:
 			ev.type = events::text_input;
-			ev.window.window_id = e.text.windowID;
+			ev.text.window_id = e.text.windowID;
 			ev.text.text_utf8 = e.text.text;
 			break;
 		case SDL_MOUSEBUTTONDOWN:

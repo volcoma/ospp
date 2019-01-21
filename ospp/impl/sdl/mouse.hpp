@@ -62,14 +62,14 @@ inline auto is_button_pressed(button b) noexcept -> bool
 
 inline auto get_position() noexcept -> point
 {
-	point result;
+	point result{};
 	SDL_GetGlobalMouseState(&result.x, &result.y);
 	return result;
 }
 
 inline point get_position(const window& relative_to) noexcept
 {
-	point relative_pos;
+	point relative_pos{};
 	auto global_pos = get_position();
 	auto window_pos = to_win_impl(relative_to).get_position();
 	relative_pos.x = global_pos.x - window_pos.x;

@@ -73,21 +73,21 @@ struct quit_event
 struct window_event
 {
 	uint32_t window_id{};
-	window_event_id type{};
 	int32_t data1{};
 	int32_t data2{};
+	window_event_id type{};
 };
 
 struct drop_event
 {
-	uint32_t window_id{};
 	std::string file{};
+	uint32_t window_id{};
 };
 
 struct text_input_event
 {
-	uint32_t window_id{};
 	std::string text_utf8{}; /**< The input text */
+	uint32_t window_id{};
 };
 
 struct mouse_button_event
@@ -118,7 +118,6 @@ struct key_event
 {
 	uint32_t window_id{};
 	key::code code{}; /**< Code of the key that has been pressed */
-	uint8_t repeat{}; /**< Non-zero if this is a key repeat */
 	bool alt{};		  /**< Is the Alt key pressed? */
 	bool ctrl{};	  /**< Is the Control key pressed? */
 	bool shift{};	 /**< Is the Shift key pressed? */
@@ -127,15 +126,17 @@ struct key_event
 
 struct event
 {
-	drop_event drop{};
-	text_input_event text{};
-	mouse_wheel_event wheel{};
-	mouse_button_event button{};
-	window_event window{};
-	key_event key{};
-	mouse_motion_event motion{};
-	events type{};
-	quit_event quit{};
+	drop_event drop;
+	text_input_event text;
+	union {
+		mouse_wheel_event wheel;
+		mouse_button_event button;
+		window_event window;
+		key_event key;
+		mouse_motion_event motion;
+		quit_event quit;
+	};
+	events type;
 };
 
 void push_event(const event& e);

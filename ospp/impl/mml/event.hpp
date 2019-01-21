@@ -19,7 +19,7 @@ namespace mml
 
 inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> event
 {
-	event ev;
+	event ev{};
 	switch(e.type)
 	{
 		case ::mml::platform_event::closed:
@@ -104,6 +104,7 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
 		case ::mml::platform_event::mouse_wheel_scrolled:
 			ev.type = events::mouse_wheel;
 			ev.wheel.window_id = window_id;
+			ev.wheel.which = static_cast<uint32_t>(e.mouse_wheel_scroll.wheel);
 			switch(e.mouse_wheel_scroll.wheel)
 			{
 				case ::mml::mouse::horizontal_wheel:
@@ -120,7 +121,6 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
 			break;
 		case ::mml::platform_event::touch_ended:
 			ev.type = events::finger_up;
-
 			break;
 		case ::mml::platform_event::touch_moved:
 			ev.type = events::finger_motion;
@@ -140,7 +140,7 @@ inline void pump_events() noexcept
 	{
 		auto& impl = window->get_impl();
 
-		::mml::platform_event ev;
+		::mml::platform_event ev{};
 		if(impl.poll_event(ev))
 		{
 			if(ev.type == ::mml::platform_event::closed)
@@ -157,7 +157,7 @@ inline void pump_events() noexcept
 								  [](const auto& e) { return e->recieved_close_event(); });
 	if(all_closed)
 	{
-		event ev;
+		event ev{};
 		ev.type = events::quit;
 		push_event(ev);
 	}

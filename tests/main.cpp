@@ -160,7 +160,7 @@ int main()
 			print(mode);
 		}
 		std::cout << "-------------------------" << std::endl;
-		os::window window{"win 1", os::window::centered, os::window::centered, 500, 500};
+		os::window window{"win 1", os::window::centered, os::window::centered, 500, 500, os::window::resizable};
 
 		bool full = false;
 		bool show = true;
