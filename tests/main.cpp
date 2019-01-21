@@ -147,8 +147,8 @@ int main()
 
 	{
 		auto desktop_mode = os::display_mode::get_desktop_mode();
-		std::cout << "-------------------------" << std::endl;
 		std::cout << "desktop mode:" << std::endl;
+        std::cout << "-------------------------" << std::endl;
 		print(desktop_mode);
 		std::cout << "-------------------------" << std::endl;
 
