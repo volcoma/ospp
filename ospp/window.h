@@ -37,8 +37,8 @@ public:
 	auto is_open() const noexcept -> bool;
 	auto get_id() const noexcept -> uint32_t;
 
-	auto get_brightness() const noexcept -> float;
 	void set_brightness(float bright);
+	auto get_brightness() const noexcept -> float;
 
 	void set_size(uint32_t width, uint32_t height) noexcept;
 	void set_size(const area& size) noexcept;
@@ -54,7 +54,7 @@ public:
 
 	void set_position(int32_t x, int32_t y) noexcept;
 	void set_position(const point& pos) noexcept;
-	auto get_position() noexcept -> point;
+	auto get_position() const noexcept -> point;
 
 	auto get_title() const noexcept -> std::string;
 	void set_title(const std::string& str) noexcept;
@@ -73,7 +73,7 @@ public:
 	void set_opacity(float opacity);
 	auto get_opacity() const -> float;
 
-	void grab_input(bool b = true) noexcept;
+	void grab_input(bool grab) noexcept;
 	auto is_input_grabbed() const noexcept -> bool;
 
 	void request_focus();

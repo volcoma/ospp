@@ -122,7 +122,7 @@ void window::set_position(const point& pos) noexcept
 	this_impl->set_position(pos);
 }
 
-auto window::get_position() noexcept -> point
+auto window::get_position() const noexcept -> point
 {
 	return this_impl->get_position();
 }
@@ -187,9 +187,9 @@ auto window::get_opacity() const -> float
 	return this_impl->get_opacity();
 }
 
-void window::grab_input(bool b) noexcept
+void window::grab_input(bool grab) noexcept
 {
-	this_impl->grab_input(b);
+	this_impl->grab_input(grab);
 }
 
 bool window::is_input_grabbed() const noexcept

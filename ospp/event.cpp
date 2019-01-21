@@ -20,13 +20,13 @@ namespace os
 namespace
 {
 
-auto get_event_queue() -> std::deque<event>&
+auto get_event_queue() noexcept -> std::deque<event>&
 {
 	static std::deque<event> event_queue;
 	return event_queue;
 }
 
-auto pop_event(event& e) -> bool
+auto pop_event(event& e) noexcept -> bool
 {
 	auto& event_queue = get_event_queue();
 	// Pop the first event of the queue, if it is not empty
