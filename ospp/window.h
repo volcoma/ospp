@@ -82,13 +82,13 @@ public:
 	void set_cursor(const cursor& c) noexcept;
 	void show_cursor(bool show) noexcept;
 
-    //-----------------------------------------------------------------------------
-    /// \a image pixels must be an array of \a width by \a height pixels
-    /// in 32-bit RGBA format. If not, this will cause undefined behavior.
+	//-----------------------------------------------------------------------------
+	/// \a image pixels must be an array of \a width by \a height pixels
+	/// in 32-bit RGBA format. If not, this will cause undefined behavior.
 	/// If image pixels are null or either the width or the height are 0,
 	/// the input is considered invalid.
-    //-----------------------------------------------------------------------------
-    void set_icon(const image& img);
+	//-----------------------------------------------------------------------------
+	void set_icon(const image& img);
 
 	auto get_impl() const noexcept -> void*;
 

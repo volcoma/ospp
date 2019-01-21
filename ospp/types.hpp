@@ -24,7 +24,7 @@ using area = area2d<uint32_t>;
 struct image
 {
 	std::vector<uint8_t> pixels;
-    area size{};
+	area size{};
 };
 
 } // os
