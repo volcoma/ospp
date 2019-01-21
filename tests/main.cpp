@@ -160,9 +160,7 @@ int main()
 			print(mode);
 		}
 		std::cout << "-------------------------" << std::endl;
-		std::vector<os::window> windows = {{"win 1", os::window::centered, os::window::centered, 500, 500}};
-
-		os::start_text_input();
+		os::window window{"win 1", os::window::centered, os::window::centered, 500, 500};
 
 		bool full = false;
 		bool show = true;
@@ -197,11 +195,6 @@ int main()
 				{
 					if(e.window.type == os::window_event_id::close)
 					{
-						auto id = e.window.window_id;
-						windows.erase(
-							std::remove_if(std::begin(windows), std::end(windows),
-										   [id](const auto& window) { return window.get_id() == id; }),
-							std::end(windows));
 					}
 				}
 				if(e.type == os::events::mouse_motion)
@@ -210,7 +203,7 @@ int main()
 					{
 						std::cout << "x1 : " << e.motion.x << std::endl;
 						std::cout << "y1 : " << e.motion.y << std::endl;
-						auto pos = os::mouse::get_position(windows[0]);
+						auto pos = os::mouse::get_position(window);
 						std::cout << "x2 : " << pos.x << std::endl;
 						std::cout << "y2 : " << pos.y << std::endl;
 					}
@@ -258,31 +251,31 @@ int main()
 					if(e.key.code == os::key::digit1)
 					{
 						full = !full;
-						windows[0].set_fullscreen(full);
+						window.set_fullscreen(full);
 					}
 					if(e.key.code == os::key::digit2)
 					{
-						windows[0].set_cursor(cursor_arrow);
+						window.set_cursor(cursor_arrow);
 					}
 					if(e.key.code == os::key::digit3)
 					{
-						windows[0].set_cursor(cursor_image);
+						window.set_cursor(cursor_image);
 					}
 					if(e.key.code == os::key::digit4)
 					{
 						show = !show;
-						windows[0].show_cursor(show);
+						window.show_cursor(show);
 					}
 
 					if(e.key.code == os::key::digit5)
 					{
 						grab = !grab;
-						windows[0].grab_input(grab);
+						window.grab_input(grab);
 					}
 
 					if(e.key.code == os::key::digit6)
 					{
-						windows[0].set_icon(image);
+						window.set_icon(image);
 					}
 				}
 			}
