@@ -208,7 +208,7 @@ void window::request_close() noexcept
 	e.type = events::window;
 	e.window.type = window_event_id::close;
 	e.window.window_id = get_id();
-	push_event(e);
+	push_event(std::move(e));
 }
 
 void window::set_cursor(const cursor& c) noexcept

@@ -42,7 +42,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.window.window_id = impl->get_id();
 		ev.window.type = window_event_id::close;
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
@@ -68,7 +68,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.window.window_id = impl->get_id();
 		ev.window.type = focused == GL_TRUE ? window_event_id::focus_gained : window_event_id::focus_lost;
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int w, int h) {
@@ -82,7 +82,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.window.data1 = static_cast<int32_t>(w);
 		ev.window.data2 = static_cast<int32_t>(h);
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetWindowPosCallback(window, [](GLFWwindow* window, int x, int y) {
@@ -96,7 +96,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.window.data1 = static_cast<int32_t>(x);
 		ev.window.data2 = static_cast<int32_t>(y);
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetWindowMaximizeCallback(window, [](GLFWwindow* window, int mode) {
@@ -108,7 +108,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.window.window_id = impl->get_id();
 		ev.window.type = mode == GLFW_TRUE ? window_event_id::maximized : window_event_id::restored;
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetCursorEnterCallback(window, [](GLFWwindow* window, int mode) {
@@ -120,7 +120,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.window.window_id = impl->get_id();
 		ev.window.type = mode == GLFW_TRUE ? window_event_id::enter : window_event_id::leave;
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y) {
@@ -133,7 +133,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.motion.x = static_cast<int32_t>(x);
 		ev.motion.y = static_cast<int32_t>(y);
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
@@ -155,7 +155,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.button.x = pos.x;
 		ev.button.y = pos.y;
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffs, double yoffs) {
@@ -168,7 +168,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.wheel.x = xoffs;
 		ev.wheel.y = yoffs;
 
-		push_event(ev);
+		push_event(std::move(ev));
 	});
 
 	glfwSetCharModsCallback(window, [](GLFWwindow* window, unsigned int unicode_codepoint, int) {
@@ -181,7 +181,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.text.text =
 			std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.to_bytes(unicode_codepoint);
 
-		push_event(ev);
+		push_event(std::move(ev));
 
 	});
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -197,7 +197,7 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.key.ctrl = mods & GLFW_MOD_CONTROL;
 		ev.key.shift = mods & GLFW_MOD_SHIFT;
 		ev.key.system = mods & GLFW_MOD_SUPER;
-		push_event(ev);
+		push_event(std::move(ev));
 
 	});
 
@@ -205,14 +205,13 @@ inline void set_callbacks(GLFWwindow* window)
 		auto user_data = glfwGetWindowUserPointer(window);
 		auto impl = reinterpret_cast<window_impl*>(user_data);
 
-		event ev{};
-		ev.type = events::drop_file;
-		ev.drop.window_id = impl->get_id();
-
 		for(int i = 0; i < count; ++i)
 		{
+            event ev{};
+            ev.type = events::drop_file;
+            ev.drop.window_id = impl->get_id();
 			ev.drop.file = paths[i];
-			push_event(ev);
+			push_event(std::move(ev));
 		}
 	});
 }
@@ -228,7 +227,7 @@ inline void pump_events() noexcept
 	{
 		event ev{};
 		ev.type = events::quit;
-		push_event(ev);
+		push_event(std::move(ev));
 	}
 }
 }

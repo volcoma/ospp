@@ -149,7 +149,7 @@ inline void pump_events() noexcept
 			}
 			auto e = to_event(ev, window->get_id());
 
-			push_event(e);
+			push_event(std::move(e));
 		}
 	}
 
@@ -159,7 +159,7 @@ inline void pump_events() noexcept
 	{
 		event ev{};
 		ev.type = events::quit;
-		push_event(ev);
+		push_event(std::move(ev));
 	}
 }
 }

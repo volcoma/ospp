@@ -139,6 +139,7 @@ struct event
 	events type;
 };
 
+void push_event(event&& e);
 void push_event(const event& e);
 
 auto poll_event(event& e) noexcept -> bool;

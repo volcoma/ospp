@@ -170,7 +170,7 @@ inline void pump_events() noexcept
 	while(SDL_PollEvent(&ev) != 0)
 	{
 		auto e = to_event(ev);
-		push_event(e);
+		push_event(std::move(e));
 	}
 }
 }

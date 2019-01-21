@@ -49,6 +49,10 @@ auto poll_event(event& e) noexcept -> bool
 
 void push_event(const event& e)
 {
-	get_event_queue().push_back(e);
+	get_event_queue().emplace_back(e);
+}
+void push_event(event&& e)
+{
+	get_event_queue().emplace_back(std::move(e));
 }
 }
