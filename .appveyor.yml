@@ -51,9 +51,6 @@ install:
   - set PATH=C:\projects\deps\ninja;%PATH%
   - ninja --version
 
-  - curl "http://openal-soft.org/openal-binaries/openal-soft-1.18.2-bin.zip" -o openal-soft-1.18.2-bin.zip
-  - 7z x -o%APPVEYOR_BUILD_FOLDER%\.. openal-soft-1.18.2-bin.zip
-  - set OPENALDIR=%APPVEYOR_BUILD_FOLDER%\..\openal-soft-1.18.2-bin
   #######################################################################################
   # Install MinGW
   #######################################################################################
@@ -96,5 +93,5 @@ build_script:
   - git submodule update --init --recursive
   - mkdir build
   - cd build
-  - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DBUILD_AUDIOPP_TESTS=ON ..
+  - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DBUILD_OSPP_TESTS=ON ..
   - cmake --build .
