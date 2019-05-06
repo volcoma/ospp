@@ -16,6 +16,7 @@
 #include <mml/system/utf.hpp>
 #include <vector>
 #include <cstring>
+#include <iterator>
 #include <dbt.h>
 // MinGW lacks the definition of some Win32 constants
 #ifndef XBUTTON1

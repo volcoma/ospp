@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
-
+#include <iterator>
 
 ////////////////////////////////////////////////////////////
 // DirectInput

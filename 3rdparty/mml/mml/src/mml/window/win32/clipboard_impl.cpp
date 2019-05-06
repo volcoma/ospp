@@ -5,6 +5,7 @@
 #include <mml/window/win32/clipboard_impl.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <windows.h>
 
 namespace mml
