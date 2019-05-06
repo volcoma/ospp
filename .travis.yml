@@ -8,13 +8,13 @@ env:
    
 addons:
   apt:
-      packages:
-          - cmake
-          - libudev-dev
-          - libxrandr-dev
-          - libxinerama-dev
-          - libxcursor-dev
-          - libxi-dev
+    packages:
+      - cmake
+      - libudev-dev
+      - libxrandr-dev
+      - libxinerama-dev
+      - libxcursor-dev
+      - libxi-dev
 
 matrix:
   include:
