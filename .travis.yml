@@ -112,7 +112,7 @@ matrix:
         
 before_install:
   - sudo apt-get install -y libudev-dev
-  - sudo apt-get install -y x11-xserver-utils
+  - sudo apt-get install -y libxrandr-dev
 
 script:
   - git submodule update --init --recursive
