@@ -11,26 +11,11 @@ int main()
 {
 	os::init();
 
-	auto desktop_mode = os::display_mode::get_desktop_mode();
-	std::cout << "desktop mode:" << std::endl;
-	std::cout << "-------------------------" << std::endl;
-	print(desktop_mode);
-	std::cout << "-------------------------" << std::endl;
-
-	auto modes = os::display_mode::get_available_modes();
-	std::cout << "available modes:" << std::endl;
-	for(const auto& mode : modes)
-	{
-		std::cout << "-------------------------" << std::endl;
-		print(mode);
-	}
-	std::cout << "-------------------------" << std::endl;
-	os::window window{"win 1", os::window::centered, os::window::centered, 500,
-					  500,	 os::window::resizable};
+	os::window window{"win", os::window::centered, os::window::centered, 500, 500, os::window::resizable};
 					  
 	bool running = true;
 
-    while(running)
+        while(running)
 	{
 
 		os::event e{};
@@ -57,7 +42,7 @@ int main()
 		std::this_thread::sleep_for(16ms);
 	}
 
-	os::shutdown();
-    return 0;
+    	os::shutdown();
+    	return 0;
 }
 ```
