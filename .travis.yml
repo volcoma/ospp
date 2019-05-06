@@ -5,16 +5,6 @@ dist: xenial
 env:
   global:
    - MAKEFLAGS="-j 2"
-   
-addons:
-  apt:
-    packages:
-      - cmake
-      - libudev-dev
-      - libxrandr-dev
-      - libxinerama-dev
-      - libxcursor-dev
-      - libxi-dev
 
 matrix:
   include:
@@ -30,6 +20,7 @@ matrix:
           packages:
             - libstdc++-5-dev
             - clang-3.8
+            - cmake
       env:
         - COMPILERCXX='clang++-3.8'
         - COMPILERC='clang-3.8'
@@ -44,6 +35,7 @@ matrix:
           packages:
             - libstdc++-6-dev
             - clang-3.9
+            - cmake
       env:
         - COMPILERCXX='clang++-3.9'
         - COMPILERC='clang-3.9'
@@ -58,6 +50,7 @@ matrix:
           packages:
             - libstdc++-6-dev
             - clang-4.0
+            - cmake
       env:
         - COMPILERCXX='clang++-4.0'
         - COMPILERC='clang-4.0'
@@ -72,6 +65,7 @@ matrix:
           packages:
             - libstdc++-7-dev
             - clang-5.0
+            - cmake
       env:
         - COMPILERCXX='clang++-5.0'
         - COMPILERC='clang-5.0'
@@ -85,6 +79,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - cmake
       env:
         - COMPILERCXX='g++-5'
         - COMPILERC='gcc-5'
@@ -97,6 +92,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+            - cmake
       env:
         - COMPILERCXX='g++-6'
         - COMPILERC='gcc-6'
@@ -109,10 +105,17 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
+            - cmake
       env:
         - COMPILERCXX='g++-7'
         - COMPILERC='gcc-7' 
         
+before_install:
+  - sudo apt-get install -y libudev-dev
+  - sudo apt-get install -y libxrandr-dev
+  - sudo apt-get install -y libxinerama-dev
+  - sudo apt-get install -y libxcursor-dev
+  - sudo apt-get install -y libxi-dev
 
 script:
   - git submodule update --init --recursive
