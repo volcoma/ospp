@@ -6,6 +6,9 @@ include(CTest)
 option(BUILD_OSPP_SHARED "Build as a shared library." ON)
 option(BUILD_OSPP_TESTS "Build the tests" ON)
 
+set(BACKEND_TYPE "SDL" CACHE STRING "Backend type chosen by the user at CMake configure time")
+set_property(CACHE BACKEND_TYPE PROPERTY STRINGS SDL GLFW MML)
+
 if(BUILD_OSPP_TESTS)
 	if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
