@@ -109,6 +109,10 @@ matrix:
       env:
         - COMPILERCXX='g++-7'
         - COMPILERC='gcc-7' 
+        
+before_install:
+  - sudo apt-get install -y libudev-dev
+  - sudo apt-get install -y x11-xserver-utils
 
 script:
   - git submodule update --init --recursive
