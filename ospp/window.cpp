@@ -25,11 +25,11 @@ inline auto to_impl(void* window) -> impl_type*
 }
 
 window::window(const std::string& title, const display_mode& display, uint32_t flags)
-	: window(title, {centered, centered}, {display.w, display.h}, flags)
+	: window(title, point{centered, centered}, area{display.w, display.h}, flags)
 {
 }
 window::window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t flags)
-	: window(title, {x, y}, {w, h}, flags)
+	: window(title, point{x, y}, area{w, h}, flags)
 {
 }
 
@@ -69,7 +69,7 @@ auto window::get_id() const noexcept -> uint32_t
 
 void window::set_size(uint32_t width, uint32_t height) noexcept
 {
-	set_size({width, height});
+	set_size(area{width, height});
 }
 
 void window::set_size(const area& size) noexcept
@@ -84,7 +84,7 @@ auto window::get_size() const noexcept -> area
 
 void window::set_maximum_size(uint32_t width, uint32_t height) noexcept
 {
-	set_maximum_size({width, height});
+	set_maximum_size(area{width, height});
 }
 
 void window::set_maximum_size(const area& size) noexcept
@@ -99,7 +99,7 @@ auto window::get_maximum_size() const noexcept -> area
 
 void window::set_minimum_size(uint32_t width, uint32_t height) noexcept
 {
-	set_minimum_size({width, height});
+	set_minimum_size(area{width, height});
 }
 
 void window::set_minimum_size(const area& size) noexcept
@@ -114,7 +114,7 @@ auto window::get_minimum_size() const noexcept -> area
 
 void window::set_position(int32_t x, int32_t y) noexcept
 {
-	set_position({x, y});
+	set_position(point{x, y});
 }
 
 void window::set_position(const point& pos) noexcept

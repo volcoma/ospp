@@ -137,7 +137,7 @@ public:
 
 	void set_size(const area& size) noexcept
 	{
-		impl_.set_size({size.w, size.h});
+		impl_.set_size(area{size.w, size.h});
 	}
 
 	auto get_size() const noexcept -> area
@@ -173,11 +173,11 @@ public:
 		{
 			auto desktop = display_mode::get_desktop_mode();
 			auto sz = get_size();
-			impl_.set_position({int32_t(desktop.w / 2 - sz.w / 2), int32_t(desktop.h / 2 - sz.h / 2)});
+			impl_.set_position(point{int32_t(desktop.w / 2 - sz.w / 2), int32_t(desktop.h / 2 - sz.h / 2)});
 		}
 		else
 		{
-			impl_.set_position({pos.x, pos.y});
+			impl_.set_position(point{pos.x, pos.y});
 		}
 	}
 
