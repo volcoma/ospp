@@ -8,38 +8,36 @@ message( STATUS "--------------------------------" )
 
 if("${BACKEND_TYPE}" STREQUAL "SDL")
 	message( STATUS "SDL backend selected." )
-
 	target_compile_definitions(${target_name} PRIVATE SDL_BACKEND)
-	if(BUILD_SHARED_LIBS)
-		target_link_libraries(${target_name} PRIVATE SDL2)
-	else()
-		target_link_libraries(${target_name} PRIVATE SDL2-static)
-	endif()
 elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
 	message( STATUS "GLFW backend selected." )
-
 	target_compile_definitions(${target_name} PRIVATE GLFW_BACKEND)
-	target_link_libraries(${target_name} PRIVATE glfw)
-	if(WIN32)
-		target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
-	elseif(APPLE)
-		target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_COCOA)
-	else()
-		#target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_WAYLAND)
-		#target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_MIR)
-		target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_X11)
-	endif()
-
 elseif("${BACKEND_TYPE}" STREQUAL "MML")
 	message( STATUS "MML backend selected." )
-
 	target_compile_definitions(${target_name} PRIVATE MML_BACKEND)
-	target_link_libraries(${target_name} PRIVATE mml-window)
-
 else()
 	message( FATAL_ERROR "No backend type was selected." )
 endif()
 message( STATUS "--------------------------------" )
+
+
+if(BUILD_SHARED_LIBS)
+	target_link_libraries(${target_name} PRIVATE SDL2)
+else()
+	target_link_libraries(${target_name} PRIVATE SDL2-static)
+endif()
+target_link_libraries(${target_name} PRIVATE glfw)
+if(WIN32)
+	target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
+elseif(APPLE)
+	target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_COCOA)
+else()
+	#target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_WAYLAND)
+	#target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_MIR)
+	target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_X11)
+endif()
+target_link_libraries(${target_name} PRIVATE mml-window)
+
 
 target_compile_definitions(${target_name} PRIVATE OS_NO_EXCEPTIONS)
 

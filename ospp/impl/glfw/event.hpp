@@ -193,10 +193,10 @@ inline void set_callbacks(GLFWwindow* window)
 		ev.type = action == GLFW_RELEASE ? events::key_up : events::key_down;
 		ev.key.window_id = impl->get_id();
 		ev.key.code = detail::glfw::from_layout_independent_impl(key);
-		ev.key.alt = mods & GLFW_MOD_ALT;
-		ev.key.ctrl = mods & GLFW_MOD_CONTROL;
-		ev.key.shift = mods & GLFW_MOD_SHIFT;
-		ev.key.system = mods & GLFW_MOD_SUPER;
+		ev.key.alt = (mods & GLFW_MOD_ALT) != 0;
+		ev.key.ctrl = (mods & GLFW_MOD_CONTROL) != 0;
+		ev.key.shift = (mods & GLFW_MOD_SHIFT) != 0;
+		ev.key.system = (mods & GLFW_MOD_SUPER) != 0;
 		push_event(std::move(ev));
 
 	});
@@ -207,9 +207,9 @@ inline void set_callbacks(GLFWwindow* window)
 
 		for(int i = 0; i < count; ++i)
 		{
-            event ev{};
-            ev.type = events::drop_file;
-            ev.drop.window_id = impl->get_id();
+			event ev{};
+			ev.type = events::drop_file;
+			ev.drop.window_id = impl->get_id();
 			ev.drop.file = paths[i];
 			push_event(std::move(ev));
 		}

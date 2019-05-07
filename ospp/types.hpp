@@ -7,6 +7,13 @@ namespace os
 template <typename T>
 struct vec2d
 {
+	vec2d() = default;
+	vec2d(T xval, T yval)
+		: x(xval)
+		, y(yval)
+	{
+	}
+
 	T x{};
 	T y{};
 };
@@ -14,6 +21,13 @@ struct vec2d
 template <typename T>
 struct area2d
 {
+	area2d() = default;
+	area2d(T wval, T hval)
+		: w(wval)
+		, h(hval)
+	{
+	}
+
 	T w{};
 	T h{};
 };

@@ -148,7 +148,7 @@ int main()
 	{
 		auto desktop_mode = os::display_mode::get_desktop_mode();
 		std::cout << "desktop mode:" << std::endl;
-        std::cout << "-------------------------" << std::endl;
+		std::cout << "-------------------------" << std::endl;
 		print(desktop_mode);
 		std::cout << "-------------------------" << std::endl;
 
@@ -204,11 +204,11 @@ int main()
 				{
 					if(os::key::is_pressed(os::key::lshift))
 					{
-						std::cout << "x1 : " << e.motion.x << std::endl;
-						std::cout << "y1 : " << e.motion.y << std::endl;
+						std::cout << "[event] x : " << e.motion.x << std::endl;
+						std::cout << "[event] y : " << e.motion.y << std::endl;
 						auto pos = os::mouse::get_position(window);
-						std::cout << "x2 : " << pos.x << std::endl;
-						std::cout << "y2 : " << pos.y << std::endl;
+						std::cout << "[poll] x : " << pos.x << std::endl;
+						std::cout << "[poll] y : " << pos.y << std::endl;
 					}
 				}
 				if(e.type == os::events::mouse_wheel)
@@ -219,18 +219,23 @@ int main()
 				if(e.type == os::events::key_up)
 				{
 					std::cout << "key up" << std::endl;
+					std::cout << "[event] state : " << std::boolalpha << false << std::endl;
+					std::cout << "[poll] state : " << std::boolalpha << os::key::is_pressed(e.key.code)
+							  << std::endl;
+
 					std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
 					std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
 					std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;
 					std::cout << "shift : " << std::boolalpha << e.key.shift << std::endl;
 					std::cout << "gui : " << std::boolalpha << e.key.system << std::endl;
-
-					std::cout << "keyboard state check pressed : " << std::boolalpha
-							  << os::key::is_pressed(e.key.code) << std::endl;
 				}
 				if(e.type == os::events::key_down)
 				{
 					std::cout << "key down" << std::endl;
+					std::cout << "[event] state : " << std::boolalpha << true << std::endl;
+					std::cout << "[poll] state : " << std::boolalpha << os::key::is_pressed(e.key.code)
+							  << std::endl;
+
 					std::cout << "code : " << os::key::to_string(e.key.code) << std::endl;
 					std::cout << "ctrl : " << std::boolalpha << e.key.ctrl << std::endl;
 					std::cout << "alt : " << std::boolalpha << e.key.alt << std::endl;

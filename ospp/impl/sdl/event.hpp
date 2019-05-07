@@ -88,19 +88,19 @@ inline auto to_event(const SDL_Event& e) -> event
 			ev.type = events::key_down;
 			ev.key.window_id = e.key.windowID;
 			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
-			ev.key.alt = e.key.keysym.mod & KMOD_ALT;
-			ev.key.ctrl = e.key.keysym.mod & KMOD_CTRL;
-			ev.key.shift = e.key.keysym.mod & KMOD_SHIFT;
-			ev.key.system = e.key.keysym.mod & KMOD_GUI;
+			ev.key.alt = (e.key.keysym.mod & KMOD_ALT) != 0;
+			ev.key.ctrl = (e.key.keysym.mod & KMOD_CTRL) != 0;
+			ev.key.shift = (e.key.keysym.mod & KMOD_SHIFT) != 0;
+			ev.key.system = (e.key.keysym.mod & KMOD_GUI) != 0;
 			break;
 		case SDL_KEYUP:
 			ev.type = events::key_up;
 			ev.key.window_id = e.key.windowID;
 			ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
-			ev.key.alt = e.key.keysym.mod & KMOD_ALT;
-			ev.key.ctrl = e.key.keysym.mod & KMOD_CTRL;
-			ev.key.shift = e.key.keysym.mod & KMOD_SHIFT;
-			ev.key.system = e.key.keysym.mod & KMOD_GUI;
+			ev.key.alt = (e.key.keysym.mod & KMOD_ALT) != 0;
+			ev.key.ctrl = (e.key.keysym.mod & KMOD_CTRL) != 0;
+			ev.key.shift = (e.key.keysym.mod & KMOD_SHIFT) != 0;
+			ev.key.system = (e.key.keysym.mod & KMOD_GUI) != 0;
 			break;
 		case SDL_TEXTINPUT:
 			ev.type = events::text_input;
