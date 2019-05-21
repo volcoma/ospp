@@ -17,7 +17,6 @@ int main()
 
         while(running)
 	{
-
 		os::event e{};
 		while(os::poll_event(e))
 		{
@@ -32,7 +31,7 @@ int main()
 			{
 				if(e.key.code == os::key::q)
 				{
-					std::cout << "quit (all windows were closed)" << std::endl;
+					std::cout << "quit ('q' key pressed)" << std::endl;
 					running = false;
 					break;
 				}
@@ -43,6 +42,7 @@ int main()
 	}
 
     	os::shutdown();
+	
     	return 0;
 }
 ```
