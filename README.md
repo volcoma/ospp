@@ -9,7 +9,10 @@
 ```c++
 int main()
 {
-	os::init();
+	if(!os::init())
+	{
+		return -1;
+	}
 
 	os::window window{"win", os::window::centered, os::window::centered, 500, 500, os::window::resizable};
 					  
@@ -40,9 +43,7 @@ int main()
 
 		std::this_thread::sleep_for(16ms);
 	}
-
-    	os::shutdown();
 	
-    	return 0;
+    	return os::shutdown();
 }
 ```
