@@ -35,6 +35,7 @@ else()
 	#target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_WAYLAND)
 	#target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_MIR)
 	target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_X11)
+    target_link_libraries(${target_name} PUBLIC ${CMAKE_DL_LIBS})
 endif()
 target_link_libraries(${target_name} PRIVATE mml-window)
 
