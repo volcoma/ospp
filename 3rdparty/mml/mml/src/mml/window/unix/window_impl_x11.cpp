@@ -494,7 +494,7 @@ _last_input_time  (0)
 		set_protocols();
 
 		// Do some common initializations
-		initialize();
+		initialize(true);
 	}
 }
 
@@ -688,7 +688,8 @@ _last_input_time  (0)
 	set_title(title);
 
 	// Do some common initializations
-	initialize();
+    bool hidden = (style & style::hidden) != 0;
+	initialize(!hidden);
 
 	// Set fullscreen video mode and switch to fullscreen if necessary
 	if (_fullscreen)
@@ -1656,7 +1657,7 @@ void window_impl_x11::set_protocols()
 
 
 ////////////////////////////////////////////////////////////
-void window_impl_x11::initialize()
+void window_impl_x11::initialize(bool visible)
 {
 	// Create the input context
 	_input_method = XOpenIM(_display, NULL, NULL, NULL);
@@ -1696,7 +1697,7 @@ void window_impl_x11::initialize()
 	}
 
 	// Show the window
-	set_visible(true);
+	set_visible(visible);
 
 	// Raise the window and grab input focus
 	grab_focus();

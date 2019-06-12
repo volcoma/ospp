@@ -163,7 +163,13 @@ _cursor_grabbed   (_fullscreen)
     ReleaseDC(NULL, screenDC);
 
     // Choose the window style according to the style parameter
-    DWORD win32Style = WS_VISIBLE;
+    bool hidden = (style & style::hidden) != 0;
+
+    DWORD win32Style = 0;
+    if(!hidden)
+    {
+        win32Style |= WS_VISIBLE;
+    }
     if (style == style::none)
     {
         win32Style |= WS_POPUP;
@@ -173,6 +179,7 @@ _cursor_grabbed   (_fullscreen)
         if (style & style::titlebar) win32Style |= WS_CAPTION | WS_MINIMIZEBOX;
         if (style & style::resize)   win32Style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
         if (style & style::close)    win32Style |= WS_SYSMENU;
+        
     }
 
     // In windowed mode, adjust width and height so that window will have the requested client area

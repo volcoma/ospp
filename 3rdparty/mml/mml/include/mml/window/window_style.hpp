@@ -19,7 +19,7 @@ namespace style
         resize     = 1 << 1, ///< Title bar + resizable border + maximize button
         close      = 1 << 2, ///< Title bar + close button
         fullscreen = 1 << 3, ///< Fullscreen mode (this flag and all others are mutually exclusive)
-
+        hidden     = 1 << 4,
         standard = titlebar | resize | close ///< standard window style
     };
 }

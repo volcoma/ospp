@@ -30,7 +30,6 @@ if("${BACKEND_TYPE}" STREQUAL "SDL")
 	else()
 		target_link_libraries(${target_name} PRIVATE SDL2-static)
 	endif()
-	target_link_libraries(${target_name} PUBLIC ${CMAKE_DL_LIBS})
 
 elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
 	target_compile_definitions(${target_name} PRIVATE GLFW_BACKEND)
@@ -44,15 +43,16 @@ elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
 		target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_X11)
 	endif()
 	target_link_libraries(${target_name} PRIVATE glfw)
-    target_link_libraries(${target_name} PUBLIC ${CMAKE_DL_LIBS})
 
 
 elseif("${BACKEND_TYPE}" STREQUAL "MML")
 	target_compile_definitions(${target_name} PRIVATE MML_BACKEND)
 
 	target_link_libraries(${target_name} PRIVATE mml-window)
+
 endif()
 
+target_link_libraries(${target_name} PUBLIC ${CMAKE_DL_LIBS})
 target_compile_definitions(${target_name} PRIVATE OS_NO_EXCEPTIONS)
 
 target_include_directories(${target_name}

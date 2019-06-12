@@ -221,7 +221,7 @@ private:
     /// \brief Do some common initializations after the window has been created
     ///
     ////////////////////////////////////////////////////////////
-    void initialize();
+    void initialize(bool visible);
 
     ////////////////////////////////////////////////////////////
     /// \brief Create a transparent mouse cursor

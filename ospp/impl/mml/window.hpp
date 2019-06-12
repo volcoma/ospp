@@ -36,6 +36,7 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	}
 	if(flags & window::hidden)
 	{
+        result |= ::mml::style::hidden;
 	}
 	if(flags & window::borderless)
 	{

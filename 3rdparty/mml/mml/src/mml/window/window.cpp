@@ -365,7 +365,6 @@ bool window::filter_event(const platform_event& event)
 void window::initialize()
 {
     // Setup default behaviors (to get a consistent behavior across different implementations)
-    set_visible(true);
     set_mouse_cursor_visible(true);
     set_key_repeat_enabled(true);
 
