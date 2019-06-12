@@ -261,6 +261,11 @@ window_handle window_impl_win32::native_handle() const
     return _handle;
 }
 
+void* window_impl_win32::native_display_handle() const
+{
+    return GetDC(_handle);
+}
+
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::process_events()

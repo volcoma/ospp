@@ -50,7 +50,7 @@ inline auto get_native_display_handle(const SDL_SysWMinfo& wmi) noexcept -> nati
 {
 	(void)wmi;
 #if defined(SDL_VIDEO_DRIVER_WINDOWS)
-	return nullptr;
+    return wmi.info.win.hdc;
 #elif defined(SDL_VIDEO_DRIVER_WINRT)
 	return nullptr;
 #elif defined(SDL_VIDEO_DRIVER_X11)

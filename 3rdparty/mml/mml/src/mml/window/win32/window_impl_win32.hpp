@@ -53,7 +53,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     virtual window_handle native_handle() const;
-	virtual void* native_display_handle() const { return nullptr; }
+	virtual void* native_display_handle() const;
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///
