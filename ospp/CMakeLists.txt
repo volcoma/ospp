@@ -44,6 +44,8 @@ elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
 		target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_X11)
 	endif()
 	target_link_libraries(${target_name} PRIVATE glfw)
+    target_link_libraries(${target_name} PUBLIC ${CMAKE_DL_LIBS})
+
 
 elseif("${BACKEND_TYPE}" STREQUAL "MML")
 	target_compile_definitions(${target_name} PRIVATE MML_BACKEND)
