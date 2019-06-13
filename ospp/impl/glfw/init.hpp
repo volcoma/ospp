@@ -19,11 +19,12 @@ inline auto init() -> int
 	if(result == GLFW_FALSE)
 	{
 		OS_GLFW_ERROR_HANDLER(result);
+        return false;
 	}
 
 	on_win_create() = set_callbacks;
 
-	return 0;
+    return true;
 }
 }
 }

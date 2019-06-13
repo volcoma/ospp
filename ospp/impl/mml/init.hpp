@@ -11,9 +11,9 @@ inline void shutdown() noexcept
 {
 }
 
-inline auto init() -> int
+inline auto init() -> bool
 {
-	return 0;
+    return true;
 }
 }
 }
