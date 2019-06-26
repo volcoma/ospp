@@ -21,7 +21,7 @@ void shutdown() noexcept
 	impl::shutdown();
 }
 
-auto init() -> int
+auto init() -> bool
 {
 	return impl::init();
 }

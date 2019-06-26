@@ -2,6 +2,6 @@
 
 namespace os
 {
-auto init() -> int;
+auto init() -> bool;
 void shutdown() noexcept;
 }
