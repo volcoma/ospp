@@ -74,6 +74,9 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
 			break;
 
 		case ::mml::platform_event::text_entered:
+            if (e.text.unicode < 32 || (e.text.unicode > 126 && e.text.unicode < 160))
+                break;
+
 			ev.type = events::text_input;
 			ev.window.window_id = window_id;
 			ev.text.text =
