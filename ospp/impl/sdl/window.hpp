@@ -15,6 +15,71 @@ namespace detail
 {
 namespace sdl
 {
+
+
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+namespace
+{
+void set_process_dpi_aware()
+{
+
+	// Try SetProcessDpiAwareness first
+	HINSTANCE shCoreDll = LoadLibraryW(L"Shcore.dll");
+
+	if(shCoreDll)
+	{
+		enum ProcessDpiAwareness
+		{
+			ProcessDpiUnaware = 0,
+			ProcessSystemDpiAware = 1,
+			ProcessPerMonitorDpiAware = 2
+		};
+
+		typedef HRESULT(WINAPI * SetProcessDpiAwarenessFuncType)(ProcessDpiAwareness);
+		SetProcessDpiAwarenessFuncType SetProcessDpiAwarenessFunc =
+			reinterpret_cast<SetProcessDpiAwarenessFuncType>(
+				GetProcAddress(shCoreDll, "SetProcessDpiAwareness"));
+
+		if(SetProcessDpiAwarenessFunc)
+		{
+			// We only check for E_INVALIDARG because we would get
+			// E_ACCESSDENIED if the DPI was already set previously
+			// and S_OK means the call was successful
+			if(SetProcessDpiAwarenessFunc(ProcessSystemDpiAware) == E_INVALIDARG)
+			{
+
+			}
+			else
+			{
+				FreeLibrary(shCoreDll);
+				return;
+			}
+		}
+
+		FreeLibrary(shCoreDll);
+	}
+
+	// Fall back to SetProcessDPIAware if SetProcessDpiAwareness
+	// is not available on this system
+	HINSTANCE user32Dll = LoadLibraryW(L"user32.dll");
+
+	if(user32Dll)
+	{
+		typedef BOOL(WINAPI * SetProcessDPIAwareFuncType)(void);
+		SetProcessDPIAwareFuncType SetProcessDPIAwareFunc =
+			reinterpret_cast<SetProcessDPIAwareFuncType>(GetProcAddress(user32Dll, "SetProcessDPIAware"));
+
+		if(SetProcessDPIAwareFunc)
+		{
+			SetProcessDPIAwareFunc();
+		}
+
+		FreeLibrary(user32Dll);
+	}
+}
+} // namespace
+#endif
+
 inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
 {
 	return *reinterpret_cast<cursor_impl*>(c.get_impl());
@@ -50,7 +115,7 @@ inline auto get_native_display_handle(const SDL_SysWMinfo& wmi) noexcept -> nati
 {
 	(void)wmi;
 #if defined(SDL_VIDEO_DRIVER_WINDOWS)
-    return wmi.info.win.hdc;
+	return wmi.info.win.hdc;
 #elif defined(SDL_VIDEO_DRIVER_WINRT)
 	return nullptr;
 #elif defined(SDL_VIDEO_DRIVER_X11)
@@ -103,6 +168,12 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	{
 		result |= SDL_WINDOW_MAXIMIZED;
 	}
+
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+    // due to sdl's current lack of dpi awarenes on windows
+    // we have to implement it ourselves
+    set_process_dpi_aware();
+#endif
 
 	return result;
 }
@@ -364,6 +435,6 @@ public:
 private:
 	std::unique_ptr<SDL_Window, window_deleter> impl_;
 };
-}
-}
-}
+} // namespace sdl
+} // namespace detail
+} // namespace os
