@@ -80,7 +80,7 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
 			ev.type = events::text_input;
 			ev.window.window_id = window_id;
 			ev.text.text =
-				std::wstring_convert<std::codecvt_utf8<uint32_t>, uint32_t>{}.to_bytes(e.text.unicode);
+				std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>{}.to_bytes(e.text.unicode);
 			break;
 		case ::mml::platform_event::mouse_button_pressed:
 			ev.type = events::mouse_button;
