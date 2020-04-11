@@ -220,15 +220,20 @@ inline void pump_events() noexcept
 {
 	glfwPollEvents();
 
-	auto& windows = get_windows();
-	auto all_closed = std::all_of(std::begin(windows), std::end(windows),
-								  [](const auto& e) { return glfwWindowShouldClose(e->get_impl()); });
-	if(all_closed)
-	{
-		event ev{};
-		ev.type = events::quit;
-		push_event(std::move(ev));
-	}
+    static bool reported{};
+    if(!reported)
+    {
+        auto& windows = get_windows();
+        auto all_closed = std::all_of(std::begin(windows), std::end(windows),
+                                      [](const auto& e) { return glfwWindowShouldClose(e->get_impl()); });
+        if(all_closed)
+        {
+            reported = true;
+            event ev{};
+            ev.type = events::quit;
+            push_event(std::move(ev));
+        }
+    }
 }
 }
 }

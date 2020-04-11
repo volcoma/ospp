@@ -78,7 +78,7 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
                 break;
 
 			ev.type = events::text_input;
-			ev.window.window_id = window_id;
+			ev.text.window_id = window_id;
 			ev.text.text =
 				std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>{}.to_bytes(e.text.unicode);
 			break;
@@ -156,14 +156,20 @@ inline void pump_events() noexcept
 		}
 	}
 
-	auto all_closed = std::all_of(std::begin(windows), std::end(windows),
-								  [](const auto& e) { return e->recieved_close_event(); });
-	if(all_closed)
-	{
-		event ev{};
-		ev.type = events::quit;
-		push_event(std::move(ev));
-	}
+    static bool reported{};
+    if(!reported)
+    {
+        auto all_closed = std::all_of(std::begin(windows), std::end(windows),
+                                      [](const auto& e) { return e->recieved_close_event(); });
+        if(all_closed)
+        {
+            reported = true;
+
+            event ev{};
+            ev.type = events::quit;
+            push_event(std::move(ev));
+        }
+    }
 }
 }
 }
