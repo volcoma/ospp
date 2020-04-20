@@ -153,7 +153,7 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    priv::cursor_impl* _impl; ///< Platform-specific implementation of the cursor
+    priv::cursor_impl* impl_; ///< Platform-specific implementation of the cursor
 };
 
 } // namespace mml

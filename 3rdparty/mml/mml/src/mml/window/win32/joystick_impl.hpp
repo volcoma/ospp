@@ -195,13 +195,13 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    unsigned int             m_index;                          ///< Index of the joystick
-    JOYCAPS                  m_caps;                           ///< joystick capabilities
-    IDirectInputDevice8W*    m_device;                         ///< DirectInput 8.x device
-    DIDEVCAPS                m_deviceCaps;                     ///< DirectInput device capabilities
-    int                      m_axes[joystick::axis_count];      ///< Offsets to the bytes containing the axes states, -1 if not available
-    int                      m_buttons[joystick::button_count]; ///< Offsets to the bytes containing the button states, -1 if not available
-    joystick::identification m_identification;                 ///< joystick identification
+    unsigned int             index_;                          ///< Index of the joystick
+    JOYCAPS                  caps_;                           ///< joystick capabilities
+    IDirectInputDevice8W*    device_;                         ///< DirectInput 8.x device
+    DIDEVCAPS                device_caps_;                     ///< DirectInput device capabilities
+    int                      axes_[joystick::axis_count];      ///< Offsets to the bytes containing the axes states, -1 if not available
+    int                      buttons_[joystick::button_count]; ///< Offsets to the bytes containing the button states, -1 if not available
+    joystick::identification identification_;                 ///< joystick identification
 };
 
 } // namespace priv

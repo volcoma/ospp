@@ -16,8 +16,8 @@ namespace priv
 
 ////////////////////////////////////////////////////////////
 cursor_impl::cursor_impl() :
-_display(open_display()),
-_cursor(None)
+display_(open_display()),
+cursor_(None)
 {
     // That's it.
 }
@@ -28,7 +28,7 @@ cursor_impl::~cursor_impl()
 {
     release();
 
-    close_display(_display);
+    close_display(display_);
 }
 
 
@@ -63,9 +63,9 @@ bool cursor_impl::load_from_pixels(const std::uint8_t* pixels, std::array<std::u
         }
     }
 
-    Pixmap maskPixmap = XCreateBitmapFromData(_display, XDefaultRootWindow(_display),
+    Pixmap maskPixmap = XCreateBitmapFromData(display_, XDefaultRootWindow(display_),
                                               (char*)&mask[0], size[0], size[1]);
-    Pixmap dataPixmap = XCreateBitmapFromData(_display, XDefaultRootWindow(_display),
+    Pixmap dataPixmap = XCreateBitmapFromData(display_, XDefaultRootWindow(display_),
                                               (char*)&data[0], size[0], size[1]);
 
     // Define the foreground color as white and the background as black.
@@ -74,14 +74,14 @@ bool cursor_impl::load_from_pixels(const std::uint8_t* pixels, std::array<std::u
     bg.red = bg.blue = bg.green =  0;
 
     // Create the monochrome cursor.
-    _cursor = XCreatePixmapCursor(_display,
+    cursor_ = XCreatePixmapCursor(display_,
                                    dataPixmap, maskPixmap,
                                    &fg, &bg,
                                    hotspot[0], hotspot[1]);
 
     // Free the resources
-    XFreePixmap(_display, dataPixmap);
-    XFreePixmap(_display, maskPixmap);
+    XFreePixmap(display_, dataPixmap);
+    XFreePixmap(display_, maskPixmap);
 
     // We assume everything went fine...
     return true;
@@ -111,7 +111,7 @@ bool cursor_impl::load_from_system(cursor::type type)
         case cursor::not_allowed:     shape = XC_X_cursor;           break;
     }
 
-    _cursor = XCreateFontCursor(_display, shape);
+    cursor_ = XCreateFontCursor(display_, shape);
     return true;
 }
 
@@ -119,10 +119,10 @@ bool cursor_impl::load_from_system(cursor::type type)
 ////////////////////////////////////////////////////////////
 void cursor_impl::release()
 {
-    if (_cursor != None)
+    if (cursor_ != None)
     {
-        XFreeCursor(_display, _cursor);
-        _cursor = None;
+        XFreeCursor(display_, cursor_);
+        cursor_ = None;
     }
 }
 

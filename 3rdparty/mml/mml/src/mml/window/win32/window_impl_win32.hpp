@@ -253,29 +253,29 @@ private:
     // Member data
     ////////////////////////////////////////////////////////////
 	///< Win32 handle of the window
-	HWND _handle;
+	HWND handle_;
 	///< Stores the original event callback function of the control
-	LONG_PTR _callback;
+	LONG_PTR callback_;
 	///< Is the cursor visible or hidden?
-	bool _cursor_visible;
+	bool cursor_visible_;
 	///< Last cursor used -- this data is not owned by the window and is required to be always valid
-	HCURSOR _last_cursor;
+	HCURSOR last_cursor_;
 	///< Custom icon assigned to the window
-	HICON _icon;
+	HICON icon_;
 	///< Automatic key-repeat state for keydown events
-	bool _key_repeat_enabled;
+	bool key_repeat_enabled_;
 	///< The last handled size of the window
-	std::array<std::uint32_t, 2> _last_size;
+	std::array<std::uint32_t, 2> last_size_;
 	///< Is the window being resized?
-	bool _resizing;
+	bool resizing_;
 	///< First half of the surrogate pair, in case we're receiving a Unicode character in two events
-	std::uint16_t _surrogate;
+	std::uint16_t surrogate_;
 	///< mouse is inside the window?
-	bool _mouse_inside;
+	bool mouse_inside_;
 	///< Is the window fullscreen?
-	bool _fullscreen;
+	bool fullscreen_;
 	///< Is the mouse cursor trapped?
-	bool _cursor_grabbed;
+	bool cursor_grabbed_;
 };
 
 } // namespace priv

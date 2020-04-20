@@ -39,7 +39,7 @@ std::string clipboard_impl::get_string()
 	}
 
 	auto clip = std::wstring(static_cast<wchar_t*>(GlobalLock(clipboard_handle)));
-	utf16::to_utf8(std::begin(clip), std::end(clip), std::begin(text));
+	utf8::from_wide(std::begin(clip), std::end(clip), std::back_inserter(text));
 	GlobalUnlock(clipboard_handle);
 
 	CloseClipboard();

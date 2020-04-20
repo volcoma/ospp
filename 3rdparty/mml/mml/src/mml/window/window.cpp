@@ -8,7 +8,7 @@
 
 namespace
 {
-    const mml::window* fullscreenWindow = NULL;
+    const mml::window* fullscreen_window = nullptr;
 }
 
 
@@ -16,9 +16,9 @@ namespace mml
 {
 ////////////////////////////////////////////////////////////
 window::window() :
-_impl          (NULL),
-_size          ({{0, 0}}),
-_visible(false)
+impl_          (nullptr),
+size_          ({{0, 0}}),
+visible_(false)
 {
 
 }
@@ -26,9 +26,9 @@ _visible(false)
 
 ////////////////////////////////////////////////////////////
 window::window(video_mode mode, const std::string& title, std::uint32_t style) :
-_impl          (NULL),
-_size          ({{0, 0}}),
-_visible(true)
+impl_          (nullptr),
+size_          ({{0, 0}}),
+visible_(true)
 {
     create(mode, title, style);
 }
@@ -36,9 +36,9 @@ _visible(true)
 
 ////////////////////////////////////////////////////////////
 window::window(window_handle handle) :
-_impl          (NULL),
-_size          ({{0, 0}}),
-_visible(true)
+impl_          (nullptr),
+size_          ({{0, 0}}),
+visible_(true)
 {
     create(handle);
 }
@@ -61,7 +61,7 @@ void window::create(video_mode mode, const std::string& title, std::uint32_t sty
     if (style & style::fullscreen)
     {
         // Make sure there's not already a fullscreen window (only one is allowed)
-        if (fullscreenWindow)
+        if (fullscreen_window)
         {
             err() << "Creating two fullscreen windows is not allowed, switching to windowed mode" << std::endl;
             style &= ~style::fullscreen;
@@ -76,7 +76,7 @@ void window::create(video_mode mode, const std::string& title, std::uint32_t sty
             }
 
             // Update the fullscreen window
-            fullscreenWindow = this;
+            fullscreen_window = this;
         }
     }
 
@@ -92,7 +92,7 @@ void window::create(video_mode mode, const std::string& title, std::uint32_t sty
     #endif
 
     // Recreate the window implementation
-    _impl = priv::window_impl::create(mode, title, style);
+    impl_ = priv::window_impl::create(mode, title, style);
 
     // Perform common initializations
     initialize();
@@ -106,7 +106,7 @@ void window::create(window_handle handle)
     dispose();
 
     // Recreate the window implementation
-    _impl = priv::window_impl::create(handle);
+    impl_ = priv::window_impl::create(handle);
 
     // Perform common initializations
     initialize();
@@ -117,35 +117,35 @@ void window::create(window_handle handle)
 void window::dispose()
 {
     // Delete the window implementation
-    delete _impl;
-    _impl = NULL;
+    delete impl_;
+    impl_ = nullptr;
 
     // Update the fullscreen window
-    if (this == fullscreenWindow)
-        fullscreenWindow = NULL;
+    if (this == fullscreen_window)
+        fullscreen_window = nullptr;
 }
 
 ////////////////////////////////////////////////////////////
 void window::request_close()
 {
-	if (_impl)
+	if (impl_)
 	{
 		platform_event e;
 		std::memset(&e, 0, sizeof(e));
 		e.type = platform_event::closed;
-		_impl->push_event(e);
+		impl_->push_event(e);
 	}
 }
 ////////////////////////////////////////////////////////////
 bool window::is_open() const
 {
-    return _impl != NULL;
+    return impl_ != nullptr;
 }
 
 ////////////////////////////////////////////////////////////
 bool window::poll_event(platform_event& event)
 {
-    if (_impl && _impl->pop_event(event, false))
+    if (impl_ && impl_->pop_event(event, false))
     {
         return filter_event(event);
     }
@@ -159,7 +159,7 @@ bool window::poll_event(platform_event& event)
 ////////////////////////////////////////////////////////////
 bool window::wait_event(platform_event& event)
 {
-    if (_impl && _impl->pop_event(event, true))
+    if (impl_ && impl_->pop_event(event, true))
     {
         return filter_event(event);
     }
@@ -173,33 +173,33 @@ bool window::wait_event(platform_event& event)
 ////////////////////////////////////////////////////////////
 std::array<std::int32_t, 2> window::get_position() const
 {
-    return _impl ? _impl->get_position() : std::array<std::int32_t, 2>();
+    return impl_ ? impl_->get_position() : std::array<std::int32_t, 2>();
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::set_position(const std::array<std::int32_t, 2>& position)
 {
-    if (_impl)
-        _impl->set_position(position);
+    if (impl_)
+        impl_->set_position(position);
 }
 
 
 ////////////////////////////////////////////////////////////
 std::array<std::uint32_t, 2> window::get_size() const
 {
-    return _size;
+    return size_;
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::set_size(const std::array<std::uint32_t, 2>& size)
 {
-    if (_impl)
+    if (impl_)
     {
-        if(_size[0] != size[0] || _size[1] != size[1])
+        if(size_[0] != size[0] || size_[1] != size[1])
         {
-            _impl->set_size(size);
+            impl_->set_size(size);
         }
     }
 }
@@ -208,124 +208,124 @@ void window::set_size(const std::array<std::uint32_t, 2>& size)
 ////////////////////////////////////////////////////////////
 void window::set_title(const std::string& title)
 {
-    if (_impl)
-        _impl->set_title(title);
+    if (impl_)
+        impl_->set_title(title);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::set_icon(unsigned int width, unsigned int height, const std::uint8_t* pixels)
 {
-    if (_impl)
-        _impl->set_icon(width, height, pixels);
+    if (impl_)
+        impl_->set_icon(width, height, pixels);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::set_visible(bool visible)
 {
-    if (_impl)
-        _impl->set_visible(visible);
+    if (impl_)
+        impl_->set_visible(visible);
     
-    _visible = visible;
+    visible_ = visible;
 }
 
 ////////////////////////////////////////////////////////////
 bool window::is_visible() const
 {
-    return _visible;
+    return visible_;
 }
 
 ////////////////////////////////////////////////////////////
 void window::maximize()
 {
-	if (_impl)
-		_impl->maximize();
+	if (impl_)
+		impl_->maximize();
 }
 
 ////////////////////////////////////////////////////////////
 void window::minimize()
 {
-	if (_impl)
-		_impl->minimize();
+	if (impl_)
+		impl_->minimize();
 }
 
 ////////////////////////////////////////////////////////////
 void window::restore()
 {
-	if (_impl)
-		_impl->restore();
+	if (impl_)
+		impl_->restore();
 }
 
 ////////////////////////////////////////////////////////////
 void window::set_opacity(float opacity)
 {
-	if (_impl)
-		_impl->set_opacity(opacity);
+	if (impl_)
+		impl_->set_opacity(opacity);
 }
 
 ////////////////////////////////////////////////////////////
 void window::set_mouse_cursor_visible(bool visible)
 {
-    if (_impl)
-        _impl->set_mouse_cursor_visible(visible);
+    if (impl_)
+        impl_->set_mouse_cursor_visible(visible);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::set_mouse_cursor_grabbed(bool grabbed)
 {
-    if (_impl)
-        _impl->set_mouse_cursor_grabbed(grabbed);
+    if (impl_)
+        impl_->set_mouse_cursor_grabbed(grabbed);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::set_mouse_cursor(const cursor& cursor)
 {
-    if (_impl)
-        _impl->set_mouse_cursor(cursor.get_impl());
+    if (impl_)
+        impl_->set_mouse_cursor(cursor.get_impl());
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::set_key_repeat_enabled(bool enabled)
 {
-    if (_impl)
-        _impl->set_key_repeat_enabled(enabled);
+    if (impl_)
+        impl_->set_key_repeat_enabled(enabled);
 }
 
 ////////////////////////////////////////////////////////////
 void window::set_joystick_threshold(float threshold)
 {
-    if (_impl)
-        _impl->set_joystick_threshold(threshold);
+    if (impl_)
+        impl_->set_joystick_threshold(threshold);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window::request_focus()
 {
-    if (_impl)
-        _impl->request_focus();
+    if (impl_)
+        impl_->request_focus();
 }
 
 
 ////////////////////////////////////////////////////////////
 bool window::has_focus() const
 {
-    return _impl && _impl->has_focus();
+    return impl_ && impl_->has_focus();
 }
 
 
 ////////////////////////////////////////////////////////////
 window_handle window::native_handle() const
 {
-    return _impl ? _impl->native_handle() : window_handle{};
+    return impl_ ? impl_->native_handle() : window_handle{};
 }
 void* window::native_display_handle() const
 {
-    return _impl ? _impl->native_display_handle() : nullptr;
+    return impl_ ? impl_->native_display_handle() : nullptr;
 }
 ////////////////////////////////////////////////////////////
 void window::on_create()
@@ -347,10 +347,10 @@ bool window::filter_event(const platform_event& event)
     // Notify resize events to the derived class
     if (event.type == platform_event::resized)
     {
-        if(_size[0] != event.size.width || _size[1] != event.size.height)
+        if(size_[0] != event.size.width || size_[1] != event.size.height)
         {
             // Cache the new size
-            _size = { {event.size.width, event.size.height} };
+            size_ = { {event.size.width, event.size.height} };
     
             // Notify the derived class
             on_resize();
@@ -369,7 +369,7 @@ void window::initialize()
     set_key_repeat_enabled(true);
 
     // Get and cache the initial size of the window
-    _size = _impl->get_size();
+    size_ = impl_->get_size();
 
     // Notify the derived class
     on_create();

@@ -43,38 +43,38 @@ void clipboard_impl::process_events()
 
 ////////////////////////////////////////////////////////////
 clipboard_impl::clipboard_impl()
-	: m_window(0)
-	, m_requestResponded(false)
+	: window_(0)
+	, request_responded_(false)
 {
 	// Open a connection with the X server
-	m_display = open_display();
+	display_ = open_display();
 
 	// Get the atoms we need to make use of the clipboard
-	m_clipboard = get_atom("CLIPBOARD", false);
-	m_targets = get_atom("TARGETS", false);
-	m_text = get_atom("TEXT", false);
-	m_utf8String = get_atom("UTF8_STRING", true);
-	m_targetProperty = get_atom("SFML_CLIPBOARD_TARGET_PROPERTY", false);
+	clipboard_ = get_atom("CLIPBOARD", false);
+	targets_ = get_atom("TARGETS", false);
+	text_ = get_atom("TEXT", false);
+	utf8_string_ = get_atom("UTF8_STRING", true);
+	target_property_ = get_atom("SFML_CLIPBOARD_TARGET_PROPERTY", false);
 
 	// Create a hidden window that will broker our clipboard interactions with X
-	m_window = XCreateSimpleWindow(m_display, DefaultRootWindow(m_display), 0, 0, 1, 1, 0, 0, 0);
+	window_ = XCreateSimpleWindow(display_, DefaultRootWindow(display_), 0, 0, 1, 1, 0, 0, 0);
 
 	// Register the events we are interested in
-	XSelectInput(m_display, m_window, SelectionNotify | SelectionClear | SelectionRequest);
+	XSelectInput(display_, window_, SelectionNotify | SelectionClear | SelectionRequest);
 }
 
 ////////////////////////////////////////////////////////////
 clipboard_impl::~clipboard_impl()
 {
 	// Destroy the window
-	if(m_window)
+	if(window_)
 	{
-		XDestroyWindow(m_display, m_window);
-		XFlush(m_display);
+		XDestroyWindow(display_, window_);
+		XFlush(display_);
 	}
 
 	// Close the connection with the X server
-	close_display(m_display);
+	close_display(display_);
 }
 
 ////////////////////////////////////////////////////////////
@@ -89,47 +89,47 @@ clipboard_impl& clipboard_impl::get_instance()
 std::string clipboard_impl::get_string_impl()
 {
 	// Check if anybody owns the current selection
-	if(XGetSelectionOwner(m_display, m_clipboard) == None)
+	if(XGetSelectionOwner(display_, clipboard_) == None)
 	{
-		m_clipboardContents.clear();
+		clipboard_contents_.clear();
 
-		return m_clipboardContents;
+		return clipboard_contents_;
 	}
 
 	// Process any already pending events
 	process_events();
 
-	m_requestResponded = false;
+	request_responded_ = false;
 
 	// Request the current selection to be converted to UTF-8 (or STRING
 	// if UTF-8 is not available) and written to our window property
-	XConvertSelection(m_display, m_clipboard, (m_utf8String != None) ? m_utf8String : XA_STRING,
-					  m_targetProperty, m_window, CurrentTime);
+	XConvertSelection(display_, clipboard_, (utf8_string_ != None) ? utf8_string_ : XA_STRING,
+					  target_property_, window_, CurrentTime);
 
 
 	auto last = std::chrono::steady_clock::now();
 	// Wait for a response for up to 1000ms
-	while(!m_requestResponded && (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - last) <
+	while(!request_responded_ && (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - last) <
 								  std::chrono::milliseconds(1000)))
 		process_events();
 
 	// If no response was received within the time period, clear our clipboard contents
-	if(!m_requestResponded)
-		m_clipboardContents.clear();
+	if(!request_responded_)
+		clipboard_contents_.clear();
 
-	return m_clipboardContents;
+	return clipboard_contents_;
 }
 
 ////////////////////////////////////////////////////////////
 void clipboard_impl::set_string_impl(const std::string& text)
 {
-	m_clipboardContents = text;
+	clipboard_contents_ = text;
 
 	// Set our window as the current owner of the selection
-	XSetSelectionOwner(m_display, m_clipboard, m_window, CurrentTime);
+	XSetSelectionOwner(display_, clipboard_, window_, CurrentTime);
 
 	// Check if setting the selection owner was successful
-	if(XGetSelectionOwner(m_display, m_clipboard) != m_window)
+	if(XGetSelectionOwner(display_, clipboard_) != window_)
 		err() << "Cannot set clipboard string: Unable to get ownership of X selection" << std::endl;
 }
 
@@ -139,14 +139,14 @@ void clipboard_impl::process_events_impl()
 	XEvent event;
 
 	// Pick out the events that are interesting for this window
-	while(XCheckIfEvent(m_display, &event, &checkEvent, reinterpret_cast<XPointer>(m_window)))
-		m_events.push_back(event);
+	while(XCheckIfEvent(display_, &event, &checkEvent, reinterpret_cast<XPointer>(window_)))
+		events_.push_back(event);
 
 	// Handle the events for this window that we just picked out
-	while(!m_events.empty())
+	while(!events_.empty())
 	{
-		event = m_events.front();
-		m_events.pop_front();
+		event = events_.front();
+		events_.pop_front();
 		process_event(event);
 	}
 }
@@ -172,12 +172,12 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 
 			XSelectionEvent& selectionEvent = *reinterpret_cast<XSelectionEvent*>(&windowEvent.xselection);
 
-			m_clipboardContents.clear();
+			clipboard_contents_.clear();
 
 			// If retrieving the selection fails or conversion is unsuccessful
 			// we leave the contents of the clipboard empty since we don't
 			// own it and we don't know what it could currently be
-			if((selectionEvent.property == None) || (selectionEvent.selection != m_clipboard))
+			if((selectionEvent.property == None) || (selectionEvent.selection != clipboard_))
 				break;
 
 			Atom type;
@@ -188,7 +188,7 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 
 			// The selection owner should have wrote the selection
 			// data to the specified window property
-			int result = XGetWindowProperty(m_display, m_window, m_targetProperty, 0, 0x7fffffff, False,
+			int result = XGetWindowProperty(display_, window_, target_property_, 0, 0x7fffffff, False,
 											AnyPropertyType, &type, &format, &items, &remainingBytes, &data);
 
 			if(result == Success)
@@ -199,23 +199,23 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 				if(type != get_atom("INCR", false))
 				{
 					// Only copy the data if the format is what we expect
-					if((type == m_utf8String) && (format == 8))
+					if((type == utf8_string_) && (format == 8))
 					{
-						m_clipboardContents = std::string(data, data + items);
+						clipboard_contents_ = std::string(data, data + items);
 					}
 					else if((type == XA_STRING) && (format == 8))
 					{
-						m_clipboardContents = std::string(data, data + items);
+						clipboard_contents_ = std::string(data, data + items);
 					}
 				}
 
 				XFree(data);
 
 				// The selection requestor must always delete the property themselves
-				XDeleteProperty(m_display, m_window, m_targetProperty);
+				XDeleteProperty(display_, window_, target_property_);
 			}
 
-			m_requestResponded = true;
+			request_responded_ = true;
 
 			break;
 		}
@@ -234,66 +234,66 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 			selectionEvent.property = selectionRequestEvent.property;
 			selectionEvent.time = selectionRequestEvent.time;
 
-			if(selectionRequestEvent.selection == m_clipboard)
+			if(selectionRequestEvent.selection == clipboard_)
 			{
-				if(selectionRequestEvent.target == m_targets)
+				if(selectionRequestEvent.target == targets_)
 				{
 					// Respond to a request for our valid conversion targets
 					std::vector<Atom> targets;
 
-					targets.push_back(m_targets);
-					targets.push_back(m_text);
+					targets.push_back(targets_);
+					targets.push_back(text_);
 					targets.push_back(XA_STRING);
 
-					if(m_utf8String != None)
-						targets.push_back(m_utf8String);
+					if(utf8_string_ != None)
+						targets.push_back(utf8_string_);
 
-					XChangeProperty(m_display, selectionRequestEvent.requestor,
+					XChangeProperty(display_, selectionRequestEvent.requestor,
 									selectionRequestEvent.property, XA_ATOM, 32, PropModeReplace,
 									reinterpret_cast<unsigned char*>(&targets[0]), targets.size());
 
 					// Notify the requestor that they can read the targets from their window property
-					selectionEvent.target = m_targets;
+					selectionEvent.target = targets_;
 
-					XSendEvent(m_display, selectionRequestEvent.requestor, True, NoEventMask,
+					XSendEvent(display_, selectionRequestEvent.requestor, True, NoEventMask,
 							   reinterpret_cast<XEvent*>(&selectionEvent));
 
 					break;
 				}
 				else if((selectionRequestEvent.target == XA_STRING) ||
-						((m_utf8String == None) && (selectionRequestEvent.target == m_text)))
+						((utf8_string_ == None) && (selectionRequestEvent.target == text_)))
 				{
 					// Respond to a request for conversion to a Latin-1 string
-					std::string data = m_clipboardContents;
+					std::string data = clipboard_contents_;
 
-					XChangeProperty(m_display, selectionRequestEvent.requestor,
+					XChangeProperty(display_, selectionRequestEvent.requestor,
 									selectionRequestEvent.property, XA_STRING, 8, PropModeReplace,
 									reinterpret_cast<const unsigned char*>(data.c_str()), data.size());
 
 					// Notify the requestor that they can read the data from their window property
 					selectionEvent.target = XA_STRING;
 
-					XSendEvent(m_display, selectionRequestEvent.requestor, True, NoEventMask,
+					XSendEvent(display_, selectionRequestEvent.requestor, True, NoEventMask,
 							   reinterpret_cast<XEvent*>(&selectionEvent));
 
 					break;
 				}
-				else if((m_utf8String != None) && ((selectionRequestEvent.target == m_utf8String) ||
-												   (selectionRequestEvent.target == m_text)))
+				else if((utf8_string_ != None) && ((selectionRequestEvent.target == utf8_string_) ||
+												   (selectionRequestEvent.target == text_)))
 				{
 					// Respond to a request for conversion to a UTF-8 string
 					// or an encoding of our choosing (we always choose UTF-8)
 					// std::basic_string<uint8> data = m_clipboardContents.toUtf8();
-					std::string data = m_clipboardContents;
+					std::string data = clipboard_contents_;
 
-					XChangeProperty(m_display, selectionRequestEvent.requestor,
-									selectionRequestEvent.property, m_utf8String, 8, PropModeReplace,
+					XChangeProperty(display_, selectionRequestEvent.requestor,
+									selectionRequestEvent.property, utf8_string_, 8, PropModeReplace,
 									reinterpret_cast<const unsigned char*>(data.c_str()), data.size());
 
 					// Notify the requestor that they can read the data from their window property
-					selectionEvent.target = m_utf8String;
+					selectionEvent.target = utf8_string_;
 
-					XSendEvent(m_display, selectionRequestEvent.requestor, True, NoEventMask,
+					XSendEvent(display_, selectionRequestEvent.requestor, True, NoEventMask,
 							   reinterpret_cast<XEvent*>(&selectionEvent));
 
 					break;
@@ -304,7 +304,7 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 			selectionEvent.target = selectionRequestEvent.target;
 			selectionEvent.property = None;
 
-			XSendEvent(m_display, selectionRequestEvent.requestor, True, NoEventMask,
+			XSendEvent(display_, selectionRequestEvent.requestor, True, NoEventMask,
 					   reinterpret_cast<XEvent*>(&selectionEvent));
 
 			break;

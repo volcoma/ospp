@@ -88,7 +88,7 @@ namespace
         return true;
     }
 
-    void update_plugged_list(udev_device* udevDevice = NULL)
+    void update_plugged_list(udev_device* udevDevice = nullptr)
     {
         if (udevDevice)
         {
@@ -234,7 +234,7 @@ namespace
         FD_SET(monitorFd, &descriptorSet);
         timeval timeout = {0, 0};
 
-        return (select(monitorFd + 1, &descriptorSet, NULL, NULL, &timeout) > 0) &&
+        return (select(monitorFd + 1, &descriptorSet, nullptr, nullptr, &timeout) > 0) &&
                FD_ISSET(monitorFd, &descriptorSet);
     }
 
@@ -250,7 +250,7 @@ namespace
         udev_device* udevDeviceParent = udev_device_get_parent_with_subsystem_devtype(udevDevice, "usb", "usb_device");
 
         if (!udevDeviceParent)
-            return NULL;
+            return nullptr;
 
         return udev_device_get_sysattr_value(udevDeviceParent, attributeName.c_str());
     }
@@ -265,7 +265,7 @@ namespace
         unsigned int value = 0;
 
         if (attribute)
-            value = static_cast<unsigned int>(std::strtoul(attribute, NULL, 16));
+            value = static_cast<unsigned int>(std::strtoul(attribute, nullptr, 16));
 
         return value;
     }
@@ -280,7 +280,7 @@ namespace
         unsigned int value = 0;
 
         if (attribute)
-            value = static_cast<unsigned int>(std::strtoul(attribute, NULL, 16));
+            value = static_cast<unsigned int>(std::strtoul(attribute, nullptr, 16));
 
         return value;
     }
@@ -417,9 +417,9 @@ namespace priv
 {
 ////////////////////////////////////////////////////////////
 joystick_impl::joystick_impl() :
-_file(-1)
+file_(-1)
 {
-    std::fill(_mapping, _mapping + ABS_MAX + 1, 0);
+    std::fill(mapping_, mapping_ + ABS_MAX + 1, 0);
 }
 
 
@@ -442,7 +442,7 @@ void joystick_impl::initialize()
     }
     else
     {
-        int error = udev_monitor_filter_add_match_subsystem_devtype(udevMonitor, "input", NULL);
+        int error = udev_monitor_filter_add_match_subsystem_devtype(udevMonitor, "input", nullptr);
 
         if (error < 0)
         {
@@ -504,7 +504,7 @@ bool joystick_impl::is_connected(unsigned int index)
         udev_device* udevDevice = udev_monitor_receive_device(udevMonitor);
 
         // If we can get the specific device, we check that,
-        // otherwise just do a full scan if udevDevice == NULL
+        // otherwise just do a full scan if udevDevice == nullptr
         update_plugged_list(udevDevice);
 
         if (udevDevice)
@@ -529,23 +529,23 @@ bool joystick_impl::open(unsigned int index)
         std::string devnode = joystickList[index].device_node;
 
         // Open the joystick's file descriptor (read-only and non-blocking)
-        _file = ::open(devnode.c_str(), O_RDONLY | O_NONBLOCK);
-        if (_file >= 0)
+        file_ = ::open(devnode.c_str(), O_RDONLY | O_NONBLOCK);
+        if (file_ >= 0)
         {
             // Retrieve the axes mapping
-            ioctl(_file, JSIOCGAXMAP, _mapping);
+            ioctl(file_, JSIOCGAXMAP, mapping_);
 
             // Get info
-            _identification.name = get_joystick_name(index);
+            identification_.name = get_joystick_name(index);
 
             if (udevContext)
             {
-                _identification.vendor_id  = get_joystick_vendor_id(index);
-                _identification.product_id = get_joystick_product_id(index);
+                identification_.vendor_id  = get_joystick_vendor_id(index);
+                identification_.product_id = get_joystick_product_id(index);
             }
 
             // Reset the joystick state
-            _state = joystick_state();
+            state_ = joystick_state();
 
             return true;
         }
@@ -562,8 +562,8 @@ bool joystick_impl::open(unsigned int index)
 ////////////////////////////////////////////////////////////
 void joystick_impl::close()
 {
-    ::close(_file);
-    _file = -1;
+    ::close(file_);
+    file_ = -1;
 }
 
 
@@ -572,22 +572,22 @@ joystick_caps joystick_impl::get_capabilities() const
 {
     joystick_caps caps;
 
-    if (_file < 0)
+    if (file_ < 0)
         return caps;
 
     // Get the number of buttons
     char button_count;
-    ioctl(_file, JSIOCGBUTTONS, &button_count);
+    ioctl(file_, JSIOCGBUTTONS, &button_count);
     caps.button_count = button_count;
     if (caps.button_count > joystick::button_count)
         caps.button_count = joystick::button_count;
 
     // Get the supported axes
     char axesCount;
-    ioctl(_file, JSIOCGAXES, &axesCount);
+    ioctl(file_, JSIOCGAXES, &axesCount);
     for (int i = 0; i < axesCount; ++i)
     {
-        switch (_mapping[i])
+        switch (mapping_[i])
         {
             case ABS_X:        caps.axes[joystick::X]    = true; break;
             case ABS_Y:        caps.axes[joystick::Y]    = true; break;
@@ -610,22 +610,22 @@ joystick_caps joystick_impl::get_capabilities() const
 ////////////////////////////////////////////////////////////
 joystick::identification joystick_impl::get_identification() const
 {
-    return _identification;
+    return identification_;
 }
 
 
 ////////////////////////////////////////////////////////////
 joystick_state joystick_impl::joystick_impl::update()
 {
-    if (_file < 0)
+    if (file_ < 0)
     {
-        _state = joystick_state();
-        return _state;
+        state_ = joystick_state();
+        return state_;
     }
 
     // pop events from the joystick file
     js_event joyState;
-    int result = read(_file, &joyState, sizeof(joyState));
+    int result = read(file_, &joyState, sizeof(joyState));
     while (result > 0)
     {
         switch (joyState.type & ~JS_EVENT_INIT)
@@ -637,18 +637,18 @@ joystick_state joystick_impl::joystick_impl::update()
 
                 if (joyState.number < ABS_MAX + 1)
                 {
-                    switch (_mapping[joyState.number])
+                    switch (mapping_[joyState.number])
                     {
-                        case ABS_X:        _state.axes[joystick::X]    = value; break;
-                        case ABS_Y:        _state.axes[joystick::Y]    = value; break;
+                        case ABS_X:        state_.axes[joystick::X]    = value; break;
+                        case ABS_Y:        state_.axes[joystick::Y]    = value; break;
                         case ABS_Z:
-                        case ABS_THROTTLE: _state.axes[joystick::Z]    = value; break;
+                        case ABS_THROTTLE: state_.axes[joystick::Z]    = value; break;
                         case ABS_RZ:
-                        case ABS_RUDDER:   _state.axes[joystick::R]    = value; break;
-                        case ABS_RX:       _state.axes[joystick::U]    = value; break;
-                        case ABS_RY:       _state.axes[joystick::V]    = value; break;
-                        case ABS_HAT0X:    _state.axes[joystick::PovX] = value; break;
-                        case ABS_HAT0Y:    _state.axes[joystick::PovY] = value; break;
+                        case ABS_RUDDER:   state_.axes[joystick::R]    = value; break;
+                        case ABS_RX:       state_.axes[joystick::U]    = value; break;
+                        case ABS_RY:       state_.axes[joystick::V]    = value; break;
+                        case ABS_HAT0X:    state_.axes[joystick::PovX] = value; break;
+                        case ABS_HAT0Y:    state_.axes[joystick::PovY] = value; break;
                         default:           break;
                     }
                 }
@@ -659,12 +659,12 @@ joystick_state joystick_impl::joystick_impl::update()
             case JS_EVENT_BUTTON:
             {
                 if (joyState.number < joystick::button_count)
-                    _state.buttons[joyState.number] = (joyState.value != 0);
+                    state_.buttons[joyState.number] = (joyState.value != 0);
                 break;
             }
         }
 
-        result = read(_file, &joyState, sizeof(joyState));
+        result = read(file_, &joyState, sizeof(joyState));
     }
 
     // Check the connection state of the joystick
@@ -674,9 +674,9 @@ joystick_state joystick_impl::joystick_impl::update()
     // result can be either negative or 0 at this point
     // If result is 0, assume the joystick is still connected
     // If result is negative, check errno and disconnect if it is not EAGAIN
-    _state.connected = (!result || (errno == EAGAIN));
+    state_.connected = (!result || (errno == EAGAIN));
 
-    return _state;
+    return state_;
 }
 
 } // namespace priv

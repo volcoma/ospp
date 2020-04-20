@@ -12,7 +12,7 @@ namespace priv
 
 ////////////////////////////////////////////////////////////
 cursor_impl::cursor_impl() :
-_cursor(NULL)
+cursor_(nullptr)
 {
     // That's it.
 }
@@ -45,18 +45,18 @@ bool cursor_impl::load_from_pixels(const std::uint8_t* pixels, const std::array<
     bitmapHeader.bV5BlueMask    = 0x000000ff;
     bitmapHeader.bV5AlphaMask   = 0xff000000;
 
-    std::uint32_t* bitmapData = NULL;
+    std::uint32_t* bitmapData = nullptr;
 
-    HDC screenDC = GetDC(NULL);
+    HDC screenDC = GetDC(nullptr);
     HBITMAP color = CreateDIBSection(
         screenDC,
         reinterpret_cast<const BITMAPINFO*>(&bitmapHeader),
         DIB_RGB_COLORS,
         reinterpret_cast<void**>(&bitmapData),
-        NULL,
+        nullptr,
         0
     );
-    ReleaseDC(NULL, screenDC);
+    ReleaseDC(nullptr, screenDC);
 
     if (!color)
     {
@@ -72,7 +72,7 @@ bool cursor_impl::load_from_pixels(const std::uint8_t* pixels, const std::array<
     }
 
     // Create a dummy mask bitmap (it won't be used)
-    HBITMAP mask = CreateBitmap(size[0], size[1], 1, 1, NULL);
+    HBITMAP mask = CreateBitmap(size[0], size[1], 1, 1, nullptr);
 
     if (!mask)
     {
@@ -92,13 +92,13 @@ bool cursor_impl::load_from_pixels(const std::uint8_t* pixels, const std::array<
     cursorInfo.hbmMask  = mask;
 
     // Create the cursor
-    _cursor = reinterpret_cast<HCURSOR>(CreateIconIndirect(&cursorInfo));
+    cursor_ = reinterpret_cast<HCURSOR>(CreateIconIndirect(&cursorInfo));
 
     // The data has been copied into the cursor, so get rid of these
     DeleteObject(color);
     DeleteObject(mask);
 
-    if (_cursor)
+    if (cursor_)
     {
         return true;
     }
@@ -134,9 +134,9 @@ bool cursor_impl::load_from_system(cursor::type type)
     }
 
     // Create a copy of the shared system cursor that we can destroy later
-    _cursor = CopyCursor(LoadCursor(NULL, shape));
+    cursor_ = CopyCursor(LoadCursor(nullptr, shape));
 
-    if (_cursor)
+    if (cursor_)
     {
         return true;
     }
@@ -151,9 +151,9 @@ bool cursor_impl::load_from_system(cursor::type type)
 ////////////////////////////////////////////////////////////
 void cursor_impl::release()
 {
-    if (_cursor) {
-        DestroyCursor(_cursor);
-        _cursor = NULL;
+    if (cursor_) {
+        DestroyCursor(cursor_);
+        cursor_ = nullptr;
     }
 }
 

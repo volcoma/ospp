@@ -92,10 +92,10 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    int                          _file;                 ///< File descriptor of the joystick
-    char                         _mapping[ABS_MAX + 1]; ///< Axes mapping (index to axis id)
-    joystick_state                _state;                ///< Current state of the joystick
-    mml::joystick::identification _identification;       ///< identification of the joystick
+    int                           file_;                 ///< File descriptor of the joystick
+    char                          mapping_[ABS_MAX + 1]; ///< Axes mapping (index to axis id)
+    joystick_state                state_;                ///< Current state of the joystick
+    mml::joystick::identification identification_;       ///< identification of the joystick
 };
 
 } // namespace priv

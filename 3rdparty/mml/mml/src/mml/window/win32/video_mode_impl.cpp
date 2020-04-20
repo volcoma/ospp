@@ -19,7 +19,7 @@ std::vector<video_mode> video_mode_impl::get_fullscreen_modes()
     DEVMODE win32Mode;
     win32Mode.dmSize = sizeof(win32Mode);
     win32Mode.dmDriverExtra = 0;
-    for (int count = 0; EnumDisplaySettings(NULL, count, &win32Mode); ++count)
+    for (int count = 0; EnumDisplaySettings(nullptr, count, &win32Mode); ++count)
     {
         // Convert to mml::video_mode
         video_mode mode(win32Mode.dmPelsWidth, win32Mode.dmPelsHeight, win32Mode.dmBitsPerPel);
@@ -39,7 +39,7 @@ video_mode video_mode_impl::get_desktop_mode()
     DEVMODE win32Mode;
     win32Mode.dmSize = sizeof(win32Mode);
     win32Mode.dmDriverExtra = 0;
-    EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &win32Mode);
+    EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &win32Mode);
 
     return video_mode(win32Mode.dmPelsWidth, win32Mode.dmPelsHeight, win32Mode.dmBitsPerPel);
 }

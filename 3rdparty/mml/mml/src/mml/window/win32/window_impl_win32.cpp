@@ -34,10 +34,10 @@
 
 namespace
 {
-    unsigned int               windowCount      = 0; // Windows owned by mml
-    unsigned int               handleCount      = 0; // All window handles
-    const wchar_t*             className        = L"MML_Window";
-    mml::priv::window_impl_win32* fullscreenWindow = NULL;
+    unsigned int               window_count      = 0; // Windows owned by mml
+    unsigned int               handle_count      = 0; // All window handles
+    const wchar_t*             class_name        = L"MML_Window";
+    mml::priv::window_impl_win32* fullscreenWindow = nullptr;
 
     void set_process_dpi_aware()
     {
@@ -101,66 +101,66 @@ namespace priv
 {
 ////////////////////////////////////////////////////////////
 window_impl_win32::window_impl_win32(window_handle handle) :
-_handle          (handle),
-_callback        (0),
-_cursor_visible   (true), // might need to call GetCursorInfo
-_last_cursor      (LoadCursor(NULL, IDC_ARROW)),
-_icon            (NULL),
-_key_repeat_enabled(true),
-_last_size        ({0, 0}),
-_resizing        (false),
-_surrogate       (0),
-_mouse_inside     (false),
-_fullscreen      (false),
-_cursor_grabbed   (false)
+handle_          (handle),
+callback_        (0),
+cursor_visible_   (true), // might need to call GetCursorInfo
+last_cursor_      (LoadCursor(nullptr, IDC_ARROW)),
+icon_            (nullptr),
+key_repeat_enabled_(true),
+last_size_        ({0, 0}),
+resizing_        (false),
+surrogate_       (0),
+mouse_inside_     (false),
+fullscreen_      (false),
+cursor_grabbed_   (false)
 {
     // Set that this process is DPI aware and can handle DPI scaling
     set_process_dpi_aware();
 
-    if (_handle)
+    if (handle_)
     {
         // If we're the first window handle, we only need to poll for joysticks when WM_DEVICECHANGE message is received
-        if (handleCount == 0)
+        if (handle_count == 0)
             joystick_impl::set_lazy_updates(true);
 
-        ++handleCount;
+        ++handle_count;
 
         // We change the event procedure of the control (it is important to save the old one)
-        SetWindowLongPtrW(_handle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-        _callback = SetWindowLongPtrW(_handle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&window_impl_win32::global_on_event));
+        SetWindowLongPtrW(handle_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+        callback_ = SetWindowLongPtrW(handle_, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&window_impl_win32::global_on_event));
     }
 }
 
 
 ////////////////////////////////////////////////////////////
 window_impl_win32::window_impl_win32(video_mode mode, const std::string& title, std::uint32_t style) :
-_handle          (NULL),
-_callback        (0),
-_cursor_visible   (true), // might need to call GetCursorInfo
-_last_cursor      (LoadCursor(NULL, IDC_ARROW)),
-_icon            (NULL),
-_key_repeat_enabled(true),
-_last_size        ({mode.width, mode.height}),
-_resizing        (false),
-_surrogate       (0),
-_mouse_inside     (false),
-_fullscreen      ((style & style::fullscreen) != 0),
-_cursor_grabbed   (_fullscreen)
+handle_          (nullptr),
+callback_        (0),
+cursor_visible_   (true), // might need to call GetCursorInfo
+last_cursor_      (LoadCursor(nullptr, IDC_ARROW)),
+icon_            (nullptr),
+key_repeat_enabled_(true),
+last_size_        ({mode.width, mode.height}),
+resizing_        (false),
+surrogate_       (0),
+mouse_inside_     (false),
+fullscreen_      ((style & style::fullscreen) != 0),
+cursor_grabbed_   (fullscreen_)
 {
     // Set that this process is DPI aware and can handle DPI scaling
     set_process_dpi_aware();
 
     // Register the window class at first call
-    if (windowCount == 0)
+    if (window_count == 0)
         register_window_class();
 
     // Compute position and size
-    HDC screenDC = GetDC(NULL);
+    HDC screenDC = GetDC(nullptr);
     int left   = (GetDeviceCaps(screenDC, HORZRES) - static_cast<int>(mode.width))  / 2;
     int top    = (GetDeviceCaps(screenDC, VERTRES) - static_cast<int>(mode.height)) / 2;
     int width  = mode.width;
     int height = mode.height;
-    ReleaseDC(NULL, screenDC);
+    ReleaseDC(nullptr, screenDC);
 
     // Choose the window style according to the style parameter
     bool hidden = (style & style::hidden) != 0;
@@ -183,7 +183,7 @@ _cursor_grabbed   (_fullscreen)
     }
 
     // In windowed mode, adjust width and height so that window will have the requested client area
-    if (!_fullscreen)
+    if (!fullscreen_)
     {
         RECT rectangle = {0, 0, width, height};
         AdjustWindowRect(&rectangle, win32Style, false);
@@ -195,19 +195,19 @@ _cursor_grabbed   (_fullscreen)
 	// Convert
 	utf8::to_wide(title.begin(), title.end(), std::back_inserter(wtitle), 0);
     // Create the window
-    _handle = CreateWindowW(className, wtitle.c_str(), win32Style, left, top, width, height, NULL, NULL, GetModuleHandle(NULL), this);
+    handle_ = CreateWindowW(class_name, wtitle.c_str(), win32Style, left, top, width, height, nullptr, nullptr, GetModuleHandle(nullptr), this);
     // Register to receive device interface change notifications (used for joystick connection handling)
     DEV_BROADCAST_HDR deviceBroadcastHeader = {sizeof(DEV_BROADCAST_HDR), DBT_DEVTYP_DEVICEINTERFACE, 0};
-    RegisterDeviceNotification(_handle, &deviceBroadcastHeader, DEVICE_NOTIFY_WINDOW_HANDLE | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES);
+    RegisterDeviceNotification(handle_, &deviceBroadcastHeader, DEVICE_NOTIFY_WINDOW_HANDLE | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES);
 
 
     // If we're the first window handle, we only need to poll for joysticks when WM_DEVICECHANGE message is received
-    if (_handle)
+    if (handle_)
     {
-        if (handleCount == 0)
+        if (handle_count == 0)
             joystick_impl::set_lazy_updates(true);
 
-        ++handleCount;
+        ++handle_count;
     }
 
     // By default, the OS limits the size of the window the the desktop size,
@@ -215,11 +215,11 @@ _cursor_grabbed   (_fullscreen)
 	set_size(std::array<std::uint32_t, 2>({ mode.width, mode.height }));
 
     // Switch to fullscreen if requested
-    if (_fullscreen)
+    if (fullscreen_)
         switch_to_fullscreen(mode);
 
     // Increment window count
-    windowCount++;
+    window_count++;
 }
 
 
@@ -229,35 +229,35 @@ window_impl_win32::~window_impl_win32()
     // TODO should we restore the cursor shape and visibility?
 
     // Destroy the custom icon, if any
-    if (_icon)
-        DestroyIcon(_icon);
+    if (icon_)
+        DestroyIcon(icon_);
 
     // If it's the last window handle we have to poll for joysticks again
-    if (_handle)
+    if (handle_)
     {
-        --handleCount;
+        --handle_count;
 
-        if (handleCount == 0)
+        if (handle_count == 0)
             joystick_impl::set_lazy_updates(false);
     }
 
-    if (!_callback)
+    if (!callback_)
     {
         // Destroy the window
-        if (_handle)
-            DestroyWindow(_handle);
+        if (handle_)
+            DestroyWindow(handle_);
 
         // Decrement the window count
-        windowCount--;
+        window_count--;
 
         // Unregister window class if we were the last window
-        if (windowCount == 0)
-            UnregisterClassW(className, GetModuleHandleW(NULL));
+        if (window_count == 0)
+            UnregisterClassW(class_name, GetModuleHandleW(nullptr));
     }
     else
     {
         // The window is external: remove the hook on its message callback
-        SetWindowLongPtrW(_handle, GWLP_WNDPROC, _callback);
+        SetWindowLongPtrW(handle_, GWLP_WNDPROC, callback_);
     }
 }
 
@@ -265,12 +265,12 @@ window_impl_win32::~window_impl_win32()
 ////////////////////////////////////////////////////////////
 window_handle window_impl_win32::native_handle() const
 {
-    return _handle;
+    return handle_;
 }
 
 void* window_impl_win32::native_display_handle() const
 {
-    return GetDC(_handle);
+    return GetDC(handle_);
 }
 
 
@@ -278,10 +278,10 @@ void* window_impl_win32::native_display_handle() const
 void window_impl_win32::process_events()
 {
     // We process the window events only if we own it
-    if (!_callback)
+    if (!callback_)
     {
         MSG message;
-        while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&message);
             DispatchMessageW(&message);
@@ -294,7 +294,7 @@ void window_impl_win32::process_events()
 std::array<std::int32_t, 2> window_impl_win32::get_position() const
 {
     RECT rect;
-    GetWindowRect(_handle, &rect);
+    GetWindowRect(handle_, &rect);
 
 	return std::array<std::int32_t, 2>({ rect.left, rect.top });
 }
@@ -303,9 +303,9 @@ std::array<std::int32_t, 2> window_impl_win32::get_position() const
 ////////////////////////////////////////////////////////////
 void window_impl_win32::set_position(const std::array<std::int32_t, 2>& position)
 {
-    SetWindowPos(_handle, NULL, position[0], position[1], 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+    SetWindowPos(handle_, nullptr, position[0], position[1], 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
-    if(_cursor_grabbed)
+    if(cursor_grabbed_)
         grab_cursor(true);
 }
 
@@ -314,7 +314,7 @@ void window_impl_win32::set_position(const std::array<std::int32_t, 2>& position
 std::array<std::uint32_t, 2> window_impl_win32::get_size() const
 {
     RECT rect;
-    GetClientRect(_handle, &rect);
+    GetClientRect(handle_, &rect);
 
 	return std::array<std::uint32_t, 2>
 		({ static_cast<std::uint32_t>(rect.right - rect.left), static_cast<std::uint32_t>(rect.bottom - rect.top) });
@@ -327,11 +327,11 @@ void window_impl_win32::set_size(const std::array<std::uint32_t, 2>& size)
     // SetWindowPos wants the total size of the window (including title bar and borders),
     // so we have to compute it
     RECT rectangle = {0, 0, static_cast<long>(size[0]), static_cast<long>(size[1])};
-    AdjustWindowRect(&rectangle, GetWindowLong(_handle, GWL_STYLE), false);
+    AdjustWindowRect(&rectangle, GetWindowLong(handle_, GWL_STYLE), false);
     int width  = rectangle.right - rectangle.left;
     int height = rectangle.bottom - rectangle.top;
 
-    SetWindowPos(_handle, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
+    SetWindowPos(handle_, nullptr, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
 }
 
 
@@ -343,7 +343,7 @@ void window_impl_win32::set_title(const std::string& title)
 
 	// Convert
 	utf8::to_wide(title.begin(), title.end(), std::back_inserter(wtitle), 0);
-    SetWindowTextW(_handle, wtitle.c_str());
+    SetWindowTextW(handle_, wtitle.c_str());
 }
 
 
@@ -351,8 +351,8 @@ void window_impl_win32::set_title(const std::string& title)
 void window_impl_win32::set_icon(unsigned int width, unsigned int height, const std::uint8_t* pixels)
 {
     // First destroy the previous one
-    if (_icon)
-        DestroyIcon(_icon);
+    if (icon_)
+        DestroyIcon(icon_);
 
     // Windows wants BGRA pixels: swap red and blue channels
     std::vector<std::uint8_t> iconPixels(width * height * 4);
@@ -365,13 +365,13 @@ void window_impl_win32::set_icon(unsigned int width, unsigned int height, const 
     }
 
     // Create the icon from the pixel array
-    _icon = CreateIcon(GetModuleHandleW(NULL), width, height, 1, 32, NULL, &iconPixels[0]);
+    icon_ = CreateIcon(GetModuleHandleW(nullptr), width, height, 1, 32, nullptr, &iconPixels[0]);
 
     // Set it as both big and small icon of the window
-    if (_icon)
+    if (icon_)
     {
-        SendMessageW(_handle, WM_SETICON, ICON_BIG,   (LPARAM)_icon);
-        SendMessageW(_handle, WM_SETICON, ICON_SMALL, (LPARAM)_icon);
+        SendMessageW(handle_, WM_SETICON, ICON_BIG,   (LPARAM)icon_);
+        SendMessageW(handle_, WM_SETICON, ICON_SMALL, (LPARAM)icon_);
     }
     else
     {
@@ -383,25 +383,25 @@ void window_impl_win32::set_icon(unsigned int width, unsigned int height, const 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::set_visible(bool visible)
 {
-    ShowWindow(_handle, visible ? SW_SHOW : SW_HIDE);
+    ShowWindow(handle_, visible ? SW_SHOW : SW_HIDE);
 }
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::maximize()
 {
-	ShowWindow(_handle, SW_MAXIMIZE);
+	ShowWindow(handle_, SW_MAXIMIZE);
 }
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::minimize()
 {
-	ShowWindow(_handle, SW_MINIMIZE);
+	ShowWindow(handle_, SW_MINIMIZE);
 }
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::restore()
 {
-	ShowWindow(_handle, SW_RESTORE);
+	ShowWindow(handle_, SW_RESTORE);
 }
 
 ////////////////////////////////////////////////////////////
@@ -412,7 +412,7 @@ void make_transparent(HWND hwnd)
 void make_opaque(HWND hwnd)
 {
 	SetWindowLongPtrW(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
-	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+	RedrawWindow(hwnd, nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 void window_impl_win32::set_opacity(float opacity)
 {
@@ -433,37 +433,31 @@ void window_impl_win32::set_opacity(float opacity)
 ////////////////////////////////////////////////////////////
 void window_impl_win32::set_mouse_cursor_visible(bool visible)
 {
-    // Don't call twice ShowCursor with the same parameter value;
-    // we don't want to increment/decrement the internal counter
-    // more than once.
-    if (visible != _cursor_visible)
-    {
-        _cursor_visible = visible;
-        ShowCursor(visible);
-    }
+    cursor_visible_ = visible;
+    SetCursor(cursor_visible_ ? last_cursor_ : nullptr);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::set_mouse_cursor_grabbed(bool grabbed)
 {
-    _cursor_grabbed = grabbed;
-    grab_cursor(_cursor_grabbed);
+    cursor_grabbed_ = grabbed;
+    grab_cursor(cursor_grabbed_);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::set_mouse_cursor(const cursor_impl& cursor)
 {
-    _last_cursor = cursor._cursor;
-    SetCursor(_last_cursor);
+    last_cursor_ = cursor.cursor_;
+    SetCursor(cursor_visible_ ? last_cursor_ : nullptr);
 }
 
 
 ////////////////////////////////////////////////////////////
 void window_impl_win32::set_key_repeat_enabled(bool enabled)
 {
-    _key_repeat_enabled = enabled;
+    key_repeat_enabled_ = enabled;
 }
 
 
@@ -471,20 +465,20 @@ void window_impl_win32::set_key_repeat_enabled(bool enabled)
 void window_impl_win32::request_focus()
 {
     // Allow focus stealing only within the same process; compare PIDs of current and foreground window
-    DWORD thisPid       = GetWindowThreadProcessId(_handle, NULL);
-    DWORD foregroundPid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+    DWORD thisPid       = GetWindowThreadProcessId(handle_, nullptr);
+    DWORD foregroundPid = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
 
     if (thisPid == foregroundPid)
     {
         // The window requesting focus belongs to the same process as the current window: steal focus
-        SetForegroundWindow(_handle);
+        SetForegroundWindow(handle_);
     }
     else
     {
         // Different process: don't steal focus, but create a taskbar notification ("flash")
         FLASHWINFO info;
         info.cbSize    = sizeof(info);
-        info.hwnd      = _handle;
+        info.hwnd      = handle_;
         info.dwFlags   = FLASHW_TRAY;
         info.dwTimeout = 0;
         info.uCount    = 3;
@@ -497,7 +491,7 @@ void window_impl_win32::request_focus()
 ////////////////////////////////////////////////////////////
 bool window_impl_win32::has_focus() const
 {
-    return _handle == GetForegroundWindow();
+    return handle_ == GetForegroundWindow();
 }
 
 
@@ -509,12 +503,12 @@ void window_impl_win32::register_window_class()
     windowClass.lpfnWndProc   = &window_impl_win32::global_on_event;
     windowClass.cbClsExtra    = 0;
     windowClass.cbWndExtra    = 0;
-    windowClass.hInstance     = GetModuleHandleW(NULL);
-    windowClass.hIcon         = NULL;
-    windowClass.hCursor       = 0;
-    windowClass.hbrBackground = 0;
-    windowClass.lpszMenuName  = NULL;
-    windowClass.lpszClassName = className;
+    windowClass.hInstance     = GetModuleHandleW(nullptr);
+    windowClass.hIcon         = nullptr;
+    windowClass.hCursor       = nullptr;
+    windowClass.hbrBackground = nullptr;
+    windowClass.lpszMenuName  = nullptr;
+    windowClass.lpszClassName = class_name;
     RegisterClassW(&windowClass);
 }
 
@@ -537,12 +531,12 @@ void window_impl_win32::switch_to_fullscreen(const video_mode& mode)
     }
 
     // Make the window flags compatible with fullscreen mode
-    SetWindowLongW(_handle, GWL_STYLE, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
-    SetWindowLongW(_handle, GWL_EXSTYLE, WS_EX_APPWINDOW);
+    SetWindowLongW(handle_, GWL_STYLE, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+    SetWindowLongW(handle_, GWL_EXSTYLE, WS_EX_APPWINDOW);
 
     // Resize the window so that it fits the entire screen
-    SetWindowPos(_handle, HWND_TOP, 0, 0, mode.width, mode.height, SWP_FRAMECHANGED);
-    ShowWindow(_handle, SW_SHOW);
+    SetWindowPos(handle_, HWND_TOP, 0, 0, mode.width, mode.height, SWP_FRAMECHANGED);
+    ShowWindow(handle_, SW_SHOW);
 
     // Set "this" as the current fullscreen window
     fullscreenWindow = this;
@@ -555,8 +549,8 @@ void window_impl_win32::cleanup()
     // Restore the previous video mode (in case we were running in fullscreen)
     if (fullscreenWindow == this)
     {
-        ChangeDisplaySettingsW(NULL, 0);
-        fullscreenWindow = NULL;
+        ChangeDisplaySettingsW(nullptr, 0);
+        fullscreenWindow = nullptr;
     }
 
     // Unhide the mouse cursor (in case it was hidden)
@@ -576,7 +570,7 @@ void window_impl_win32::set_tracking(bool track)
     TRACKMOUSEEVENT mouseEvent;
     mouseEvent.cbSize = sizeof(TRACKMOUSEEVENT);
     mouseEvent.dwFlags = track ? TME_LEAVE : TME_CANCEL;
-    mouseEvent.hwndTrack = _handle;
+    mouseEvent.hwndTrack = handle_;
     mouseEvent.dwHoverTime = HOVER_DEFAULT;
     TrackMouseEvent(&mouseEvent);
 }
@@ -588,13 +582,13 @@ void window_impl_win32::grab_cursor(bool grabbed)
     if (grabbed)
     {
         RECT rect;
-        GetClientRect(_handle, &rect);
-        MapWindowPoints(_handle, NULL, reinterpret_cast<LPPOINT>(&rect), 2);
+        GetClientRect(handle_, &rect);
+        MapWindowPoints(handle_, nullptr, reinterpret_cast<LPPOINT>(&rect), 2);
         ClipCursor(&rect);
     }
     else
     {
-        ClipCursor(NULL);
+        ClipCursor(nullptr);
     }
 }
 
@@ -603,7 +597,7 @@ void window_impl_win32::grab_cursor(bool grabbed)
 void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam)
 {
     // Don't process any message until window is created
-    if (_handle == NULL)
+    if (handle_ == nullptr)
         return;
 
     switch (message)
@@ -621,7 +615,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             // The mouse has moved, if the cursor is in our window we must refresh the cursor
             if (LOWORD(lParam) == HTCLIENT)
-                SetCursor(_last_cursor);
+                SetCursor(cursor_visible_ ? last_cursor_ : nullptr);
 
             break;
         }
@@ -639,20 +633,20 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         case WM_SIZE:
         {
             // Consider only events triggered by a maximize or a un-maximize
-            if (wParam != SIZE_MINIMIZED && !_resizing && _last_size != get_size())
+            if (wParam != SIZE_MINIMIZED && !resizing_ && last_size_ != get_size())
             {
                 // Update the last handled size
-                _last_size = get_size();
+                last_size_ = get_size();
 
                 // Push a resize event
                 platform_event event;
                 event.type        = platform_event::resized;
-                event.size.width  = _last_size[0];
-                event.size.height = _last_size[1];
+                event.size.width  = last_size_[0];
+                event.size.height = last_size_[1];
                 push_event(event);
 
                 // Restore/update cursor grabbing
-                grab_cursor(_cursor_grabbed);
+                grab_cursor(cursor_grabbed_);
             }
             break;
         }
@@ -660,7 +654,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         // Start resizing
         case WM_ENTERSIZEMOVE:
         {
-            _resizing = true;
+            resizing_ = true;
             grab_cursor(false);
             break;
         }
@@ -668,24 +662,24 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         // Stop resizing
         case WM_EXITSIZEMOVE:
         {
-            _resizing = false;
+            resizing_ = false;
 
             // Ignore cases where the window has only been moved
-            if(_last_size != get_size())
+            if(last_size_ != get_size())
             {
                 // Update the last handled size
-                _last_size = get_size();
+                last_size_ = get_size();
 
                 // Push a resize event
                 platform_event event;
                 event.type        = platform_event::resized;
-                event.size.width  = _last_size[0];
-                event.size.height = _last_size[1];
+                event.size.width  = last_size_[0];
+                event.size.height = last_size_[1];
                 push_event(event);
             }
 
             // Restore/update cursor grabbing
-            grab_cursor(_cursor_grabbed);
+            grab_cursor(cursor_grabbed_);
             break;
         }
 
@@ -704,7 +698,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         case WM_SETFOCUS:
         {
             // Restore cursor grabbing
-            grab_cursor(_cursor_grabbed);
+            grab_cursor(cursor_grabbed_);
 
             platform_event event;
             event.type = platform_event::gained_focus;
@@ -727,7 +721,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         // Text event
         case WM_CHAR:
         {
-            if (_key_repeat_enabled || ((lParam & (1 << 30)) == 0))
+            if (key_repeat_enabled_ || ((lParam & (1 << 30)) == 0))
             {
                 // Get the code of the typed character
 				std::uint32_t character = static_cast<std::uint32_t>(wParam);
@@ -736,7 +730,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
                 if ((character >= 0xD800) && (character <= 0xDBFF))
                 {
                     // First part of a surrogate pair: store it and wait for the second one
-                    _surrogate = static_cast<std::uint16_t>(character);
+                    surrogate_ = static_cast<std::uint16_t>(character);
                 }
                 else
                 {
@@ -744,9 +738,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
                     if ((character >= 0xDC00) && (character <= 0xDFFF))
                     {
                         // Convert the UTF-16 surrogate pair to a single UTF-32 value
-                        std::uint16_t utf16[] = {_surrogate, static_cast<std::uint16_t>(character)};
+                        std::uint16_t utf16[] = {surrogate_, static_cast<std::uint16_t>(character)};
                         mml::utf16::to_utf32(utf16, utf16 + 2, &character);
-                        _surrogate = 0;
+                        surrogate_ = 0;
                     }
 
                     // Send a text_entered event
@@ -763,7 +757,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
         {
-            if (_key_repeat_enabled || ((HIWORD(lParam) & KF_REPEAT) == 0))
+            if (key_repeat_enabled_ || ((HIWORD(lParam) & KF_REPEAT) == 0))
             {
                 platform_event event;
                 event.type        = platform_event::key_pressed;
@@ -799,7 +793,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
             POINT position;
             position.x = static_cast<std::int16_t>(LOWORD(lParam));
             position.y = static_cast<std::int16_t>(HIWORD(lParam));
-            ScreenToClient(_handle, &position);
+            ScreenToClient(handle_, &position);
 
             std::int16_t delta = static_cast<std::int16_t>(HIWORD(wParam));
 
@@ -821,7 +815,7 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
             POINT position;
             position.x = static_cast<std::int16_t>(LOWORD(lParam));
             position.y = static_cast<std::int16_t>(HIWORD(lParam));
-            ScreenToClient(_handle, &position);
+            ScreenToClient(handle_, &position);
 
             std::int16_t delta = static_cast<std::int16_t>(HIWORD(wParam));
 
@@ -935,9 +929,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         case WM_MOUSELEAVE:
         {
             // Avoid this firing a second time in case the cursor is dragged outside
-            if (_mouse_inside)
+            if (mouse_inside_)
             {
-                _mouse_inside = false;
+                mouse_inside_ = false;
 
                 // Generate a mouse_left event
                 platform_event event;
@@ -956,28 +950,28 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
 
             // Get the client area of the window
             RECT area;
-            GetClientRect(_handle, &area);
+            GetClientRect(handle_, &area);
 
             // Capture the mouse in case the user wants to drag it outside
             if ((wParam & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON | MK_XBUTTON1 | MK_XBUTTON2)) == 0)
             {
                 // Only release the capture if we really have it
-                if (GetCapture() == _handle)
+                if (GetCapture() == handle_)
                     ReleaseCapture();
             }
-            else if (GetCapture() != _handle)
+            else if (GetCapture() != handle_)
             {
                 // Set the capture to continue receiving mouse events
-                SetCapture(_handle);
+                SetCapture(handle_);
             }
 
             // If the cursor is outside the client area...
             if ((x < area.left) || (x > area.right) || (y < area.top) || (y > area.bottom))
             {
                 // and it used to be inside, the mouse left it.
-                if (_mouse_inside)
+                if (mouse_inside_)
                 {
-                    _mouse_inside = false;
+                    mouse_inside_ = false;
 
                     // No longer care for the mouse leaving the window
                     set_tracking(false);
@@ -991,9 +985,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
             else
             {
                 // and vice-versa
-                if (!_mouse_inside)
+                if (!mouse_inside_)
                 {
-                    _mouse_inside = true;
+                    mouse_inside_ = true;
 
                     // Look for the mouse leaving the window
                     set_tracking(true);
@@ -1165,15 +1159,15 @@ LRESULT CALLBACK window_impl_win32::global_on_event(HWND handle, UINT message, W
     }
 
     // Get the WindowImpl instance corresponding to the window handle
-    window_impl_win32* window = handle ? reinterpret_cast<window_impl_win32*>(GetWindowLongPtr(handle, GWLP_USERDATA)) : NULL;
+    window_impl_win32* window = handle ? reinterpret_cast<window_impl_win32*>(GetWindowLongPtr(handle, GWLP_USERDATA)) : nullptr;
 
     // Forward the event to the appropriate function
     if (window)
     {
         window->process_event(message, wParam, lParam);
 
-        if (window->_callback)
-            return CallWindowProcW(reinterpret_cast<WNDPROC>(window->_callback), handle, message, wParam, lParam);
+        if (window->callback_)
+            return CallWindowProcW(reinterpret_cast<WNDPROC>(window->callback_), handle, message, wParam, lParam);
     }
 
     // We don't forward the WM_CLOSE message to prevent the OS from automatically destroying the window

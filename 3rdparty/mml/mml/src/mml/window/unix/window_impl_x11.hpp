@@ -56,7 +56,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     virtual window_handle native_handle() const;
-    virtual void* native_display_handle() const { return _display; }
+    virtual void* native_display_handle() const { return display_; }
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///
@@ -278,26 +278,27 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    ::Window   _window;         ///< X identifier defining our window
-    ::Display* _display;        ///< Pointer to the display
-    int        _screen;         ///< Screen identifier
-    XIM        _input_method;    ///< Input method linked to the X display
-    XIC        _input_context;   ///< Input context used to get unicode input in our window
-    std::deque<XEvent> _events; ///< Queue we use to store pending events for this window
-    bool       _is_external;     ///< Tell whether the window has been created externally or by mml
-    int        _old_video_mode;   ///< Video mode in use before we switch to fullscreen
-    RRCrtc     _old_rrc_rtc;      ///< RRCrtc in use before we switch to fullscreen
-    ::Cursor   _hidden_cursor;   ///< As X11 doesn't provide cursor hiding, we must create a transparent one
-    ::Cursor   _last_cursor;     ///< Last cursor used -- this data is not owned by the window and is required to be always valid
-    bool       _key_repeat;      ///< Is the KeyRepeat feature enabled?
-    std::array<std::int32_t, 2>   _previous_size;   ///< Previous size of the window, to find if a ConfigureNotify event is a resize event (could be a move event only)
-    bool       _use_size_hints;   ///< Is the size of the window fixed with size hints?
-    bool       _fullscreen;     ///< Is the window in fullscreen?
-    bool       _cursor_grabbed;  ///< Is the mouse cursor trapped?
-    bool       _window_mapped;   ///< Has the window been mapped by the window manager?
-    Pixmap     _icon_pixmap;     ///< The current icon pixmap if in use
-    Pixmap     _icon_mask_pixmap; ///< The current icon mask pixmap if in use
-    ::Time     _last_input_time;  ///< Last time we received user input
+    ::Window   window_;         ///< X identifier defining our window
+    ::Display* display_;        ///< Pointer to the display
+    int        screen_;         ///< Screen identifier
+    XIM        input_method_;    ///< Input method linked to the X display
+    XIC        input_context_;   ///< Input context used to get unicode input in our window
+    std::deque<XEvent> events_; ///< Queue we use to store pending events for this window
+    bool       is_external_;     ///< Tell whether the window has been created externally or by mml
+    int        old_video_mode_;   ///< Video mode in use before we switch to fullscreen
+    RRCrtc     old_rrc_rtc_;      ///< RRCrtc in use before we switch to fullscreen
+    ::Cursor   hidden_cursor_;   ///< As X11 doesn't provide cursor hiding, we must create a transparent one
+    ::Cursor   last_cursor_;     ///< Last cursor used -- this data is not owned by the window and is required to be always valid
+    bool       key_repeat_;      ///< Is the KeyRepeat feature enabled?
+    std::array<std::int32_t, 2>   previous_size_;   ///< Previous size of the window, to find if a ConfigureNotify event is a resize event (could be a move event only)
+    bool       use_size_hints_;   ///< Is the size of the window fixed with size hints?
+    bool       fullscreen_;     ///< Is the window in fullscreen?
+    bool       cursor_grabbed_;  ///< Is the mouse cursor trapped?
+    bool       cursor_visible_;
+    bool       window_mapped_;   ///< Has the window been mapped by the window manager?
+    Pixmap     icon_pixmap_;     ///< The current icon pixmap if in use
+    Pixmap     icon_mask_pixmap_; ///< The current icon mask pixmap if in use
+    ::Time     last_input_time_;  ///< Last time we received user input
 };
 
 } // namespace priv

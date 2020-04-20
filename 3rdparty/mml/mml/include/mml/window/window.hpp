@@ -466,9 +466,9 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    priv::window_impl* _impl;           ///< Platform-specific implementation of the window
-    std::array<std::uint32_t, 2> _size;           ///< Current size of the window
-    bool _visible;
+    priv::window_impl* impl_;           ///< Platform-specific implementation of the window
+    std::array<std::uint32_t, 2> size_;           ///< Current size of the window
+    bool visible_;
 };
 
 } // namespace mml
