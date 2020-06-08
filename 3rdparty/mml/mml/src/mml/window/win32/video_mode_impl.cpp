@@ -242,9 +242,9 @@ video_bounds video_mode_impl::get_display_bounds(int index)
                 wcscpy(monitor.adapterName, adapter.DeviceName);
 
                 auto callback = [](HMONITOR handle,
-                        HDC dc,
-                        RECT* rect,
-                        LPARAM data) -> BOOL
+                        HDC /*dc*/,
+                        LPRECT /*rect*/,
+                        LPARAM data) -> WINBOOL
                 {
                     MONITORINFOEX mi;
                     ZeroMemory(&mi, sizeof(mi));
