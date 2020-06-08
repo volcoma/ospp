@@ -10,6 +10,30 @@ namespace mml
 {
 namespace priv
 {
+struct monitor_data
+{
+    WCHAR adapterName[CCHDEVICENAME] {};
+    HMONITOR handle{};
+};
+
+BOOL WINAPI callback(HMONITOR handle,
+        HDC /*dc*/,
+        LPRECT /*rect*/,
+        LPARAM data)
+{
+    MONITORINFOEX mi;
+    ZeroMemory(&mi, sizeof(mi));
+    mi.cbSize = sizeof(mi);
+
+    if (GetMonitorInfo(handle, (MONITORINFO*) &mi))
+    {
+        monitor_data* monitor = (monitor_data*) data;
+        if (wcscmp(mi.szDevice, monitor->adapterName) == 0)
+            monitor->handle = handle;
+    }
+
+    return TRUE;
+}
 
 int video_mode_impl::get_number_of_displays()
 {
@@ -233,32 +257,11 @@ video_bounds video_mode_impl::get_display_bounds(int index)
                 rect.right  = win32Mode.dmPosition.x + win32Mode.dmPelsWidth;
                 rect.bottom = win32Mode.dmPosition.y + win32Mode.dmPelsHeight;
 
-                struct monitor_data
-                {
-                    WCHAR adapterName[CCHDEVICENAME] {};
-                    HMONITOR handle{};
-                } monitor;
+                monitor_data monitor;
 
                 wcscpy(monitor.adapterName, adapter.DeviceName);
 
-                auto callback = [](HMONITOR handle,
-                        HDC /*dc*/,
-                        LPRECT /*rect*/,
-                        LPARAM data) -> int
-                {
-                    MONITORINFOEX mi;
-                    ZeroMemory(&mi, sizeof(mi));
-                    mi.cbSize = sizeof(mi);
 
-                    if (GetMonitorInfo(handle, (MONITORINFO*) &mi))
-                    {
-                        monitor_data* monitor = (monitor_data*) data;
-                        if (wcscmp(mi.szDevice, monitor->adapterName) == 0)
-                            monitor->handle = handle;
-                    }
-
-                    return TRUE;
-                };
 
                 EnumDisplayMonitors(nullptr, &rect, callback, (LPARAM)&monitor);
 
