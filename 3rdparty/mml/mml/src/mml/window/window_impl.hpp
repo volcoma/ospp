@@ -31,6 +31,7 @@ namespace priv
 class window_impl : non_copyable
 {
 public:
+    constexpr static const auto centered = std::numeric_limits<int32_t>::max();
 
     ////////////////////////////////////////////////////////////
     /// \brief Create a new window depending on the current OS
@@ -43,7 +44,8 @@ public:
     /// \return Pointer to the created window (don't forget to delete it)
     ///
     ////////////////////////////////////////////////////////////
-    static window_impl* create(video_mode mode, const std::string& title, std::uint32_t style);
+    static window_impl* create(video_mode mode, const std::array<std::int32_t, 2>& position,
+                               const std::string& title, std::uint32_t style);
 
     ////////////////////////////////////////////////////////////
     /// \brief Create a new window depending on to the current OS
@@ -250,13 +252,13 @@ private:
     // Member data
     ////////////////////////////////////////////////////////////
     ///< Queue of available events
-	std::queue<platform_event> _events;                          
+	std::queue<platform_event> events_;
     ///< Previous state of the joysticks
-	joystick_state _joystick_states[joystick::count]; 
+	joystick_state joystick_states_[joystick::count];
     ///< Previous value of the sensors
-	std::array<float, 3> _sensor_value[sensor::count];      
+	std::array<float, 3> sensor_value_[sensor::count];
 	///< joystick threshold (minimum motion for "move" event to be generated)
-	float _joystick_threshold;               
+	float joystick_threshold_;
 };
 
 } // namespace priv

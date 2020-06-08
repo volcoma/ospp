@@ -13,9 +13,9 @@ namespace glfw
 {
 namespace
 {
-inline auto from_impl(const GLFWvidmode& mode) -> display_mode
+inline auto from_impl(const GLFWvidmode& mode) -> ::os::display::mode
 {
-	display_mode result;
+    ::os::display::mode result;
 	result.w = static_cast<uint32_t>(mode.width);
 	result.h = static_cast<uint32_t>(mode.height);
 	result.refresh_rate = static_cast<uint32_t>(mode.refreshRate);
@@ -35,14 +35,14 @@ inline auto number_of_video_displays() -> int
 	return result;
 }
 
-inline auto get_available_modes(int index = 0) -> std::vector<display_mode>
+inline auto get_available_modes(int index = 0) -> std::vector<::os::display::mode>
 {
 	int mointor_count{0};
 	auto monitors = glfwGetMonitors(&mointor_count);
 	auto monitor = monitors[index];
 	int count{0};
 	auto modes = glfwGetVideoModes(monitor, &count);
-	std::vector<display_mode> result;
+    std::vector<::os::display::mode> result;
 	if(count < 1)
 	{
 		OS_GLFW_ERROR_HANDLER(result);
@@ -57,7 +57,7 @@ inline auto get_available_modes(int index = 0) -> std::vector<display_mode>
 	return result;
 }
 
-inline auto get_desktop_mode(int index = 0) -> display_mode
+inline auto get_desktop_mode(int index = 0) -> ::os::display::mode
 {
 	int mointor_count{0};
 	auto monitors = glfwGetMonitors(&mointor_count);
@@ -69,6 +69,21 @@ inline auto get_desktop_mode(int index = 0) -> display_mode
 	}
 
 	return {};
+}
+
+inline auto get_display_bounds(int index = 0) -> ::os::display::bounds
+{
+    int mointor_count{0};
+    auto monitors = glfwGetMonitors(&mointor_count);
+    auto monitor = monitors[index];
+    ::os::display::bounds result {};
+    int width {};
+    int height {};
+    glfwGetMonitorWorkarea(monitor, &result.x, &result.y, &width, &height);
+    result.w = uint32_t(width);
+    result.h = uint32_t(height);
+
+    return result;
 }
 }
 }

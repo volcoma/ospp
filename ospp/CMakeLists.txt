@@ -4,15 +4,15 @@ set(target_name ospp)
 
 message( STATUS "--------------------------------" )
 if("${BACKEND_TYPE}" STREQUAL "SDL")
-	message( STATUS "SDL backend selected." )
+	message( STATUS "SDL WINDOW backend selected." )
 	file(GLOB impl_src ${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*)
 
 elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
-	message( STATUS "GLFW backend selected." )
+	message( STATUS "GLFW WINDOW backend selected." )
 	file(GLOB impl_src ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/*)
 
 elseif("${BACKEND_TYPE}" STREQUAL "MML")
-	message( STATUS "MML backend selected." )
+	message( STATUS "MML WINDOW backend selected." )
 	file(GLOB impl_src ${CMAKE_CURRENT_SOURCE_DIR}/impl/mml/*)
 else()
 	message( FATAL_ERROR "No backend type was selected." )

@@ -211,7 +211,7 @@ std::array<std::int32_t, 2> input_impl::get_mouse_position()
     // Close the connection with the X server
     close_display(display);
 
-	return std::array<std::int32_t, 2>({ gx, gy });
+    return std::array<std::int32_t, 2>({{ gx, gy }});
 }
 
 
@@ -236,11 +236,11 @@ std::array<std::int32_t, 2> input_impl::get_mouse_position(const window& relativ
         // Close the connection with the X server
         close_display(display);
 
-		return std::array<std::int32_t, 2>({ x, y });
+        return std::array<std::int32_t, 2>({{ x, y }});
     }
     else
     {
-		return std::array<std::int32_t, 2>({0, 0});
+        return std::array<std::int32_t, 2>({{0, 0}});
     }
 }
 

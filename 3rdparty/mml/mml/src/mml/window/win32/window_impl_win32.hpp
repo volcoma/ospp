@@ -38,13 +38,14 @@ public:
     /// \param settings Additional settings for the underlying OpenGL context
     ///
     ////////////////////////////////////////////////////////////
-    window_impl_win32(video_mode mode, const std::string& title, std::uint32_t style);
+    window_impl_win32(video_mode mode, const std::array<std::int32_t, 2>& position,
+                      const std::string& title, std::uint32_t style);
 
     ////////////////////////////////////////////////////////////
     /// \brief Destructor
     ///
     ////////////////////////////////////////////////////////////
-    ~window_impl_win32();
+    ~window_impl_win32() override;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the OS-specific handle of the window
@@ -52,15 +53,15 @@ public:
     /// \return Handle of the window
     ///
     ////////////////////////////////////////////////////////////
-    virtual window_handle native_handle() const;
-	virtual void* native_display_handle() const;
+    window_handle native_handle() const final;
+	void* native_display_handle() const final;
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///
     /// \return Position of the window, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual std::array<std::int32_t, 2> get_position() const;
+    std::array<std::int32_t, 2> get_position() const final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the position of the window on screen
@@ -68,7 +69,7 @@ public:
     /// \param position New position of the window, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_position(const std::array<std::int32_t, 2>& position);
+    void set_position(const std::array<std::int32_t, 2>& position) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the client size of the window
@@ -76,7 +77,7 @@ public:
     /// \return Size of the window, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual std::array<std::uint32_t, 2> get_size() const;
+    std::array<std::uint32_t, 2> get_size() const final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the size of the rendering region of the window
@@ -84,7 +85,7 @@ public:
     /// \param size New size, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_size(const std::array<std::uint32_t, 2>& size);
+    void set_size(const std::array<std::uint32_t, 2>& size) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window
@@ -92,7 +93,7 @@ public:
     /// \param title New title
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_title(const std::string& title);
+    void set_title(const std::string& title) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the window's icon
@@ -102,7 +103,7 @@ public:
     /// \param pixels Pointer to the pixels in memory, format must be RGBA 32 bits
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_icon(unsigned int width, unsigned int height, const std::uint8_t* pixels);
+    void set_icon(unsigned int width, unsigned int height, const std::uint8_t* pixels) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the window
@@ -110,12 +111,12 @@ public:
     /// \param visible True to show, false to hide
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_visible(bool visible);
+    void set_visible(bool visible) final;
 
-	virtual void maximize();
-	virtual void minimize();
-	virtual void restore();
-	virtual void set_opacity(float opacity);
+	void maximize() final;
+	void minimize() final;
+	void restore() final;
+	void set_opacity(float opacity) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the mouse cursor
@@ -123,7 +124,7 @@ public:
     /// \param visible True to show, false to hide
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_mouse_cursor_visible(bool visible);
+    void set_mouse_cursor_visible(bool visible) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Grab or release the mouse cursor
@@ -131,7 +132,7 @@ public:
     /// \param grabbed True to enable, false to disable
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_mouse_cursor_grabbed(bool grabbed);
+    void set_mouse_cursor_grabbed(bool grabbed) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Set the displayed cursor to a native system cursor
@@ -139,7 +140,7 @@ public:
     /// \param cursor Native system cursor type to display
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_mouse_cursor(const cursor_impl& cursor);
+    void set_mouse_cursor(const cursor_impl& cursor) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Enable or disable automatic key-repeat
@@ -147,14 +148,14 @@ public:
     /// \param enabled True to enable, false to disable
     ///
     ////////////////////////////////////////////////////////////
-    virtual void set_key_repeat_enabled(bool enabled);
+    void set_key_repeat_enabled(bool enabled) final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Request the current window to be made the active
     ///        foreground window
     ///
     ////////////////////////////////////////////////////////////
-    virtual void request_focus();
+    void request_focus() final;
 
     ////////////////////////////////////////////////////////////
     /// \brief Check whether the window has the input focus
@@ -162,7 +163,7 @@ public:
     /// \return True if window has focus, false otherwise
     ///
     ////////////////////////////////////////////////////////////
-    virtual bool has_focus() const;
+    bool has_focus() const final;
 
 protected:
 
@@ -170,7 +171,7 @@ protected:
     /// \brief Process incoming events from the operating system
     ///
     ////////////////////////////////////////////////////////////
-    virtual void process_events();
+    void process_events() final;
 
 private:
 

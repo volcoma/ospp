@@ -58,7 +58,8 @@ public:
     /// \param style    %window style, a bitwise OR combination of mml::style enumerators
     ///
     ////////////////////////////////////////////////////////////
-    window(video_mode mode, const std::string& title, std::uint32_t style = style::standard);
+    window(video_mode mode, const std::array<std::int32_t, 2>& position,
+           const std::string& title, std::uint32_t style = style::standard);
 
     ////////////////////////////////////////////////////////////
     /// \brief Construct the window from an existing control
@@ -100,7 +101,8 @@ public:
     /// \param settings Additional settings for the underlying OpenGL context
     ///
     ////////////////////////////////////////////////////////////
-    void create(video_mode mode, const std::string& title, std::uint32_t style = style::standard);
+    void create(video_mode mode, const std::array<std::int32_t, 2>& position,
+                const std::string& title, std::uint32_t style = style::standard);
 
     ////////////////////////////////////////////////////////////
     /// \brief Create (or recreate) the window from an existing control

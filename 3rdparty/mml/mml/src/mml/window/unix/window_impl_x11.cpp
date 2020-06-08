@@ -36,7 +36,7 @@
 ////////////////////////////////////////////////////////////
 namespace
 {
-    mml::priv::window_impl_x11*              fullscreenWindow = nullptr;
+    //mml::priv::window_impl_x11*              fullscreenWindow = nullptr;
 	std::vector<mml::priv::window_impl_x11*> allWindows;
 	std::mutex                             allWindowsMutex;
 	std::string                            windowManagerName;
@@ -79,7 +79,7 @@ namespace
 		int file = ::open("/proc/self/cmdline", O_RDONLY | O_NONBLOCK);
 
 		if (file < 0)
-			return "sfml";
+			return "mml";
 
 		std::vector<char> buffer(256, 0);
 		std::size_t offset = 0;
@@ -457,12 +457,12 @@ screen_         (0),
 input_method_    (nullptr),
 input_context_   (nullptr),
 is_external_     (true),
-old_video_mode_   (0),
-old_rrc_rtc_      (0),
+//old_video_mode_   (0),
+//old_rrc_rtc_      (0),
 hidden_cursor_   (0),
 last_cursor_     (None),
 key_repeat_      (true),
-previous_size_   {-1, -1},
+previous_size_   {{-1, -1}},
 use_size_hints_   (false),
 fullscreen_     (false),
 cursor_grabbed_  (false),
@@ -501,20 +501,20 @@ last_input_time_  (0)
 
 
 ////////////////////////////////////////////////////////////
-window_impl_x11::window_impl_x11(video_mode mode, const std::string& title, unsigned long style) :
+window_impl_x11::window_impl_x11(video_mode mode, const std::array<std::int32_t, 2>& position, const std::string& title, unsigned long style) :
 window_         (0),
 screen_         (0),
 input_method_    (nullptr),
 input_context_   (nullptr),
 is_external_     (false),
-old_video_mode_   (0),
-old_rrc_rtc_      (0),
+//old_video_mode_   (0),
+//old_rrc_rtc_      (0),
 hidden_cursor_   (0),
 last_cursor_     (None),
 key_repeat_      (true),
-previous_size_   {-1, -1},
+previous_size_   {{-1, -1}},
 use_size_hints_   (false),
-fullscreen_     ((style & style::fullscreen) != 0),
+fullscreen_     (false),
 cursor_grabbed_  (fullscreen_),
 window_mapped_   (false),
 icon_pixmap_     (0),
@@ -529,20 +529,32 @@ last_input_time_  (0)
 
 	screen_ = DefaultScreen(display_);
 
-	// Compute position and size
-	std::array<std::int32_t, 2> windowPosition{{0, 0}};
+    // Compute position and size
+    int32_t x{};
+    int32_t y{};
 	if(fullscreen_)
 	{
-        windowPosition = getPrimaryMonitorPosition();
+		auto bounds = video_bounds::get_display_bounds(0);
+        x = bounds.x;
+        y = bounds.y;
 	}
 	else
 	{
-        windowPosition[0] = (DisplayWidth(display_, screen_)  - mode.width) / 2;
-        windowPosition[1] = (DisplayWidth(display_, screen_)  - mode.height) / 2;
+        x = position[0];
+        y = position[1];
+
+        if(x == centered)
+		{
+            x = (DisplayWidth(display_, screen_)  - mode.width) / 2;
+		}
+        if(y == centered)
+		{
+            y = (DisplayHeight(display_, screen_)  - mode.height) / 2;
+		}
 	}
 
-	int width  = mode.width;
-	int height = mode.height;
+    int width  = int(mode.width);
+    int height = int(mode.height);
 
     // Choose the visual according to the context setting
     Visual* visual = DefaultVisual(display_, screen_);
@@ -556,7 +568,7 @@ last_input_time_  (0)
 
 	window_ = XCreateWindow(display_,
 	                         DefaultRootWindow(display_),
-	                         windowPosition[0], windowPosition[1],
+                             x, y,
 	                         width, height,
 	                         0,
                              depth,
@@ -570,6 +582,16 @@ last_input_time_  (0)
 		err() << "Failed to create window" << std::endl;
 		return;
 	}
+
+    XSizeHints    my_hints = {0};
+
+    my_hints.flags  = PPosition | PSize;     /* I want to specify position and size */
+    my_hints.x      = x;       /* The origin and size coords I want */
+    my_hints.y      = y;
+    my_hints.width  = width;
+    my_hints.height = height;
+
+    XSetNormalHints(display_, window_, &my_hints);  /* Where new_window is the new window */
 
 	// Set the WM protocols
 	set_protocols();
@@ -656,8 +678,8 @@ last_input_time_  (0)
 		sizeHints->flags = PMinSize | PMaxSize | USPosition;
 		sizeHints->min_width = sizeHints->max_width = width;
 		sizeHints->min_height = sizeHints->max_height = height;
-		sizeHints->x = windowPosition[0];
-        sizeHints->y = windowPosition[1];
+        sizeHints->x = x;
+        sizeHints->y = y;
 		XSetWMNormalHints(display_, window_, sizeHints);
 		XFree(sizeHints);
 	}
@@ -704,8 +726,8 @@ last_input_time_  (0)
         XSetWMNormalHints(display_, window_, sizeHints);
         XFree(sizeHints);
 
-        set_video_mode(mode);
-		switch_to_fullscreen();
+//        set_video_mode(mode);
+//		switch_to_fullscreen();
 	}
 }
 
@@ -735,7 +757,9 @@ window_impl_x11::~window_impl_x11()
 	// Destroy the window
 	if (window_ && !is_external_)
 	{
-		XUnmapWindow(display_, window_);
+        XFlush(display_);
+        XUnmapWindow(display_, window_);
+        XFlush(display_);
 		XDestroyWindow(display_, window_);
 		XFlush(display_);
 	}
@@ -1210,7 +1234,7 @@ void window_impl_x11::set_mouse_cursor_visible(bool visible)
 ////////////////////////////////////////////////////////////
 void window_impl_x11::set_mouse_cursor(const cursor_impl& cursor)
 {
-	last_cursor_ = cursor.cursor_;
+    last_cursor_ = cursor.cursor_;
     if(cursor_visible_)
     {
         XDefineCursor(display_, window_, last_cursor_);
@@ -1266,7 +1290,7 @@ void window_impl_x11::request_focus()
 	// Focus is only stolen among mml windows, not between applications
 	// Check the global list of windows to find out whether an mml window has the focus
 	// Note: can't handle console and other non-mml windows belonging to the application.
-	bool sfmlWindowFocused = false;
+	bool windowFocused = false;
 
 	{
 		std::lock_guard<std::mutex> lock(allWindowsMutex);
@@ -1274,7 +1298,7 @@ void window_impl_x11::request_focus()
 		{
 			if ((*itr)->has_focus())
 			{
-				sfmlWindowFocused = true;
+				windowFocused = true;
 				break;
 			}
 		}
@@ -1291,7 +1315,7 @@ void window_impl_x11::request_focus()
 
 	bool windowViewable = (attributes.map_state == IsViewable);
 
-	if (sfmlWindowFocused && windowViewable)
+	if (windowFocused && windowViewable)
 	{
 		// Another mml window of this application has the focus and the current window is viewable:
 		// steal focus (i.e. bring window to the front and give it input focus)
@@ -1371,229 +1395,6 @@ void window_impl_x11::grab_focus()
 		XFlush(display_);
 	}
 }
-
-
-////////////////////////////////////////////////////////////
-void window_impl_x11::set_video_mode(const video_mode& mode)
-{
-	// Skip mode switching if the new mode is equal to the desktop mode
-	if (mode == video_mode::get_desktop_mode())
-		return;
-
-	// Check if the XRandR extension is present
-    int xRandRMajor, xRandRMinor;
-    if (!checkXRandR(xRandRMajor, xRandRMinor))
-    {
-        // XRandR extension is not supported: we cannot use fullscreen mode
-        err() << "Fullscreen is not supported, switching to window mode" << std::endl;
-        return;
-    }
-
-    // Get root window
-    ::Window rootWindow = RootWindow(display_, screen_);
-
-    // Get the screen resources
-    XRRScreenResources* res = XRRGetScreenResources(display_, rootWindow);
-    if (!res)
-    {
-        err() << "Failed to get the current screen resources for fullscreen mode, switching to window mode" << std::endl;
-        return;
-    }
-
-    RROutput output = getOutputPrimary(rootWindow, res, xRandRMajor, xRandRMinor);
-
-    // Get output info from output
-    XRROutputInfo* outputInfo = XRRGetOutputInfo(display_, res, output);
-    if (!outputInfo || outputInfo->connection == RR_Disconnected)
-    {
-        XRRFreeScreenResources(res);
-
-        // If outputInfo->connection == RR_Disconnected, free output info
-        if (outputInfo)
-            XRRFreeOutputInfo(outputInfo);
-
-        err() << "Failed to get output info for fullscreen mode, switching to window mode" << std::endl;
-        return;
-    }
-
-    // Retreive current RRMode, screen position and rotation
-    XRRCrtcInfo* crtcInfo = XRRGetCrtcInfo(display_, res, outputInfo->crtc);
-    if (!crtcInfo)
-    {
-        XRRFreeScreenResources(res);
-        XRRFreeOutputInfo(outputInfo);
-        err() << "Failed to get crtc info for fullscreen mode, switching to window mode" << std::endl;
-        return;
-    }
-
-    // Find RRMode to set
-    bool modeFound = false;
-    RRMode xRandMode;
-
-    for (int i = 0; (i < res->nmode) && !modeFound; i++)
-    {
-        if (crtcInfo->rotation == RR_Rotate_90 || crtcInfo->rotation == RR_Rotate_270)
-            std::swap(res->modes[i].height, res->modes[i].width);
-
-        // Check if screen size match
-        if (res->modes[i].width == static_cast<int>(mode.width) &&
-            res->modes[i].height == static_cast<int>(mode.height))
-        {
-            xRandMode = res->modes[i].id;
-            modeFound = true;
-        }
-    }
-
-    if (!modeFound)
-    {
-        XRRFreeScreenResources(res);
-        XRRFreeOutputInfo(outputInfo);
-        err() << "Failed to find a matching RRMode for fullscreen mode, switching to window mode" << std::endl;
-        return;
-    }
-
-    // Save the current video mode before we switch to fullscreen
-    old_video_mode_ = crtcInfo->mode;
-    old_rrc_rtc_ = outputInfo->crtc;
-
-    // Switch to fullscreen mode
-    XRRSetCrtcConfig(display_,
-                     res,
-                     outputInfo->crtc,
-                     CurrentTime,
-                     crtcInfo->x,
-                     crtcInfo->y,
-                     xRandMode,
-                     crtcInfo->rotation,
-                     &output,
-                     1);
-
-    // Set "this" as the current fullscreen window
-    fullscreenWindow = this;
-
-    XRRFreeScreenResources(res);
-    XRRFreeOutputInfo(outputInfo);
-    XRRFreeCrtcInfo(crtcInfo);
-}
-
-
-////////////////////////////////////////////////////////////
-void window_impl_x11::reset_video_mode()
-{
-	if (fullscreenWindow == this)
-    {
-        // Try to set old configuration
-        // Check if the XRandR extension
-        int xRandRMajor, xRandRMinor;
-        if (checkXRandR(xRandRMajor, xRandRMinor))
-        {
-            XRRScreenResources* res = XRRGetScreenResources(display_, DefaultRootWindow(display_));
-            if (!res)
-            {
-                err() << "Failed to get the current screen resources to reset the video mode" << std::endl;
-                return;
-            }
-
-            // Retreive current screen position and rotation
-            XRRCrtcInfo* crtcInfo = XRRGetCrtcInfo(display_, res, old_rrc_rtc_);
-            if (!crtcInfo)
-            {
-                XRRFreeScreenResources(res);
-                err() << "Failed to get crtc info to reset the video mode" << std::endl;
-                return;
-            }
-
-            RROutput output;
-
-            // if version >= 1.3 get the primary screen else take the first screen
-            if ((xRandRMajor == 1 && xRandRMinor >= 3) || xRandRMajor > 1)
-            {
-                output = XRRGetOutputPrimary(display_, DefaultRootWindow(display_));
-
-                // Check if returned output is valid, otherwise use the first screen
-                if (output == None)
-                    output = res->outputs[0];
-            }
-            else{
-                output = res->outputs[0];
-            }
-
-            XRRSetCrtcConfig(display_,
-                             res,
-                             old_rrc_rtc_,
-                             CurrentTime,
-                             crtcInfo->x,
-                             crtcInfo->y,
-                             old_video_mode_,
-                             crtcInfo->rotation,
-                             &output,
-                             1);
-
-            XRRFreeCrtcInfo(crtcInfo);
-            XRRFreeScreenResources(res);
-        }
-
-        // Reset the fullscreen window
-        fullscreenWindow = nullptr;
-    }
-}
-
-
-////////////////////////////////////////////////////////////
-void window_impl_x11::switch_to_fullscreen()
-{
-	grab_focus();
-
-	if (ewmhSupported())
-	{
-		Atom netWmBypassCompositor = get_atom("_NET_WM_BYPASS_COMPOSITOR");
-
-		if (netWmBypassCompositor)
-		{
-			static const unsigned long bypassCompositor = 1;
-
-			XChangeProperty(display_,
-			                window_,
-			                netWmBypassCompositor,
-			                XA_CARDINAL,
-			                32,
-			                PropModeReplace,
-			                reinterpret_cast<const unsigned char*>(&bypassCompositor),
-			                1);
-		}
-
-		Atom netWmState = get_atom("_NET_WM_STATE", true);
-		Atom netWmStateFullscreen = get_atom("_NET_WM_STATE_FULLSCREEN", true);
-
-		if (!netWmState || !netWmStateFullscreen)
-		{
-			err() << "Setting fullscreen failed. Could not get required atoms" << std::endl;
-			return;
-		}
-
-		XEvent event;
-		std::memset(&event, 0, sizeof(event));
-
-		event.type = ClientMessage;
-		event.xclient.window = window_;
-		event.xclient.format = 32;
-		event.xclient.message_type = netWmState;
-		event.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD
-		event.xclient.data.l[1] = netWmStateFullscreen;
-		event.xclient.data.l[2] = 0; // No second property
-		event.xclient.data.l[3] = 1; // Normal window
-
-		int result = XSendEvent(display_,
-		                        DefaultRootWindow(display_),
-		                        False,
-		                        SubstructureNotifyMask | SubstructureRedirectMask,
-		                        &event);
-
-		if (!result)
-			err() << "Setting fullscreen failed, could not send \"_NET_WM_STATE\" event" << std::endl;
-	}
-}
-
 
 ////////////////////////////////////////////////////////////
 void window_impl_x11::set_protocols()
@@ -1767,7 +1568,7 @@ void window_impl_x11::create_hidden_cursor()
 void window_impl_x11::cleanup()
 {
 	// Restore the previous video mode (in case we were running in fullscreen)
-	reset_video_mode();
+    //reset_video_mode();
 
 	// Unhide the mouse cursor (in case it was hidden)
 	set_mouse_cursor_visible(true);
@@ -1951,7 +1752,30 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
 			event.key.alt     = windowEvent.xkey.state & Mod1Mask;
 			event.key.control = windowEvent.xkey.state & ControlMask;
 			event.key.shift   = windowEvent.xkey.state & ShiftMask;
-			event.key.system  = windowEvent.xkey.state & Mod4Mask;
+            event.key.system  = windowEvent.xkey.state & Mod4Mask;
+
+            switch(key)
+            {
+                case keyboard::key::LControl:
+                case keyboard::key::RControl:
+                    event.key.control = true;
+                    break;
+                case keyboard::key::LAlt:
+                case keyboard::key::RAlt:
+                    event.key.alt = true;
+                    break;
+                case keyboard::key::LShift:
+                case keyboard::key::RShift:
+                    event.key.shift = true;
+                    break;
+                case keyboard::key::LSystem:
+                case keyboard::key::RSystem:
+                    event.key.system = true;
+                    break;
+                default:
+                    break;
+            }
+
 			push_event(event);
 
 			// Generate a text_entered event
@@ -2028,6 +1852,28 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
 			event.key.control = windowEvent.xkey.state & ControlMask;
 			event.key.shift   = windowEvent.xkey.state & ShiftMask;
 			event.key.system  = windowEvent.xkey.state & Mod4Mask;
+            switch(key)
+            {
+            case keyboard::key::LControl:
+            case keyboard::key::RControl:
+                event.key.control = false;
+                break;
+            case keyboard::key::LAlt:
+            case keyboard::key::RAlt:
+                event.key.alt = false;
+                break;
+            case keyboard::key::LShift:
+            case keyboard::key::RShift:
+                event.key.shift = false;
+                break;
+            case keyboard::key::LSystem:
+            case keyboard::key::RSystem:
+                event.key.system = false;
+                break;
+            default:
+                break;
+            }
+
 			push_event(event);
 
 			break;
@@ -2232,63 +2078,6 @@ RROutput window_impl_x11::getOutputPrimary(::Window& rootWindow, XRRScreenResour
     return res->outputs[0];
 }
 
-
-////////////////////////////////////////////////////////////
-std::array<std::int32_t, 2> window_impl_x11::getPrimaryMonitorPosition()
-{
-    std::array<std::int32_t, 2> monitorPosition{{0, 0}};
-
-    // Get root window
-    ::Window rootWindow = RootWindow(display_, screen_);
-
-    // Get the screen resources
-    XRRScreenResources* res = XRRGetScreenResources(display_, rootWindow);
-    if (!res)
-    {
-        err() << "Failed to get the current screen resources for.primary monitor position" << std::endl;
-        return monitorPosition;
-    }
-
-    // Get xRandr version
-    int xRandRMajor, xRandRMinor;
-    if (!checkXRandR(xRandRMajor, xRandRMinor))
-        xRandRMajor = xRandRMinor = 0;
-
-    RROutput output = getOutputPrimary(rootWindow, res, xRandRMajor, xRandRMinor);
-
-    // Get output info from output
-    XRROutputInfo* outputInfo = XRRGetOutputInfo(display_, res, output);
-    if (!outputInfo || outputInfo->connection == RR_Disconnected)
-    {
-        XRRFreeScreenResources(res);
-
-        // If outputInfo->connection == RR_Disconnected, free output info
-        if (outputInfo)
-            XRRFreeOutputInfo(outputInfo);
-
-        err() << "Failed to get output info for.primary monitor position" << std::endl;
-        return monitorPosition;
-    }
-
-    // Retreive current RRMode, screen position and rotation
-    XRRCrtcInfo* crtcInfo = XRRGetCrtcInfo(display_, res, outputInfo->crtc);
-    if (!crtcInfo)
-    {
-        XRRFreeScreenResources(res);
-        XRRFreeOutputInfo(outputInfo);
-        err() << "Failed to get crtc info for.primary monitor position" << std::endl;
-        return monitorPosition;
-    }
-
-    monitorPosition[0] = crtcInfo->x;
-    monitorPosition[1] = crtcInfo->y;
-
-    XRRFreeCrtcInfo(crtcInfo);
-    XRRFreeOutputInfo(outputInfo);
-    XRRFreeScreenResources(res);
-
-    return monitorPosition;
-}
 
 } // namespace priv
 

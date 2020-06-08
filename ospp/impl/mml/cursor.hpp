@@ -34,7 +34,7 @@ inline auto to_impl(cursor::type system_type) -> ::mml::cursor::type
 		case cursor::size_all:
 			return ::mml::cursor::size_all;
 		case cursor::size_nesw:
-			return ::mml::cursor::size_top_left_bottom_right;
+			return ::mml::cursor::size_bottom_left_top_right;
 		case cursor::size_ns:
 			return ::mml::cursor::size_vertical;
 		case cursor::size_nwse:

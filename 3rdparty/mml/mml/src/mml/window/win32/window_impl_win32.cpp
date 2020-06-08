@@ -133,7 +133,10 @@ cursor_grabbed_   (false)
 
 
 ////////////////////////////////////////////////////////////
-window_impl_win32::window_impl_win32(video_mode mode, const std::string& title, std::uint32_t style) :
+window_impl_win32::window_impl_win32(video_mode mode,
+                                     const std::array<std::int32_t, 2>& position,
+                                     const std::string& title,
+                                     std::uint32_t style) :
 handle_          (nullptr),
 callback_        (0),
 cursor_visible_   (true), // might need to call GetCursorInfo
@@ -156,10 +159,19 @@ cursor_grabbed_   (fullscreen_)
 
     // Compute position and size
     HDC screenDC = GetDC(nullptr);
-    int left   = (GetDeviceCaps(screenDC, HORZRES) - static_cast<int>(mode.width))  / 2;
-    int top    = (GetDeviceCaps(screenDC, VERTRES) - static_cast<int>(mode.height)) / 2;
-    int width  = mode.width;
-    int height = mode.height;
+
+    int x = position[0];
+    int y  = position[1];
+    if(x == centered)
+    {
+        x = (GetDeviceCaps(screenDC, HORZRES) - static_cast<int>(mode.width))  / 2;
+    }
+    if(y == centered)
+    {
+        y = (GetDeviceCaps(screenDC, VERTRES) - static_cast<int>(mode.height)) / 2;
+    }
+    int width  = int(mode.width);
+    int height = int(mode.height);
     ReleaseDC(nullptr, screenDC);
 
     // Choose the window style according to the style parameter
@@ -195,7 +207,7 @@ cursor_grabbed_   (fullscreen_)
 	// Convert
 	utf8::to_wide(title.begin(), title.end(), std::back_inserter(wtitle), 0);
     // Create the window
-    handle_ = CreateWindowW(class_name, wtitle.c_str(), win32Style, left, top, width, height, nullptr, nullptr, GetModuleHandle(nullptr), this);
+    handle_ = CreateWindowW(class_name, wtitle.c_str(), win32Style, x, y, width, height, nullptr, nullptr, GetModuleHandle(nullptr), this);
     // Register to receive device interface change notifications (used for joystick connection handling)
     DEV_BROADCAST_HDR deviceBroadcastHeader = {sizeof(DEV_BROADCAST_HDR), DBT_DEVTYP_DEVICEINTERFACE, 0};
     RegisterDeviceNotification(handle_, &deviceBroadcastHeader, DEVICE_NOTIFY_WINDOW_HANDLE | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES);

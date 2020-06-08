@@ -10,74 +10,28 @@
 
 namespace mml
 {
-////////////////////////////////////////////////////////////
-/// \brief video_mode defines a video mode (width, height, bpp)
-///
-////////////////////////////////////////////////////////////
-class MML_WINDOW_API video_mode
+
+MML_WINDOW_API int get_number_of_displays();
+
+struct MML_WINDOW_API video_mode
 {
-public:
+    static video_mode get_desktop_mode(int index);
+    static std::vector<video_mode> get_desktop_modes(int index);
 
-    ////////////////////////////////////////////////////////////
-    /// \brief Default constructor
-    ///
-    /// This constructors initializes all members to 0.
-    ///
-    ////////////////////////////////////////////////////////////
-    video_mode();
+    unsigned int width {};
+    unsigned int height {};
+    unsigned int bits_per_pixel {};
+    unsigned int refresh_rate {};
+};
 
-    ////////////////////////////////////////////////////////////
-    /// \brief Construct the video mode with its attributes
-    ///
-    /// \param modeWidth        Width in pixels
-    /// \param modeHeight       Height in pixels
-    /// \param modeBitsPerPixel Pixel depths in bits per pixel
-    ///
-    ////////////////////////////////////////////////////////////
-    video_mode(unsigned int modeWidth, unsigned int modeHeight, unsigned int modeBitsPerPixel = 32);
+struct MML_WINDOW_API video_bounds
+{
+    static video_bounds get_display_bounds(int index);
 
-    ////////////////////////////////////////////////////////////
-    /// \brief Get the current desktop video mode
-    ///
-    /// \return Current desktop video mode
-    ///
-    ////////////////////////////////////////////////////////////
-    static video_mode get_desktop_mode();
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Retrieve all the video modes supported in fullscreen mode
-    ///
-    /// When creating a fullscreen window, the video mode is restricted
-    /// to be compatible with what the graphics driver and monitor
-    /// support. This function returns the complete list of all video
-    /// modes that can be used in fullscreen mode.
-    /// The returned array is sorted from best to worst, so that
-    /// the first element will always give the best mode (higher
-    /// width, height and bits-per-pixel).
-    ///
-    /// \return Array containing all the supported fullscreen modes
-    ///
-    ////////////////////////////////////////////////////////////
-    static const std::vector<video_mode>& get_fullscreen_modes();
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Tell whether or not the video mode is valid
-    ///
-    /// The validity of video modes is only relevant when using
-    /// fullscreen windows; otherwise any video mode can be used
-    /// with no restriction.
-    ///
-    /// \return True if the video mode is valid for fullscreen mode
-    ///
-    ////////////////////////////////////////////////////////////
-    bool is_valid() const;
-
-    ////////////////////////////////////////////////////////////
-    // Member data
-    ////////////////////////////////////////////////////////////
-    unsigned int width;        ///< Video mode width, in pixels
-    unsigned int height;       ///< Video mode height, in pixels
-    unsigned int bits_per_pixel; ///< Video mode pixel depth, in bits per pixels
+    int x {};
+    int y {};
+    unsigned int width {};
+    unsigned int height {};
 };
 
 ////////////////////////////////////////////////////////////

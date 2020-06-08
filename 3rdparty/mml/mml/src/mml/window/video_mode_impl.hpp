@@ -18,22 +18,10 @@ namespace priv
 class video_mode_impl
 {
 public:
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Get the list of all the supported fullscreen video modes
-    ///
-    /// \return Array filled with the fullscreen video modes
-    ///
-    ////////////////////////////////////////////////////////////
-    static std::vector<video_mode> get_fullscreen_modes();
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Get the current desktop video mode
-    ///
-    /// \return Current desktop video mode
-    ///
-    ////////////////////////////////////////////////////////////
-    static video_mode get_desktop_mode();
+    static int get_number_of_displays();
+    static std::vector<video_mode> get_desktop_modes(int index = 0);
+    static video_mode get_desktop_mode(int index = 0);
+    static video_bounds get_display_bounds(int index = 0);
 };
 
 } // namespace priv

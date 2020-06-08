@@ -84,13 +84,12 @@ class window_impl
 {
 
 public:
-	window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
-		: impl_(::mml::video_mode(size.w, size.h), title, get_impl_flags(flags))
+    window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
+        : impl_(::mml::video_mode{size.w, size.h}, {{pos.x, pos.y}}, title, get_impl_flags(flags))
 		, title_(title)
 		, style_(get_impl_flags(flags))
 	{
 		id_ = register_window(this);
-		set_position(pos);
 	}
 
 	~window_impl()
@@ -138,7 +137,7 @@ public:
 
 	void set_size(const area& size) noexcept
 	{
-		impl_.set_size(std::array<uint32_t, 2>{size.w, size.h});
+        impl_.set_size(std::array<uint32_t, 2>{{size.w, size.h}});
 	}
 
 	auto get_size() const noexcept -> area
@@ -170,16 +169,7 @@ public:
 
 	void set_position(const point& pos) noexcept
 	{
-		if(pos.x == window::centered && pos.y == window::centered)
-		{
-			auto desktop = display_mode::get_desktop_mode();
-			auto sz = get_size();
-			impl_.set_position(std::array<int32_t, 2>{int32_t(desktop.w / 2 - sz.w / 2), int32_t(desktop.h / 2 - sz.h / 2)});
-		}
-		else
-		{
-			impl_.set_position(std::array<int32_t, 2>{pos.x, pos.y});
-		}
+        impl_.set_position(std::array<int32_t, 2>{{pos.x, pos.y}});
 	}
 
 	auto get_position() noexcept -> point
@@ -317,6 +307,11 @@ public:
 	{
 		impl_.set_icon(img.size.w, img.size.h, img.pixels.data());
 	}
+
+    bool has_focus() const
+    {
+        return impl_.has_focus();
+    }
 
 private:
 	::mml::window impl_;

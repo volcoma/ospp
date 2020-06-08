@@ -25,20 +25,21 @@ visible_(false)
 
 
 ////////////////////////////////////////////////////////////
-window::window(video_mode mode, const std::string& title, std::uint32_t style) :
-impl_          (nullptr),
-size_          ({{0, 0}}),
-visible_(true)
+window::window(video_mode mode, const std::array<std::int32_t, 2>& position,
+               const std::string& title, std::uint32_t style)
+    : impl_(nullptr)
+    , size_({{0, 0}})
+    , visible_(true)
 {
-    create(mode, title, style);
+    create(mode, position, title, style);
 }
 
 
 ////////////////////////////////////////////////////////////
-window::window(window_handle handle) :
-impl_          (nullptr),
-size_          ({{0, 0}}),
-visible_(true)
+window::window(window_handle handle)
+    : impl_          (nullptr)
+    , size_          ({{0, 0}})
+    , visible_(true)
 {
     create(handle);
 }
@@ -52,7 +53,8 @@ window::~window()
 
 
 ////////////////////////////////////////////////////////////
-void window::create(video_mode mode, const std::string& title, std::uint32_t style)
+void window::create(video_mode mode, const std::array<std::int32_t, 2>& position,
+                    const std::string& title, std::uint32_t style)
 {
     // Destroy the previous window implementation
     dispose();
@@ -68,11 +70,13 @@ void window::create(video_mode mode, const std::string& title, std::uint32_t sty
         }
         else
         {
+            auto modes = video_mode::get_desktop_modes(0);
+            bool valid = std::find(modes.begin(), modes.end(), mode) != modes.end();
             // Make sure that the chosen video mode is compatible
-            if (!mode.is_valid())
+            if (!valid)
             {
                 err() << "The requested video mode is not available, switching to a valid mode" << std::endl;
-                mode = video_mode::get_fullscreen_modes()[0];
+                mode = modes.at(0);
             }
 
             // Update the fullscreen window
@@ -92,7 +96,7 @@ void window::create(video_mode mode, const std::string& title, std::uint32_t sty
     #endif
 
     // Recreate the window implementation
-    impl_ = priv::window_impl::create(mode, title, style);
+    impl_ = priv::window_impl::create(mode, position, title, style);
 
     // Perform common initializations
     initialize();

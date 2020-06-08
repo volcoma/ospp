@@ -49,7 +49,7 @@ void sensor_impl::close()
 std::array<float, 3> sensor_impl::update()
 {
     // To be implemented
-	return std::array<float, 3>({ 0, 0, 0 });
+    return std::array<float, 3>({{ 0, 0, 0 }});
 }
 
 

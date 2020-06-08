@@ -98,16 +98,18 @@ bool cursor_impl::load_from_system(cursor::type type)
     {
         default: return false;
 
-        case cursor::arrow:          shape = XC_left_ptr;              break;
-		case cursor::arrow_wait:     shape = XC_left_ptr;              break;
-        case cursor::wait:           shape = XC_watch;              break;
-        case cursor::text:           shape = XC_xterm;              break;
-        case cursor::hand:           shape = XC_hand2;              break;
+        case cursor::arrow:           shape = XC_left_ptr;           break;
+        case cursor::arrow_wait:      shape = XC_left_ptr;           break;
+        case cursor::wait:            shape = XC_watch;              break;
+        case cursor::text:            shape = XC_xterm;              break;
+        case cursor::hand:            shape = XC_hand2;              break;
         case cursor::size_horizontal: shape = XC_sb_h_double_arrow;  break;
         case cursor::size_vertical:   shape = XC_sb_v_double_arrow;  break;
+        case cursor::size_top_left_bottom_right: shape = XC_fleur; break;
+        case cursor::size_bottom_left_top_right: shape = XC_fleur; break;
         case cursor::size_all:        shape = XC_fleur;              break;
-        case cursor::cross:          shape = XC_tcross;          break;
-        case cursor::help:           shape = XC_question_arrow;     break;
+        case cursor::cross:           shape = XC_tcross;             break;
+        case cursor::help:            shape = XC_question_arrow;     break;
         case cursor::not_allowed:     shape = XC_X_cursor;           break;
     }
 

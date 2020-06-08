@@ -15,17 +15,16 @@
 
 namespace os
 {
-namespace clipboard
-{
+    namespace clipboard
+    {
+        auto get_text() noexcept -> std::string
+        {
+            return impl::get_text();
+        }
 
-auto get_text() noexcept -> std::string
-{
-	return impl::get_text();
-}
-
-void set_text(const std::string& text)
-{
-	impl::set_text(text);
-}
-}
+        void set_text(const std::string& text)
+        {
+            impl::set_text(text);
+        }
+    }
 }

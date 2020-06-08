@@ -85,6 +85,7 @@ if(MML_OS_WINDOWS)
     endif()
 endif()
 
+mark_as_advanced(MML_BUILD_WINDOW)
 # add the MML header path
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_subdirectory(src/mml)

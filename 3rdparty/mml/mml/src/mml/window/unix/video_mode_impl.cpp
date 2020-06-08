@@ -7,159 +7,318 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include <algorithm>
+#include <cmath>
 
 
 namespace mml
 {
 namespace priv
 {
-////////////////////////////////////////////////////////////
-std::vector<video_mode> video_mode_impl::get_fullscreen_modes()
-{
-    std::vector<video_mode> modes;
-
-    // Open a connection with the X server
-    Display* display = open_display();
-    if (display)
+    namespace
     {
-        // Retrieve the default screen number
-        int screen = DefaultScreen(display);
-
-        // Check if the XRandR extension is present
-        int version;
-        if (XQueryExtension(display, "RANDR", &version, &version, &version))
+        const XRRModeInfo* get_mode_info(const XRRScreenResources* sr, RRMode id)
         {
-            // Get the current configuration
-            XRRScreenConfiguration* config = XRRGetScreenInfo(display, RootWindow(display, screen));
-            if (config)
+            int i;
+
+            for (i = 0;  i < sr->nmode;  i++)
             {
-                // Get the available screen sizes
-                int nbSizes;
-                XRRScreenSize* sizes = XRRConfigSizes(config, &nbSizes);
-                if (sizes && (nbSizes > 0))
+                if (sr->modes[i].id == id)
+                    return sr->modes + i;
+            }
+
+            return nullptr;
+        }
+
+        static int calculate_refresh_rate(const XRRModeInfo* mi)
+        {
+            if (mi->hTotal && mi->vTotal)
+                return int(round(double (mi->dotClock) / (double (mi->hTotal) * double (mi->vTotal))));
+            else
+                return 0;
+        }
+
+        // Check whether the display mode should be included in enumeration
+        //
+        static bool mode_is_good(const XRRModeInfo* mi)
+        {
+            return (mi->modeFlags & RR_Interlace) == 0;
+        }
+
+    }
+    ////////////////////////////////////////////////////////////
+    int video_mode_impl::get_number_of_displays()
+    {
+        Display* display = open_display();
+        if (!display)
+        {
+            return 0;
+        }
+
+        int version {};
+        if (!XQueryExtension(display, "RANDR", &version, &version, &version))
+        {
+            close_display(display);
+            return 0;
+        }
+
+        int connected_displays {};
+        int screen = DefaultScreen(display);
+        auto resources = XRRGetScreenResources(display, RootWindow(display, screen));
+        if (resources)
+        {
+            for (auto i = 0; i < resources->noutput; i++)
+            {
+                auto& current_output = resources->outputs[i];
+                auto output_info = XRRGetOutputInfo(display, resources, current_output);
+                if (output_info)
                 {
-                    // Get the list of supported depths
-                    int nbDepths = 0;
-                    int* depths = XListDepths(display, screen, &nbDepths);
-                    if (depths && (nbDepths > 0))
+                    if (output_info->connection == RR_Connected)
                     {
-                        // Combine depths and sizes to fill the array of supported modes
-                        for (int i = 0; i < nbDepths; ++i)
+                        connected_displays++;
+                    }
+
+                    XRRFreeOutputInfo(output_info);
+                }
+            }
+
+            XRRFreeScreenResources(resources);
+        }
+
+        close_display(display);
+
+        return connected_displays;
+    }
+
+    std::vector<video_mode> video_mode_impl::get_desktop_modes(int index)
+    {
+        Display* display = open_display();
+        if (!display)
+        {
+            return {};
+        }
+
+        int version {};
+        if (!XQueryExtension(display, "RANDR", &version, &version, &version))
+        {
+            close_display(display);
+            return {};
+        }
+
+        int screen = DefaultScreen(display);
+        auto resources = XRRGetScreenResources(display, RootWindow(display, screen));
+        std::vector<video_mode> modes;
+
+        if (resources)
+        {
+            int inner_index {};
+            for (auto i = 0; i < resources->noutput; i++)
+            {
+                auto& current_output = resources->outputs[i];
+                auto output_info = XRRGetOutputInfo(display, resources, current_output);
+                if (output_info)
+                {
+                    if (output_info->connection == RR_Connected)
+                    {
+                        if (inner_index == index)
                         {
-                            for (int j = 0; j < nbSizes; ++j)
+                            auto& crtc_id = output_info->crtc;
+                            auto crtc_info = XRRGetCrtcInfo(display, resources, crtc_id);
+                            if (crtc_info)
                             {
-                                // Convert to video_mode
-                                video_mode mode(sizes[j].width, sizes[j].height, depths[i]);
-
-                                Rotation currentRotation;
-                                XRRConfigRotations(config, &currentRotation);
-
-                                if (currentRotation == RR_Rotate_90 || currentRotation == RR_Rotate_270)
-                                    std::swap(mode.width, mode.height);
-
-                                // Add it only if it is not already in the array
-                                if (std::find(modes.begin(), modes.end(), mode) == modes.end())
-                                    modes.push_back(mode);
+                                for(auto idx = 0; idx < output_info->nmode; idx++)
+                                {
+                                    auto& mode_id = output_info->modes[idx];
+                                    auto mode_info = get_mode_info(resources, mode_id);
+                                    if (mode_info && mode_is_good(mode_info))
+                                    {
+                                        modes.emplace_back();
+                                        auto& mode = modes.back();
+                                        if (crtc_info->rotation == RR_Rotate_90 || crtc_info->rotation == RR_Rotate_270)
+                                        {
+                                            mode.width = crtc_info->height;
+                                            mode.height = crtc_info->width;
+                                        }
+                                        else
+                                        {
+                                            mode.width = mode_info->width;
+                                            mode.height = mode_info->height;
+                                        }
+                                        mode.bits_per_pixel = unsigned (DefaultDepth(display, screen));
+                                        mode.refresh_rate = unsigned (calculate_refresh_rate(mode_info));
+                                    }
+                                }
+                                XRRFreeCrtcInfo(crtc_info);
                             }
                         }
 
-                        // Free the array of depths
-                        XFree(depths);
+                        inner_index++;
+                    }
+
+                    XRRFreeOutputInfo(output_info);
+
+                    if (!modes.empty())
+                    {
+                        break;
                     }
                 }
+            }
 
-                // Free the configuration instance
-                XRRFreeScreenConfigInfo(config);
-            }
-            else
-            {
-                // Failed to get the screen configuration
-                err() << "Failed to retrieve the screen configuration while trying to get the supported video modes" << std::endl;
-            }
-        }
-        else
-        {
-            // XRandr extension is not supported: we cannot get the video modes
-            err() << "Failed to use the XRandR extension while trying to get the supported video modes" << std::endl;
+            XRRFreeScreenResources(resources);
         }
 
-        // Close the connection with the X server
         close_display(display);
-    }
-    else
-    {
-        // We couldn't connect to the X server
-        err() << "Failed to connect to the X server while trying to get the supported video modes" << std::endl;
+
+        return modes;
     }
 
-    return modes;
-}
 
-
-////////////////////////////////////////////////////////////
-video_mode video_mode_impl::get_desktop_mode()
-{
-    video_mode desktopMode;
-
-    // Open a connection with the X server
-    Display* display = open_display();
-    if (display)
+    ////////////////////////////////////////////////////////////
+    video_mode video_mode_impl::get_desktop_mode(int index)
     {
-        // Retrieve the default screen number
+        Display* display = open_display();
+        if (!display)
+        {
+            return {};
+        }
+
+        int version {};
+        if (!XQueryExtension(display, "RANDR", &version, &version, &version))
+        {
+            close_display(display);
+            return {};
+        }
+
         int screen = DefaultScreen(display);
-
-        // Check if the XRandR extension is present
-        int version;
-        if (XQueryExtension(display, "RANDR", &version, &version, &version))
+        auto resources = XRRGetScreenResources(display, RootWindow(display, screen));
+        video_mode mode {};
+        if (resources)
         {
-            // Get the current configuration
-            XRRScreenConfiguration* config = XRRGetScreenInfo(display, RootWindow(display, screen));
-            if (config)
+            int inner_index {};
+            for (auto i = 0; i < resources->noutput; i++)
             {
-                // Get the current video mode
-                Rotation currentRotation;
-                int currentMode = XRRConfigCurrentConfiguration(config, &currentRotation);
-
-                // Get the available screen sizes
-                int nbSizes;
-                XRRScreenSize* sizes = XRRConfigSizes(config, &nbSizes);
-                if (sizes && (nbSizes > 0))
+                auto& current_output = resources->outputs[i];
+                auto output_info = XRRGetOutputInfo(display, resources, current_output);
+                if (output_info)
                 {
-                    desktopMode = video_mode(sizes[currentMode].width, sizes[currentMode].height, DefaultDepth(display, screen));
+                    if (output_info->connection == RR_Connected)
+                    {
+                        if (inner_index == index)
+                        {
+                            auto& crtc_id = output_info->crtc;
+                            auto crtc_info = XRRGetCrtcInfo(display, resources, crtc_id);
+                            if (crtc_info)
+                            {
+                                auto& current_mode = crtc_info->mode;
+                                auto mode_info = get_mode_info(resources, current_mode);
+                                if (mode_info)
+                                {
+                                    if (crtc_info->rotation == RR_Rotate_90 || crtc_info->rotation == RR_Rotate_270)
+                                    {
+                                        mode.width = crtc_info->height;
+                                        mode.height = crtc_info->width;
+                                    }
+                                    else
+                                    {
+                                        mode.width = mode_info->width;
+                                        mode.height = mode_info->height;
+                                    }
+                                    mode.bits_per_pixel = unsigned (DefaultDepth(display, screen));
+                                    mode.refresh_rate = unsigned (calculate_refresh_rate(mode_info));
+                                }
+                                XRRFreeCrtcInfo(crtc_info);
+                            }
+                        }
 
-                    Rotation currentRotation;
-                    XRRConfigRotations(config, &currentRotation);
+                        inner_index++;
+                    }
 
-                    if (currentRotation == RR_Rotate_90 || currentRotation == RR_Rotate_270)
-                        std::swap(desktopMode.width, desktopMode.height);
+                    XRRFreeOutputInfo(output_info);
+
+                    if (mode.width != 0 && mode.height != 0)
+                    {
+                        break;
+                    }
                 }
+            }
 
-                // Free the configuration instance
-                XRRFreeScreenConfigInfo(config);
-            }
-            else
-            {
-                // Failed to get the screen configuration
-                err() << "Failed to retrieve the screen configuration while trying to get the desktop video modes" << std::endl;
-            }
-        }
-        else
-        {
-            // XRandr extension is not supported: we cannot get the video modes
-            err() << "Failed to use the XRandR extension while trying to get the desktop video modes" << std::endl;
+            XRRFreeScreenResources(resources);
         }
 
-        // Close the connection with the X server
         close_display(display);
-    }
-    else
-    {
-        // We couldn't connect to the X server
-        err() << "Failed to connect to the X server while trying to get the desktop video modes" << std::endl;
+
+        return mode;
     }
 
-    return desktopMode;
-}
+    video_bounds video_mode_impl::get_display_bounds(int index)
+    {
+        Display* display = open_display();
+        if (!display)
+        {
+            return {};
+        }
+
+        int version {};
+        if (!XQueryExtension(display, "RANDR", &version, &version, &version))
+        {
+            close_display(display);
+            return {};
+        }
+
+        int screen = DefaultScreen(display);
+        auto resources = XRRGetScreenResources(display, RootWindow(display, screen));
+        video_bounds bounds {};
+        if (resources)
+        {
+            int inner_index {};
+            for (auto i = 0; i < resources->noutput; i++)
+            {
+                auto& current_output = resources->outputs[i];
+                auto output_info = XRRGetOutputInfo(display, resources, current_output);
+                if (output_info)
+                {
+                    if (output_info->connection == RR_Connected)
+                    {
+                        if (inner_index == index)
+                        {
+                            auto& crtc_id = output_info->crtc;
+                            auto crtc_info = XRRGetCrtcInfo(display, resources, crtc_id);
+                            if (crtc_info)
+                            {
+                                bounds.x = crtc_info->x;
+                                bounds.y = crtc_info->y;
+                                if (crtc_info->rotation == RR_Rotate_90 || crtc_info->rotation == RR_Rotate_270)
+                                {
+                                    bounds.width = crtc_info->height;
+                                    bounds.height = crtc_info->width;
+                                }
+                                else
+                                {
+                                    bounds.width = crtc_info->width;
+                                    bounds.height = crtc_info->height;
+                                }
+                                XRRFreeCrtcInfo(crtc_info);
+                            }
+                        }
+
+                        inner_index++;
+                    }
+
+                    XRRFreeOutputInfo(output_info);
+
+                    if (bounds.width != 0 && bounds.height != 0)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            XRRFreeScreenResources(resources);
+        }
+
+        close_display(display);
+
+        return bounds;
+    }
 
 } // namespace priv
 

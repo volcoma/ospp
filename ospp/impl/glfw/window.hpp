@@ -417,12 +417,12 @@ public:
 
 	void set_opacity(float opacity)
 	{
-		glfwSetWindowOpacity(impl_.get(), opacity);
+        glfwSetWindowOpacity(impl_.get(), opacity);
 	}
 
 	auto get_opacity() const -> float
-	{
-		return glfwGetWindowOpacity(impl_.get());
+    {
+        return glfwGetWindowOpacity(impl_.get());
 	}
 
 	void grab_input(bool b) noexcept
@@ -439,6 +439,11 @@ public:
 	{
 		glfwFocusWindow(impl_.get());
 	}
+
+    bool has_focus()
+    {
+        return glfwGetWindowAttrib(impl_.get(), GLFW_FOCUSED) != 0;
+    }
 
 	void set_cursor(const cursor& c) noexcept
 	{

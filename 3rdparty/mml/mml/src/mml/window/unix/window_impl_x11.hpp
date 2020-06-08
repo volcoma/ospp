@@ -41,7 +41,8 @@ public:
     /// \param settings Additional settings for the underlying OpenGL context
     ///
     ////////////////////////////////////////////////////////////
-    window_impl_x11(video_mode mode, const std::string& title, unsigned long style);
+    window_impl_x11(video_mode mode, const std::array<std::int32_t, 2>& position,
+                    const std::string& title, unsigned long style);
 
     ////////////////////////////////////////////////////////////
     /// \brief Destructor
@@ -184,26 +185,6 @@ private:
     void grab_focus();
 
     ////////////////////////////////////////////////////////////
-    /// \brief Set fullscreen video mode
-    ///
-    /// \param Mode video mode to switch to
-    ///
-    ////////////////////////////////////////////////////////////
-    void set_video_mode(const video_mode& mode);
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Reset to desktop video mode
-    ///
-    ////////////////////////////////////////////////////////////
-    void reset_video_mode();
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Switch to fullscreen mode
-    ///
-    ////////////////////////////////////////////////////////////
-    void switch_to_fullscreen();
-
-    ////////////////////////////////////////////////////////////
     /// \brief Set the WM protocols we support
     ///
     ////////////////////////////////////////////////////////////
@@ -285,8 +266,8 @@ private:
     XIC        input_context_;   ///< Input context used to get unicode input in our window
     std::deque<XEvent> events_; ///< Queue we use to store pending events for this window
     bool       is_external_;     ///< Tell whether the window has been created externally or by mml
-    int        old_video_mode_;   ///< Video mode in use before we switch to fullscreen
-    RRCrtc     old_rrc_rtc_;      ///< RRCrtc in use before we switch to fullscreen
+//    int        old_video_mode_;   ///< Video mode in use before we switch to fullscreen
+//    RRCrtc     old_rrc_rtc_;      ///< RRCrtc in use before we switch to fullscreen
     ::Cursor   hidden_cursor_;   ///< As X11 doesn't provide cursor hiding, we must create a transparent one
     ::Cursor   last_cursor_;     ///< Last cursor used -- this data is not owned by the window and is required to be always valid
     bool       key_repeat_;      ///< Is the KeyRepeat feature enabled?

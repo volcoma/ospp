@@ -19,21 +19,21 @@ joystick_manager& joystick_manager::get_instance()
 ////////////////////////////////////////////////////////////
 const joystick_caps& joystick_manager::get_capabilities(unsigned int joystick) const
 {
-    return m_joysticks[joystick].capabilities;
+    return joysticks_[joystick].capabilities;
 }
 
 
 ////////////////////////////////////////////////////////////
 const joystick_state& joystick_manager::get_state(unsigned int joystick) const
 {
-    return m_joysticks[joystick].state;
+    return joysticks_[joystick].state;
 }
 
 
 ////////////////////////////////////////////////////////////
 const joystick::identification& joystick_manager::get_identification(unsigned int joystick) const
 {
-    return m_joysticks[joystick].identification;
+    return joysticks_[joystick].identification;
 }
 
 
@@ -42,7 +42,7 @@ void joystick_manager::update()
 {
     for (int i = 0; i < joystick::count; ++i)
     {
-        item& item = m_joysticks[i];
+        item& item = joysticks_[i];
 
         if (item.state.connected)
         {
@@ -87,8 +87,8 @@ joystick_manager::~joystick_manager()
 {
     for (int i = 0; i < joystick::count; ++i)
     {
-        if (m_joysticks[i].state.connected)
-            m_joysticks[i].joystick.close();
+        if (joysticks_[i].state.connected)
+            joysticks_[i].joystick.close();
     }
 
     joystick_impl::cleanup();

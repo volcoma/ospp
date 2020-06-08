@@ -13,7 +13,7 @@ namespace glfw
 inline auto last_error() -> std::string
 {
 	const char* result = nullptr;
-	glfwGetError(&result);
+    glfwGetError(&result);
 	return result;
 }
 class error : public std::runtime_error
@@ -26,7 +26,7 @@ public:
 
 	error(const std::string& str)
 		: std::runtime_error(str)
-	{
+    {
 	}
 };
 
@@ -35,7 +35,7 @@ public:
 #define OS_GLFW_ERROR_HANDLER_NO_RET()                                                                       \
 	do                                                                                                       \
 	{                                                                                                        \
-		glfwGetError(nullptr);                                                                               \
+        glfwGetError(nullptr);                                                                               \
 	} while(0)
 #define OS_GLFW_ERROR_HANDLER_VOID()                                                                         \
 	do                                                                                                       \

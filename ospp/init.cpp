@@ -1,4 +1,5 @@
 #include "init.h"
+#include "cursor.h"
 
 #if defined(SDL_BACKEND)
 #include "impl/sdl/init.hpp"
@@ -15,14 +16,14 @@
 
 namespace os
 {
+    void shutdown() noexcept
+    {
+        system_cursors().clear();
+        impl::shutdown();
+    }
 
-void shutdown() noexcept
-{
-	impl::shutdown();
-}
-
-auto init() -> bool
-{
-	return impl::init();
-}
+    auto init() -> bool
+    {
+        return impl::init();
+    }
 }

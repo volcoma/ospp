@@ -15,33 +15,31 @@
 
 namespace os
 {
+    namespace mouse
+    {
+        auto is_button_pressed(button b) noexcept -> bool
+        {
+            return impl::is_button_pressed(b);
+        }
 
-namespace mouse
-{
+        auto get_position() noexcept -> point
+        {
+            return impl::get_position();
+        }
 
-auto is_button_pressed(button b) noexcept -> bool
-{
-	return impl::is_button_pressed(b);
-}
+        auto get_position(const window& relative_to) noexcept -> point
+        {
+            return impl::get_position(relative_to);
+        }
 
-auto get_position() noexcept -> point
-{
-	return impl::get_position();
-}
+        void set_position(const point& pos) noexcept
+        {
+            impl::set_position(pos);
+        }
 
-auto get_position(const window& relative_to) noexcept -> point
-{
-	return impl::get_position(relative_to);
-}
-
-void set_position(const point& pos) noexcept
-{
-	impl::set_position(pos);
-}
-
-void set_position(const point& pos, const window& relative_to) noexcept
-{
-	impl::set_position(pos, relative_to);
-}
-}
+        void set_position(const point& pos, const window& relative_to) noexcept
+        {
+            impl::set_position(pos, relative_to);
+        }
+    }
 }

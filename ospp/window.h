@@ -1,7 +1,9 @@
 #pragma once
+
 #include "cursor.h"
 #include "display_mode.h"
 #include "types.hpp"
+
 #include <cstdint>
 #include <limits>
 #include <memory>
@@ -9,90 +11,95 @@
 
 namespace os
 {
-using native_handle = void*;
-using native_display = void*;
+    using native_handle = void*;
+    using native_display = void*;
 
-class window
-{
-public:
-	enum : uint32_t
-	{
-		fullscreen = 1 << 0,
-		fullscreen_desktop = 1 << 1,
-		hidden = 1 << 2,
-		borderless = 1 << 3,
-		resizable = 1 << 4,
-		minimized = 1 << 5,
-		maximized = 1 << 6,
-	};
-	constexpr static const auto centered = std::numeric_limits<int32_t>::max();
+    class window
+    {
+    public:
+        using ptr = std::shared_ptr<window>;
+        using u_ptr = std::unique_ptr<window>;
+        using weak_ptr = std::weak_ptr<window>;
 
-	window(const std::string& title, const display_mode& display, uint32_t flags = 0);
-	window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t flags = 0);
-	window(const std::string& title, const point& pos, const area& size, uint32_t flags = 0);
+        enum : uint32_t
+        {
+            fullscreen = 1 << 0,
+            fullscreen_desktop = 1 << 1,
+            hidden = 1 << 2,
+            borderless = 1 << 3,
+            resizable = 1 << 4,
+            minimized = 1 << 5,
+            maximized = 1 << 6,
+        };
+        constexpr static const auto centered = std::numeric_limits<int32_t>::max();
 
-	auto get_native_handle() const -> native_handle;
-	auto get_native_display() const -> native_display;
+        window(const std::string& title, int32_t x, int32_t y, uint32_t w, uint32_t h, uint32_t flags = 0);
+        window(const std::string& title, const point& pos, const area& size, uint32_t flags = 0);
 
-	auto is_open() const noexcept -> bool;
-	auto get_id() const noexcept -> uint32_t;
+        auto get_native_handle() const -> native_handle;
+        auto get_native_display() const -> native_display;
 
-	void set_brightness(float bright);
-	auto get_brightness() const noexcept -> float;
+        auto is_open() const noexcept -> bool;
+        auto get_id() const noexcept -> uint32_t;
 
-	void set_size(uint32_t width, uint32_t height) noexcept;
-	void set_size(const area& size) noexcept;
-	auto get_size() const noexcept -> area;
+        void set_brightness(float bright);
+        auto get_brightness() const noexcept -> float;
 
-	void set_maximum_size(uint32_t width, uint32_t height) noexcept;
-	void set_maximum_size(const area& size) noexcept;
-	auto get_maximum_size() const noexcept -> area;
+        void set_size(uint32_t width, uint32_t height) noexcept;
+        void set_size(const area& size) noexcept;
+        auto get_size() const noexcept -> area;
 
-	void set_minimum_size(uint32_t width, uint32_t height) noexcept;
-	void set_minimum_size(const area& size) noexcept;
-	auto get_minimum_size() const noexcept -> area;
+        void set_maximum_size(uint32_t width, uint32_t height) noexcept;
+        void set_maximum_size(const area& size) noexcept;
+        auto get_maximum_size() const noexcept -> area;
 
-	void set_position(int32_t x, int32_t y) noexcept;
-	void set_position(const point& pos) noexcept;
-	auto get_position() const noexcept -> point;
+        void set_minimum_size(uint32_t width, uint32_t height) noexcept;
+        void set_minimum_size(const area& size) noexcept;
+        auto get_minimum_size() const noexcept -> area;
 
-	auto get_title() const noexcept -> std::string;
-	void set_title(const std::string& str) noexcept;
+        void set_position(int32_t x, int32_t y) noexcept;
+        void set_position(const point& pos) noexcept;
+        auto get_position() const noexcept -> point;
 
-	void show() noexcept;
-	void hide() noexcept;
+        auto get_title() const noexcept -> std::string;
+        void set_title(const std::string& str) noexcept;
 
-	void maximize() noexcept;
-	void minimize() noexcept;
-	void restore() noexcept;
-	void raise() noexcept;
+        void show() noexcept;
+        void hide() noexcept;
 
-	void set_border(bool b = true) noexcept;
-	void set_fullscreen(bool b = true);
+        void maximize() noexcept;
+        void minimize() noexcept;
+        void restore() noexcept;
+        void raise() noexcept;
 
-	void set_opacity(float opacity);
-	auto get_opacity() const -> float;
+        void set_border(bool b = true) noexcept;
+        void set_fullscreen(bool b = true);
 
-	void grab_input(bool grab) noexcept;
-	auto is_input_grabbed() const noexcept -> bool;
+        void set_opacity(float opacity);
+        auto get_opacity() const -> float;
 
-	void request_focus();
-	void request_close() noexcept;
+        void grab_input(bool grab) noexcept;
+        auto is_input_grabbed() const noexcept -> bool;
 
-	void set_cursor(const cursor& c) noexcept;
-	void show_cursor(bool show) noexcept;
+        void request_focus();
+        auto has_focus() const noexcept -> bool;
+        void request_close() noexcept;
 
-	//-----------------------------------------------------------------------------
-	/// \a image pixels must be an array of \a width by \a height pixels
-	/// in 32-bit RGBA format. If not, this will cause undefined behavior.
-	/// If image pixels are null or either the width or the height are 0,
-	/// the input is considered invalid.
-	//-----------------------------------------------------------------------------
-	void set_icon(const image& img);
+        void set_cursor(const cursor& c) noexcept;
+        void set_cursor(cursor::type type) noexcept;
+        void show_cursor(bool show) noexcept;
 
-	auto get_impl() const noexcept -> void*;
+        //-----------------------------------------------------------------------------
+        /// \a image pixels must be an array of \a width by \a height pixels
+        /// in 32-bit RGBA format. If not, this will cause undefined behavior.
+        /// If image pixels are null or either the width or the height are 0,
+        /// the input is considered invalid.
+        //-----------------------------------------------------------------------------
+        void set_icon(const image& img);
 
-private:
-	std::shared_ptr<void> impl_;
-};
+        auto get_impl() const noexcept -> void*;
+
+    private:
+        std::shared_ptr<void> impl_;
+    };
 } // sdl
