@@ -244,7 +244,7 @@ video_bounds video_mode_impl::get_display_bounds(int index)
                 auto callback = [](HMONITOR handle,
                         HDC /*dc*/,
                         LPRECT /*rect*/,
-                        LPARAM data) -> WINBOOL
+                        LPARAM data) -> BOOL
                 {
                     MONITORINFOEX mi;
                     ZeroMemory(&mi, sizeof(mi));
