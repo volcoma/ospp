@@ -26,7 +26,6 @@ elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/*.cc")
 
 elseif("${BACKEND_TYPE}" STREQUAL "MML")
-	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/mml" mml)
 
 	message( STATUS "MML WINDOW backend selected." )
 	file(GLOB impl_src "${CMAKE_CURRENT_SOURCE_DIR}/impl/mml/*.h"
