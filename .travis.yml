@@ -90,7 +90,7 @@ matrix:
       addons: &clang70
         apt:
           sources:
-            - llvm-toolchain-xenial-7.0
+            - llvm-toolchain-xenial-7
             - ubuntu-toolchain-r-test
           packages:
             - libstdc++-7-dev
@@ -105,60 +105,45 @@ matrix:
       addons: &clang80
         apt:
           sources:
-            - llvm-toolchain-xenial-8.0
+            - llvm-toolchain-xenial-8
             - ubuntu-toolchain-r-test
           packages:
             - libstdc++-8-dev
-            - clang-8.0
+            - clang-8
             - cmake
       env:
-        - COMPILERCXX='clang++-8.0'
-        - COMPILERC='clang-8.0'
+        - COMPILERCXX='clang++-8'
+        - COMPILERC='clang-8'
         
     - os: linux
       compiler: clang
       addons: &clang90
         apt:
           sources:
-            - llvm-toolchain-xenial-9.0
+            - llvm-toolchain-xenial-9
             - ubuntu-toolchain-r-test
           packages:
             - libstdc++-9-dev
-            - clang-9.0
+            - clang-9
             - cmake
       env:
-        - COMPILERCXX='clang++-9.0'
-        - COMPILERC='clang-9.0'
-        
-    - os: linux
-      compiler: clang
-      addons: &clang80
-        apt:
-          sources:
-            - llvm-toolchain-xenial-8.0
-            - ubuntu-toolchain-r-test
-          packages:
-            - libstdc++-8-dev
-            - clang-8.0
-            - cmake
-      env:
-        - COMPILERCXX='clang++-8.0'
-        - COMPILERC='clang-8.0'
-        
+        - COMPILERCXX='clang++-9'
+        - COMPILERC='clang-9'
+
     - os: linux
       compiler: clang
       addons: &clang100
         apt:
           sources:
-            - llvm-toolchain-xenial-10.0
+            - llvm-toolchain-xenial-10
             - ubuntu-toolchain-r-test
           packages:
             - libstdc++-10-dev
-            - clang-10.0
+            - clang-10
             - cmake
       env:
-        - COMPILERCXX='clang++-10.0'
-        - COMPILERC='clang-10.0'
+        - COMPILERCXX='clang++-10'
+        - COMPILERC='clang-10'
 
     # 2/ Linux GCC Builds
     - os: linux
