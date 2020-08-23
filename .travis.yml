@@ -187,7 +187,20 @@ matrix:
             - cmake
       env:
         - COMPILERCXX='g++-7'
-        - COMPILERC='gcc-7' 
+        - COMPILERC='gcc-7'
+        
+    - os: linux
+      compiler: gcc
+      addons: &gcc8
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+            - cmake
+      env:
+        - COMPILERCXX='g++-8'
+        - COMPILERC='gcc-8'
         
 before_install:
   - sudo apt-get install -y libudev-dev
