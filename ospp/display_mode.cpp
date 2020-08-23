@@ -187,7 +187,7 @@ namespace os
             return ss.str();
         }
 
-        void enumerate_display_caps()
+        void enumerate_caps()
         {
             auto count = get_available_displays_count();
             std::cout << "displays : " << count << std::endl;

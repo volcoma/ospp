@@ -133,33 +133,13 @@ static os::image load_cursor_image(const char* image[])
 	return parse_image(data, mask, 32, 32);
 }
 
-void print(const os::display_mode& mode)
-{
-	std::cout << "w : " << mode.w << std::endl;
-	std::cout << "h : " << mode.h << std::endl;
-	std::cout << "bpp : " << mode.bpp << std::endl;
-	std::cout << "refresh rate : " << mode.refresh_rate << std::endl;
-}
-
 int main()
 {
 	os::init();
 
 	{
-		auto desktop_mode = os::display_mode::get_desktop_mode();
-		std::cout << "desktop mode:" << std::endl;
-		std::cout << "-------------------------" << std::endl;
-		print(desktop_mode);
-		std::cout << "-------------------------" << std::endl;
+        os::display::enumerate_caps();
 
-		auto modes = os::display_mode::get_available_modes();
-		std::cout << "available modes:" << std::endl;
-		for(const auto& mode : modes)
-		{
-			std::cout << "-------------------------" << std::endl;
-			print(mode);
-		}
-		std::cout << "-------------------------" << std::endl;
 		os::window window{"win 1", os::window::centered, os::window::centered, 500,
 						  500,	 os::window::resizable};
 
