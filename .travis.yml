@@ -120,8 +120,10 @@ matrix:
       addons: &clang90
         apt:
           sources:
-            - llvm-toolchain-xenial-9
+            #- llvm-toolchain-xenial-9
             - ubuntu-toolchain-r-test
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
             - libstdc++-9-dev
             - clang-9
@@ -135,8 +137,10 @@ matrix:
       addons: &clang100
         apt:
           sources:
-            - llvm-toolchain-xenial-10
+            #- llvm-toolchain-xenial-10
             - ubuntu-toolchain-r-test
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-10 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
             - libstdc++-10-dev
             - clang-10
