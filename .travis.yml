@@ -94,11 +94,11 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - libstdc++-7-dev
-            - clang-7.0
+            - clang-7
             - cmake
       env:
-        - COMPILERCXX='clang++-7.0'
-        - COMPILERC='clang-7.0'
+        - COMPILERCXX='clang++-7'
+        - COMPILERC='clang-7'
         
     - os: linux
       compiler: clang
@@ -147,18 +147,18 @@ matrix:
         
     - os: linux
       compiler: clang
-      addons: &clang90
+      addons: &clang100
         apt:
           sources:
-            - llvm-toolchain-xenial-9.0
+            - llvm-toolchain-xenial-10.0
             - ubuntu-toolchain-r-test
           packages:
-            - libstdc++-9-dev
-            - clang-9.0
+            - libstdc++-10-dev
+            - clang-10.0
             - cmake
       env:
-        - COMPILERCXX='clang++-9.0'
-        - COMPILERC='clang-9.0'
+        - COMPILERCXX='clang++-10.0'
+        - COMPILERC='clang-10.0'
 
     # 2/ Linux GCC Builds
     - os: linux

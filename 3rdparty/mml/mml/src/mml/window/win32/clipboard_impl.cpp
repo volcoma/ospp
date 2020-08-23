@@ -38,10 +38,9 @@ std::string clipboard_impl::get_string()
 		return text;
 	}
 
-	auto clip = std::wstring(static_cast<wchar_t*>(GlobalLock(clipboard_handle)));
-	utf8::from_wide(std::begin(clip), std::end(clip), std::back_inserter(text));
-	GlobalUnlock(clipboard_handle);
-
+    auto clip = std::u16string(static_cast<std::u16string::value_type*>(GlobalLock(clipboard_handle)));
+    utf16::to_utf8(std::begin(clip), std::end(clip), std::back_inserter(text));
+    GlobalUnlock(clipboard_handle);
 	CloseClipboard();
 	return text;
 }
@@ -62,10 +61,10 @@ void clipboard_impl::set_string(const std::string& text)
 	}
 
 	// Create a Win32-compatible string
-	std::wstring wide;
-	utf8::to_wide(std::begin(text), std::end(text), std::back_inserter(wide));
-	size_t string_size = (wide.size() + 1) * sizeof(WCHAR);
-	HANDLE string_handle = GlobalAlloc(GMEM_MOVEABLE, string_size);
+    std::u16string wide;
+    utf8::to_utf16(std::begin(text), std::end(text), std::back_inserter(wide));
+    size_t string_size = (wide.size() + 1) * sizeof(std::u16string::value_type);
+    HANDLE string_handle = GlobalAlloc(GMEM_MOVEABLE, string_size);
 
 	if(string_handle)
 	{

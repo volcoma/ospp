@@ -26,7 +26,7 @@
 namespace
 {
     std::map<unsigned int, std::string> plugged;
-    std::map<int, std::pair<int, int> > hatValueMap;
+    std::map<int, std::pair<int, int> > hat_value_map;
 
     bool is_joystick(const char *name)
     {
@@ -109,7 +109,7 @@ namespace
         }
     }
 
-    int usageToAxis(int usage)
+    int usage_to_axis(int usage)
     {
         switch (usage)
         {
@@ -123,10 +123,10 @@ namespace
         }
     }
 
-    void hatValueToSfml(int value, mml::priv::JoystickState& state)
+    void val_to_mml(int value, mml::priv::joystick_state& state)
     {
-        state.axes[mml::Joystick::PovX] = hatValueMap[value].first;
-        state.axes[mml::Joystick::PovY] = hatValueMap[value].second;
+        state.axes[mml::Joystick::PovX] = hat_value_map[value].first;
+        state.axes[mml::Joystick::PovY] = hat_value_map[value].second;
     }
 }
 
@@ -138,23 +138,23 @@ namespace priv
 ////////////////////////////////////////////////////////////
 void joystick_impl::initialize()
 {
-    hid_init(NULL);
+    hid_init(nullptr);
 
     // Do an initial scan
     update_plugged_list();
 
     // Map of hat values
-    hatValueMap[0] = std::make_pair(   0,    0); // center
+    hat_value_map[0] = std::make_pair(   0,    0); // center
 
-    hatValueMap[1] = std::make_pair(   0, -100); // top
-    hatValueMap[3] = std::make_pair( 100,    0); // right
-    hatValueMap[5] = std::make_pair(   0,  100); // bottom
-    hatValueMap[7] = std::make_pair(-100,    0); // left
+    hat_value_map[1] = std::make_pair(   0, -100); // top
+    hat_value_map[3] = std::make_pair( 100,    0); // right
+    hat_value_map[5] = std::make_pair(   0,  100); // bottom
+    hat_value_map[7] = std::make_pair(-100,    0); // left
 
-    hatValueMap[2] = std::make_pair( 100, -100); // top-right
-    hatValueMap[4] = std::make_pair( 100,  100); // bottom-right
-    hatValueMap[6] = std::make_pair(-100,  100); // bottom-left
-    hatValueMap[8] = std::make_pair(-100, -100); // top-left
+    hat_value_map[2] = std::make_pair( 100, -100); // top-right
+    hat_value_map[4] = std::make_pair( 100,  100); // bottom-right
+    hat_value_map[6] = std::make_pair(-100,  100); // bottom-left
+    hat_value_map[8] = std::make_pair(-100, -100); // top-left
 }
 
 
@@ -165,7 +165,7 @@ void joystick_impl::cleanup()
 
 
 ////////////////////////////////////////////////////////////
-bool joystick_impl::isConnected(unsigned int index)
+bool joystick_impl::is_connected(unsigned int index)
 {
     return plugged.find(index) != plugged.end();
 }
@@ -177,26 +177,26 @@ bool joystick_impl::open(unsigned int index)
     if (isConnected(index))
     {
         // Open the joystick's file descriptor (read-only and non-blocking)
-        _file = ::open(plugged[index].c_str(), O_RDONLY | O_NONBLOCK);
-        if (_file >= 0)
+        file_ = ::open(plugged[index].c_str(), O_RDONLY | O_NONBLOCK);
+        if (file_ >= 0)
         {
             // Reset the joystick state
-            _state = JoystickState();
+            _state = joystick_state();
 
             // Get the report descriptor
-            m_desc = hid_get_report_desc(_file);
-            if (!m_desc)
+            desc_ = hid_get_report_desc(file_);
+            if (!desc_)
             {
-                ::close(_file);
+                ::close(file_);
                 return false;
             }
 
             // And the id
-            m_id = hid_get_report_id(_file);
+            id_ = hid_get_report_id(file_);
 
             // Then allocate a buffer for data retrieval
-            m_length = hid_report_size(m_desc, hid_input, m_id);
-            m_buffer.resize(m_length);
+            length_ = hid_report_size(desc_, hid_input, id_);
+            buffer_.resize(length_);
 
             _state.connected = true;
 
@@ -211,8 +211,8 @@ bool joystick_impl::open(unsigned int index)
 ////////////////////////////////////////////////////////////
 void joystick_impl::close()
 {
-    ::close(_file);
-    hid_dispose_report_desc(m_desc);
+    ::close(file_);
+    hid_dispose_report_desc(desc_);
 }
 
 
@@ -222,7 +222,7 @@ JoystickCaps joystick_impl::get_capabilities() const
     JoystickCaps caps;
     hid_item_t item;
 
-    hid_data_t data = hid_start_parse(m_desc, 1 << hid_input, m_id);
+    hid_data_t data = hid_start_parse(desc_, 1 << hid_input, id_);
 
     while (hid_get_item(data, &item))
     {
@@ -237,7 +237,7 @@ JoystickCaps joystick_impl::get_capabilities() const
             }
             else if (usage == HUP_GENERIC_DESKTOP)
             {
-                int axis = usageToAxis(usage);
+                int axis = usage_to_axis(usage);
 
                 if (usage == HUG_HAT_SWITCH)
                 {
@@ -261,16 +261,16 @@ JoystickCaps joystick_impl::get_capabilities() const
 ////////////////////////////////////////////////////////////
 Joystick::Identification joystick_impl::getIdentification() const
 {
-    return _identification;
+    return identification_;
 }
 
 
 ////////////////////////////////////////////////////////////
-JoystickState joystick_impl::joystick_impl::update()
+joystick_state joystick_impl::joystick_impl::update()
 {
-    while (read(_file, &m_buffer[0], m_length) == m_length)
+    while (read(file_, &buffer_[0], length_) == length_)
     {
-        hid_data_t data = hid_start_parse(m_desc, 1 << hid_input, m_id);
+        hid_data_t data = hid_start_parse(desc_, 1 << hid_input, id_);
 
         // No memory?
         if (!data)
@@ -287,16 +287,16 @@ JoystickState joystick_impl::joystick_impl::update()
 
                 if (usage == HUP_BUTTON)
                 {
-                    _state.buttons[buttonIndex++] = hid_get_data(&m_buffer[0], &item);
+                    state_.buttons[buttonIndex++] = hid_get_data(&buffer_[0], &item);
                 }
                 else if (usage == HUP_GENERIC_DESKTOP)
                 {
-                    int value = hid_get_data(&m_buffer[0], &item);
-                    int axis = usageToAxis(usage);
+                    int value = hid_get_data(&buffer_[0], &item);
+                    int axis = usage_to_axis(usage);
 
                     if (usage == HUG_HAT_SWITCH)
                     {
-                        hatValueToSfml(value, _state);
+                        val_to_mml(value, state_);
                     }
                     else if (axis != -1)
                     {
@@ -304,7 +304,7 @@ JoystickState joystick_impl::joystick_impl::update()
                         int maximum = item.logical_maximum;
 
                         value = (value - minimum) * 200 / (maximum - minimum) - 100;
-                        _state.axes[axis] = value;
+                        state_.axes[axis] = value;
                     }
                 }
             }
@@ -313,7 +313,7 @@ JoystickState joystick_impl::joystick_impl::update()
         hid_end_parse(data);
     }
 
-    return _state;
+    return state_;
 }
 
 } // namespace priv

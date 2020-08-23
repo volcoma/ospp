@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.4.3)
+
 set(INCROOT ${PROJECT_SOURCE_DIR}/include/mml/system)
 set(SRCROOT ${PROJECT_SOURCE_DIR}/src/mml/system)
 

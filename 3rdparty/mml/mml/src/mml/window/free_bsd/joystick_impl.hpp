@@ -41,7 +41,7 @@ public:
     /// \return True if the joystick is connected, false otherwise
     ///
     ////////////////////////////////////////////////////////////
-    static bool isConnected(unsigned int index);
+    static bool is_connected(unsigned int index);
 
     ////////////////////////////////////////////////////////////
     /// \brief Open the joystick
@@ -65,7 +65,7 @@ public:
     /// \return Joystick capabilities
     ///
     ////////////////////////////////////////////////////////////
-    JoystickCaps get_capabilities() const;
+    joystick_caps get_capabilities() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the joystick identification
@@ -73,7 +73,7 @@ public:
     /// \return Joystick identification
     ///
     ////////////////////////////////////////////////////////////
-    Joystick::Identification getIdentification() const;
+    joystick::identification get_identification() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Update the joystick and get its new state
@@ -81,25 +81,25 @@ public:
     /// \return Joystick state
     ///
     ////////////////////////////////////////////////////////////
-    JoystickState update();
+    joystick_state update();
 
 private:
 
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    int                      _file;           ///< File descriptor of the joystick
-    report_desc_t            m_desc;           ///< USB report descriptor
-    int                      m_id;             ///< USB id
-    std::vector<char>        m_buffer;         ///< USB HID buffer
-    int                      m_length;         ///< Buffer length
-    Joystick::Identification _identification; ///< Joystick identification
-    JoystickState            _state;          ///< Current state of the joystick
+    int                      file_;           ///< File descriptor of the joystick
+    report_desc_t            desc_;           ///< USB report descriptor
+    int                      id_;             ///< USB id
+    std::vector<char>        buffer_;         ///< USB HID buffer
+    int                      length_;         ///< Buffer length
+    joystick::identification identification_; ///< Joystick identification
+    joystick_state           state_;          ///< Current state of the joystick
 };
 
 } // namespace priv
 
-} // namespace sf
+} // namespace mml
 
 
 #endif // MML_JOYSTICKIMPLFREEBSD_HPP
