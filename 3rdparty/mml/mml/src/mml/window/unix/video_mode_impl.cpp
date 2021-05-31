@@ -132,17 +132,17 @@ namespace priv
                                     if (mode_info && mode_is_good(mode_info))
                                     {
                                         modes.emplace_back();
-                                        auto& mode = modes.back();
-                                        if (crtc_info->rotation == RR_Rotate_90 || crtc_info->rotation == RR_Rotate_270)
-                                        {
-                                            mode.width = crtc_info->height;
-                                            mode.height = crtc_info->width;
-                                        }
-                                        else
-                                        {
-                                            mode.width = mode_info->width;
-                                            mode.height = mode_info->height;
-                                        }
+										auto& mode = modes.back();
+										if (crtc_info->rotation & (RR_Rotate_90 | RR_Rotate_270))
+										{
+											mode.width = mode_info->height;
+											mode.height = mode_info->width;
+										}
+										else
+										{
+											mode.width = mode_info->width;
+											mode.height = mode_info->height;
+										}
                                         mode.bits_per_pixel = unsigned (DefaultDepth(display, screen));
                                         mode.refresh_rate = unsigned (calculate_refresh_rate(mode_info));
                                     }
@@ -212,16 +212,16 @@ namespace priv
                                 auto mode_info = get_mode_info(resources, current_mode);
                                 if (mode_info)
                                 {
-                                    if (crtc_info->rotation == RR_Rotate_90 || crtc_info->rotation == RR_Rotate_270)
-                                    {
-                                        mode.width = crtc_info->height;
-                                        mode.height = crtc_info->width;
-                                    }
-                                    else
-                                    {
-                                        mode.width = mode_info->width;
-                                        mode.height = mode_info->height;
-                                    }
+									if (crtc_info->rotation & (RR_Rotate_90 | RR_Rotate_270))
+									{
+										mode.width = mode_info->height;
+										mode.height = mode_info->width;
+									}
+									else
+									{
+										mode.width = mode_info->width;
+										mode.height = mode_info->height;
+									}
                                     mode.bits_per_pixel = unsigned (DefaultDepth(display, screen));
                                     mode.refresh_rate = unsigned (calculate_refresh_rate(mode_info));
                                 }
@@ -286,16 +286,22 @@ namespace priv
                             {
                                 bounds.x = crtc_info->x;
                                 bounds.y = crtc_info->y;
-                                if (crtc_info->rotation == RR_Rotate_90 || crtc_info->rotation == RR_Rotate_270)
-                                {
-                                    bounds.width = crtc_info->height;
-                                    bounds.height = crtc_info->width;
-                                }
-                                else
-                                {
-                                    bounds.width = crtc_info->width;
-                                    bounds.height = crtc_info->height;
-                                }
+
+								auto& current_mode = crtc_info->mode;
+								auto mode_info = get_mode_info(resources, current_mode);
+								if (mode_info)
+								{
+									if (crtc_info->rotation & (RR_Rotate_90 | RR_Rotate_270))
+									{
+										bounds.width = mode_info->height;
+										bounds.height = mode_info->width;
+									}
+									else
+									{
+										bounds.width = mode_info->width;
+										bounds.height = mode_info->height;
+									}
+								}
                                 XRRFreeCrtcInfo(crtc_info);
                             }
                         }
