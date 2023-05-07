@@ -377,6 +377,7 @@ public:
 
 	void minimize() noexcept
 	{
+        glfwIconifyWindow(impl_.get());
 	}
 
 	void restore() noexcept
@@ -386,6 +387,7 @@ public:
 
 	void raise() noexcept
 	{
+        glfwRequestWindowAttention(impl_.get());
 	}
 
 	void set_border(bool) noexcept

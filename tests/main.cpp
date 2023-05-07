@@ -236,6 +236,16 @@ int main()
 						std::cout << "clipboard text : " << text << std::endl;
 					}
 
+                    if(e.key.code == os::key::t)
+					{
+						window.minimize();
+					}
+
+                    if(e.key.code == os::key::y)
+					{
+						window.raise();
+					}
+
 					if(e.key.code == os::key::digit1)
 					{
 						full = !full;
