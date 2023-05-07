@@ -18,33 +18,33 @@ namespace os
             {
                 switch(id)
                 {
-                case SDL_WINDOWEVENT_SHOWN:
+                case SDL_EVENT_WINDOW_SHOWN:
                     return window_event_id::shown;
-                case SDL_WINDOWEVENT_HIDDEN:
+                case SDL_EVENT_WINDOW_HIDDEN:
                     return window_event_id::hidden;
-                case SDL_WINDOWEVENT_EXPOSED:
+                case SDL_EVENT_WINDOW_EXPOSED:
                     return window_event_id::exposed;
-                case SDL_WINDOWEVENT_MOVED:
+                case SDL_EVENT_WINDOW_MOVED:
                     return window_event_id::moved;
-                case SDL_WINDOWEVENT_RESIZED:
+                case SDL_EVENT_WINDOW_RESIZED:
                     return window_event_id::resized;
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
                     return window_event_id::size_changed;
-                case SDL_WINDOWEVENT_MAXIMIZED:
+                case SDL_EVENT_WINDOW_MAXIMIZED:
                     return window_event_id::maximized;
-                case SDL_WINDOWEVENT_MINIMIZED:
+                case SDL_EVENT_WINDOW_MINIMIZED:
                     return window_event_id::minimized;
-                case SDL_WINDOWEVENT_RESTORED:
+                case SDL_EVENT_WINDOW_RESTORED:
                     return window_event_id::restored;
-                case SDL_WINDOWEVENT_ENTER:
+                case SDL_EVENT_WINDOW_MOUSE_ENTER:
                     return window_event_id::enter;
-                case SDL_WINDOWEVENT_LEAVE:
+                case SDL_EVENT_WINDOW_MOUSE_LEAVE:
                     return window_event_id::leave;
-                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                case SDL_EVENT_WINDOW_FOCUS_GAINED:
                     return window_event_id::focus_gained;
-                case SDL_WINDOWEVENT_FOCUS_LOST:
+                case SDL_EVENT_WINDOW_FOCUS_LOST:
                     return window_event_id::focus_lost;
-                case SDL_WINDOWEVENT_CLOSE:
+                case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                     return window_event_id::close;
                 }
 
@@ -56,105 +56,98 @@ namespace os
                 event ev{};
                 switch(e.type)
                 {
-                case SDL_QUIT:
+                case SDL_EVENT_QUIT:
                     ev.type = events::quit;
                     break;
-                case SDL_APP_TERMINATING:
+                case SDL_EVENT_TERMINATING:
                     ev.type = events::app_terminating;
                     break;
-                case SDL_APP_LOWMEMORY:
+                case SDL_EVENT_LOW_MEMORY:
                     ev.type = events::app_low_memory;
                     break;
-                case SDL_APP_WILLENTERBACKGROUND:
+                case SDL_EVENT_WILL_ENTER_BACKGROUND:
                     ev.type = events::app_will_enter_background;
                     break;
-                case SDL_APP_DIDENTERBACKGROUND:
+                case SDL_EVENT_DID_ENTER_BACKGROUND:
                     ev.type = events::app_did_enter_background;
                     break;
-                case SDL_APP_WILLENTERFOREGROUND:
+                case SDL_EVENT_WILL_ENTER_FOREGROUND:
                     ev.type = events::app_will_enter_foreground;
                     break;
-                case SDL_APP_DIDENTERFOREGROUND:
+                case SDL_EVENT_DID_ENTER_FOREGROUND:
                     ev.type = events::app_did_enter_foreground;
                     break;
-                case SDL_WINDOWEVENT:
-                    ev.type = events::window;
-                    ev.window.window_id = e.window.windowID;
-                    ev.window.type = to_window_event_id(e.window.event);
-                    ev.window.data1 = e.window.data1;
-                    ev.window.data2 = e.window.data2;
-                    break;
-                case SDL_KEYDOWN:
+                case SDL_EVENT_KEY_DOWN:
                     ev.type = events::key_down;
                     ev.key.window_id = e.key.windowID;
                     ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
-                    ev.key.alt = (e.key.keysym.mod & KMOD_ALT) != 0;
-                    ev.key.ctrl = (e.key.keysym.mod & KMOD_CTRL) != 0;
-                    ev.key.shift = (e.key.keysym.mod & KMOD_SHIFT) != 0;
-                    ev.key.system = (e.key.keysym.mod & KMOD_GUI) != 0;
+                    ev.key.alt = (e.key.keysym.mod & SDL_KMOD_ALT) != 0;
+                    ev.key.ctrl = (e.key.keysym.mod & SDL_KMOD_CTRL) != 0;
+                    ev.key.shift = (e.key.keysym.mod & SDL_KMOD_SHIFT) != 0;
+                    ev.key.system = (e.key.keysym.mod & SDL_KMOD_GUI) != 0;
                     break;
-                case SDL_KEYUP:
+                case SDL_EVENT_KEY_UP:
                     ev.type = events::key_up;
                     ev.key.window_id = e.key.windowID;
                     ev.key.code = detail::sdl::from_layout_independent_impl(e.key.keysym.scancode);
-                    ev.key.alt = (e.key.keysym.mod & KMOD_ALT) != 0;
-                    ev.key.ctrl = (e.key.keysym.mod & KMOD_CTRL) != 0;
-                    ev.key.shift = (e.key.keysym.mod & KMOD_SHIFT) != 0;
-                    ev.key.system = (e.key.keysym.mod & KMOD_GUI) != 0;
+                    ev.key.alt = (e.key.keysym.mod & SDL_KMOD_ALT) != 0;
+                    ev.key.ctrl = (e.key.keysym.mod & SDL_KMOD_CTRL) != 0;
+                    ev.key.shift = (e.key.keysym.mod & SDL_KMOD_SHIFT) != 0;
+                    ev.key.system = (e.key.keysym.mod & SDL_KMOD_GUI) != 0;
                     break;
-                case SDL_TEXTINPUT:
+                case SDL_EVENT_TEXT_INPUT:
                     ev.type = events::text_input;
                     ev.text.window_id = e.text.windowID;
                     ev.text.text = e.text.text;
                     break;
-                case SDL_MOUSEBUTTONDOWN:
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     ev.type = events::mouse_button;
                     ev.button.window_id = e.button.windowID;
                     ev.button.button = mouse::detail::sdl::from_impl(e.button.button);
                     ev.button.state_id = state::pressed;
-                    ev.button.x = e.button.x;
-                    ev.button.y = e.button.y;
-                    ev.button.raw_x = e.button.x;
-                    ev.button.raw_y = e.button.y;
+                    ev.button.x = int32_t(e.button.x);
+                    ev.button.y = int32_t(e.button.y);
+                    ev.button.raw_x = int32_t(e.button.x);
+                    ev.button.raw_y = int32_t(e.button.y);
                     break;
-                case SDL_MOUSEBUTTONUP:
+                case SDL_EVENT_MOUSE_BUTTON_UP:
                     ev.type = events::mouse_button;
                     ev.button.window_id = e.button.windowID;
                     ev.button.button = mouse::detail::sdl::from_impl(e.button.button);
                     ev.button.state_id = state::released;
-                    ev.button.x = e.button.x;
-                    ev.button.y = e.button.y;
-                    ev.button.raw_x = e.button.x;
-                    ev.button.raw_y = e.button.y;
+                    ev.button.x = int32_t(e.button.x);
+                    ev.button.y = int32_t(e.button.y);
+                    ev.button.raw_x = int32_t(e.button.x);
+                    ev.button.raw_y = int32_t(e.button.y);
                     break;
-                case SDL_MOUSEMOTION:
+                case SDL_EVENT_MOUSE_MOTION:
                     ev.type = events::mouse_motion;
                     ev.motion.window_id = e.motion.windowID;
-                    ev.motion.x = e.motion.x;
-                    ev.motion.y = e.motion.y;
-                    ev.motion.raw_x = e.motion.x;
-                    ev.motion.raw_y = e.motion.y;
+                    ev.motion.x = int32_t(e.motion.x);
+                    ev.motion.y = int32_t(e.motion.y);
+                    ev.motion.raw_x = int32_t(e.motion.x);
+                    ev.motion.raw_y = int32_t(e.motion.y);
                     break;
-                case SDL_MOUSEWHEEL:
+                case SDL_EVENT_MOUSE_WHEEL:
                     ev.type = events::mouse_wheel;
                     ev.wheel.window_id = e.wheel.windowID;
                     ev.wheel.which = e.wheel.which;
                     ev.wheel.x = static_cast<double>(e.wheel.x);
                     ev.wheel.y = static_cast<double>(e.wheel.y);
                     break;
-                case SDL_FINGERDOWN:
+                case SDL_EVENT_FINGER_DOWN:
                     ev.type = events::finger_down;
                     break;
-                case SDL_FINGERUP:
+                case SDL_EVENT_FINGER_UP:
                     ev.type = events::finger_up;
                     break;
-                case SDL_FINGERMOTION:
+                case SDL_EVENT_FINGER_MOTION:
                     ev.type = events::finger_motion;
                     break;
-                case SDL_CLIPBOARDUPDATE:
+                case SDL_EVENT_CLIPBOARD_UPDATE:
                     ev.type = events::clipboard_update;
                     break;
-                case SDL_DROPFILE:
+                case SDL_EVENT_DROP_FILE:
                     ev.type = events::drop_file;
                     ev.drop.window_id = e.drop.windowID;
                     if(e.drop.file != nullptr)
@@ -164,7 +157,19 @@ namespace os
                     }
                     break;
                 default:
-                    ev.type = events::unknown;
+                    if(e.type >= SDL_EVENT_WINDOW_FIRST &&
+                       e.type <= SDL_EVENT_WINDOW_LAST)
+                    {
+                        ev.type = events::window;
+                        ev.window.window_id = e.window.windowID;
+                        ev.window.type = to_window_event_id(e.type);
+                        ev.window.data1 = e.window.data1;
+                        ev.window.data2 = e.window.data2;
+                    }
+                    else
+                    {
+                        ev.type = events::unknown;
+                    }
                 }
 
                 return ev;

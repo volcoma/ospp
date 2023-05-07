@@ -8,7 +8,9 @@
  */
 #define SDL_MAIN_HANDLED
 #if defined(__has_include)
-#   if __has_include(<SDL2/SDL.h>)
+#   if __has_include(<SDL3/SDL.h>)
+#       include <SDL3/SDL.h>
+#   elif __has_include(<SDL2/SDL.h>)
 #       include <SDL2/SDL.h>
 #   elif __has_include(<SDL/SDL.h>)
 #       include <SDL/SDL.h>
@@ -20,7 +22,9 @@
 #endif
 
 #if defined(__has_include)
-#   if __has_include(<SDL2/SDL_syswm.h>)
+#   if __has_include(<SDL3/SDL_syswm.h>)
+#       include <SDL3/SDL_syswm.h>
+#   elif __has_include(<SDL2/SDL_syswm.h>)
 #       include <SDL2/SDL_syswm.h>
 #   elif __has_include(<SDL/SDL_syswm.h>)
 #       include <SDL/SDL_syswm.h>

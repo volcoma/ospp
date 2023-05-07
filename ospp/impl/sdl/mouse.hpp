@@ -62,9 +62,10 @@ namespace os
 
                 inline auto get_position() noexcept -> point
                 {
-                    point result{};
-                    SDL_GetGlobalMouseState(&result.x, &result.y);
-                    return result;
+                    float x{};
+                    float y{};
+                    SDL_GetGlobalMouseState(&x, &y);
+                    return {int32_t(x), int32_t(y)};
                 }
 
                 inline point get_position(const window& relative_to) noexcept
@@ -79,12 +80,12 @@ namespace os
 
                 inline void set_position(const point& pos) noexcept
                 {
-                    SDL_WarpMouseGlobal(pos.x, pos.y);
+                    SDL_WarpMouseGlobal(float(pos.x), float(pos.y));
                 }
 
                 inline void set_position(const point& pos, const window& relative_to) noexcept
                 {
-                    SDL_WarpMouseInWindow(to_win_impl(relative_to).get_impl(), pos.x, pos.y);
+                    SDL_WarpMouseInWindow(to_win_impl(relative_to).get_impl(), float(pos.x), float(pos.y));
                 }
             }
         }

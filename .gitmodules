@@ -4,3 +4,6 @@
 [submodule "3rdparty/glfw/glfw"]
 	path = 3rdparty/glfw/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "3rdparty/SDL/SDL"]
+	path = 3rdparty/SDL/SDL
+	url = https://github.com/libsdl-org/SDL.git

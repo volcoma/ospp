@@ -51,7 +51,7 @@ namespace os
             {
                 void operator()(SDL_Cursor* cursor) const noexcept
                 {
-                    SDL_FreeCursor(cursor);
+                    SDL_DestroyCursor(cursor);
                 }
             };
 
@@ -67,8 +67,8 @@ namespace os
                 cursor_impl(const image& img, const point& hotspot)
                 {
                     auto surface =
-                        SDL_CreateRGBSurfaceFrom((void*)img.pixels.data(), int(img.size.w), int(img.size.h), 32,
-                                                 int(img.size.w * 4), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+                        SDL_CreateSurfaceFrom((void*)img.pixels.data(), int(img.size.w), int(img.size.h), int(img.size.w * 4),
+                                              SDL_PixelFormatEnum::SDL_PIXELFORMAT_RGBA8888);
                     if(!surface)
                     {
                         OS_SDL_ERROR_HANDLER_VOID();
@@ -76,7 +76,7 @@ namespace os
 
                     impl_.reset(SDL_CreateColorCursor(surface, hotspot.x, hotspot.y));
 
-                    SDL_FreeSurface(surface);
+                    SDL_DestroySurface(surface);
                 }
 
                 auto get_impl() const noexcept -> SDL_Cursor*

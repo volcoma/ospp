@@ -1041,7 +1041,7 @@ namespace os
 
             inline auto is_text_input_active() noexcept -> bool
             {
-                return SDL_IsTextInputActive() == SDL_TRUE;
+                return SDL_TextInputActive() == SDL_TRUE;
             }
         }
     }

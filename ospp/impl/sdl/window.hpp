@@ -139,14 +139,14 @@ inline auto get_native_display_handle(const SDL_SysWMinfo& wmi) noexcept -> nati
 
 inline auto get_impl_flags(uint32_t flags) -> uint32_t
 {
-    uint32_t result = SDL_WINDOW_ALLOW_HIGHDPI;
+    uint32_t result = 0x00002000;//SDL_WINDOW_ALLOW_HIGHDPI;
     if(flags & window::fullscreen)
     {
         result |= SDL_WINDOW_FULLSCREEN;
     }
     if(flags & window::fullscreen_desktop)
     {
-        result |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        result |= 0x00001000;//SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
     if(flags & window::hidden)
     {
@@ -193,14 +193,15 @@ class window_impl
 
 public:
     window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
-        : impl_(SDL_CreateWindow(title.c_str(), pos.x == window::centered ? centered : pos.x,
-                                 pos.y == window::centered ? centered : pos.y, static_cast<int>(size.w),
+        : impl_(SDL_CreateWindow(title.c_str(), static_cast<int>(size.w),
                                  static_cast<int>(size.h), get_impl_flags(flags)))
     {
         if(impl_ == nullptr)
         {
             OS_SDL_ERROR_HANDLER_VOID();
         }
+        set_position(point(pos.x == window::centered ? centered : pos.x,
+                      pos.y == window::centered ? centered : pos.y));
     }
 
     auto get_impl() const noexcept -> SDL_Window*
@@ -211,8 +212,7 @@ public:
     auto get_native_handle() const -> native_handle
     {
         SDL_SysWMinfo wmi;
-        SDL_VERSION(&wmi.version);
-        if(!SDL_GetWindowWMInfo(impl_.get(), &wmi))
+        if(!SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION))
         {
             OS_SDL_ERROR_HANDLER({});
         }
@@ -222,8 +222,7 @@ public:
     auto get_native_display() const -> native_display
     {
         SDL_SysWMinfo wmi;
-        SDL_VERSION(&wmi.version);
-        if(!SDL_GetWindowWMInfo(impl_.get(), &wmi))
+        if(!SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION))
         {
             OS_SDL_ERROR_HANDLER({});
         }
@@ -242,15 +241,12 @@ public:
 
     auto get_brightness() const noexcept -> float
     {
-        return SDL_GetWindowBrightness(impl_.get());
+        return 1.0f;
     }
 
     void set_brightness(float bright)
     {
-        if(SDL_SetWindowBrightness(impl_.get(), bright))
-        {
-            OS_SDL_ERROR_HANDLER_VOID();
-        }
+
     }
 
     void set_size(const area& size) noexcept
@@ -365,7 +361,7 @@ public:
 
     void set_fullscreen(bool b)
     {
-        if(SDL_SetWindowFullscreen(impl_.get(), b ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0))
+        if(SDL_SetWindowFullscreen(impl_.get(), b ? SDL_TRUE : SDL_FALSE))
         {
             OS_SDL_ERROR_HANDLER_VOID();
         }
@@ -421,21 +417,28 @@ public:
 
     void show_cursor(bool show) noexcept
     {
-        SDL_ShowCursor(show ? SDL_TRUE : SDL_FALSE);
+        if(show)
+        {
+            SDL_ShowCursor();
+        }
+        else
+        {
+            SDL_HideCursor();
+        }
     }
 
     void set_icon(const image& img)
     {
         auto surface =
-            SDL_CreateRGBSurfaceFrom((void*)img.pixels.data(), int(img.size.w), int(img.size.h), 32,
-                                     int(img.size.w * 4), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+            SDL_CreateSurfaceFrom((void*)img.pixels.data(), int(img.size.w), int(img.size.h), int(img.size.w * 4),
+                                  SDL_PixelFormatEnum::SDL_PIXELFORMAT_RGBA8888);
         if(!surface)
         {
             OS_SDL_ERROR_HANDLER_VOID();
         }
 
         SDL_SetWindowIcon(impl_.get(), surface);
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
     }
 
 private:
