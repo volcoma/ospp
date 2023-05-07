@@ -31,6 +31,13 @@ public:
         unsigned int height; ///< New height, in pixels
     };
 
+
+    struct move_event
+    {
+        int x; ///< New x, in pixels
+        int y; ///< New y, in pixels
+    };
+
     ////////////////////////////////////////////////////////////
     /// \brief keyboard event parameters (key_pressed, key_released)
     ///
@@ -168,6 +175,9 @@ public:
 		///< The window was resized (data in event.size)
 		resized,
 
+        ///< The window was moved (data in event.move)
+        moved,
+
 		///< The window lost the focus (no data)
 		lost_focus,
 
@@ -240,7 +250,10 @@ public:
 	union
 	{
 		///< Size event parameters (platform_event::resized)
-		size_event					size;
+        size_event					size;
+
+        ///< Coord event parameters (platform_event::moved)
+        move_event					move;
 
 		///< key event parameters (platform_event::key_pressed, platform_event::key_released)
 		key_event					key;

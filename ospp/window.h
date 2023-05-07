@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cursor.h"
-#include "display_mode.h"
 #include "types.hpp"
 
 #include <cstdint>
@@ -23,13 +22,18 @@ namespace os
 
         enum : uint32_t
         {
-            fullscreen = 1 << 0,
-            fullscreen_desktop = 1 << 1,
-            hidden = 1 << 2,
-            borderless = 1 << 3,
-            resizable = 1 << 4,
-            minimized = 1 << 5,
-            maximized = 1 << 6,
+            fullscreen          = 1 << 0,
+            fullscreen_desktop  = 1 << 1,
+            hidden              = 1 << 2,
+            borderless          = 1 << 3,
+            resizable           = 1 << 4,
+            minimized           = 1 << 5,
+            maximized           = 1 << 6,
+            always_on_top       = 1 << 7,
+            no_taskbar          = 1 << 8,
+            tooltip             = 1 << 9,
+            popup               = 1 << 10,
+            utility             = 1 << 11
         };
         constexpr static const auto centered = std::numeric_limits<int32_t>::max();
 

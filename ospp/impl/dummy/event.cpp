@@ -1,18 +1,6 @@
 #include "event.h"
 #include <deque>
 
-#if defined(SDL_BACKEND)
-#include "impl/sdl/event.hpp"
-#define impl detail::sdl
-#elif defined(MML_BACKEND)
-#include "impl/mml/event.hpp"
-#define impl detail::mml
-#elif defined(GLFW_BACKEND)
-#include "impl/glfw/event.hpp"
-#define impl detail::glfw
-#else
-#error "unsupported backend"
-#endif
 
 namespace os
 {
@@ -40,8 +28,6 @@ namespace os
 
     auto poll_event(event& e) noexcept -> bool
     {
-        impl::pump_events();
-
         return pop_event(e);
     }
 

@@ -40,7 +40,7 @@ namespace
 	std::vector<mml::priv::window_impl_x11*> allWindows;
 	std::mutex                             allWindowsMutex;
 	std::string                            windowManagerName;
-    std::string                            wmAbsPosGood[] = { "Enlightenment", "FVWM", "i3" };
+    std::string                            wmAbsPosGood[] = { "Enlightenment", "FVWM", "i3", "KWin", "Xfwm4" };
 	static const unsigned long            eventMask = FocusChangeMask      | ButtonPressMask     |
 	                                                  ButtonReleaseMask    | ButtonMotionMask    |
 	                                                  PointerMotionMask    | KeyPressMask        |
@@ -112,7 +112,7 @@ namespace
 		static bool ewmhSupported = false;
 
 		if (checked)
-			return ewmhSupported;
+            return ewmhSupported;
 
 		checked = true;
 
@@ -321,16 +321,16 @@ namespace
     bool isWMAbsolutePositionGood()
     {
         // This can only work with EWMH, to get the name.
-        if (!ewmhSupported())
-            return false;
+//        if (!ewmhSupported())
+//            return false;
 
-        for (size_t i = 0; i < (sizeof(wmAbsPosGood) / sizeof(wmAbsPosGood[0])); i++)
-        {
-            if (wmAbsPosGood[i] == windowManagerName)
-                return true;
-        }
+//        for (size_t i = 0; i < (sizeof(wmAbsPosGood) / sizeof(wmAbsPosGood[0])); i++)
+//        {
+//            if (wmAbsPosGood[i] == windowManagerName)
+//                return true;
+//        }
 
-        return false;
+        return true;
     }
 
 	mml::keyboard::key keysym_to_mml(KeySym symbol)
@@ -442,7 +442,7 @@ namespace
 		}
 
 		return mml::keyboard::Unknown;
-	}
+    }
 }
 
 
@@ -450,6 +450,34 @@ namespace mml
 {
 namespace priv
 {
+void set_net_wm_state(Display* display, ::Window xwindow, uint32_t style)
+{
+    auto _NET_WM_STATE = get_atom("_NET_WM_STATE", False);
+//    auto _NET_WM_STATE_FOCUSED = get_atom("_NET_WM_STATE_FOCUSED", False);
+    auto _NET_WM_STATE_ABOVE = get_atom("_NET_WM_STATE_ABOVE", False);
+//    auto _NET_WM_WINDOW_TYPE = get_atom("_NET_WM_WINDOW_TYPE", False);
+    auto _NET_WM_STATE_SKIP_TASKBAR = get_atom("_NET_WM_STATE_SKIP_TASKBAR", False);
+    auto _NET_WM_STATE_SKIP_PAGER = get_atom("_NET_WM_STATE_SKIP_PAGER", False);
+
+    Atom atoms[16];
+    int count = 0;
+
+    if (style & style::always_on_top) {
+        atoms[count++] = _NET_WM_STATE_ABOVE;
+    }
+    if (style & style::no_taskbar) {
+        atoms[count++] = _NET_WM_STATE_SKIP_TASKBAR;
+        atoms[count++] = _NET_WM_STATE_SKIP_PAGER;
+    }
+
+    if (count > 0) {
+        XChangeProperty(display, xwindow, _NET_WM_STATE, XA_ATOM, 32,
+                            PropModeReplace, (unsigned char *)atoms, count);
+    } /*else {
+        XDeleteProperty(display, xwindow, _NET_WM_STATE);
+    }*/
+}
+
 ////////////////////////////////////////////////////////////
 window_impl_x11::window_impl_x11(window_handle handle) :
 window_         (0),
@@ -462,6 +490,7 @@ is_external_     (true),
 hidden_cursor_   (0),
 last_cursor_     (None),
 key_repeat_      (true),
+previous_pos_    {{-1, -1}},
 previous_size_   {{-1, -1}},
 use_size_hints_   (false),
 fullscreen_     (false),
@@ -512,6 +541,7 @@ is_external_     (false),
 hidden_cursor_   (0),
 last_cursor_     (None),
 key_repeat_      (true),
+previous_pos_    {{-1, -1}},
 previous_size_   {{-1, -1}},
 use_size_hints_   (false),
 fullscreen_     (false),
@@ -553,6 +583,7 @@ last_input_time_  (0)
 		}
 	}
 
+
     int width  = int(mode.width);
     int height = int(mode.height);
 
@@ -563,19 +594,20 @@ last_input_time_  (0)
 	// Define the window attributes
 	XSetWindowAttributes attributes;
     attributes.colormap = XCreateColormap(display_, DefaultRootWindow(display_), visual, AllocNone);
-	attributes.event_mask = eventMask;
-	attributes.override_redirect = (fullscreen_ && !ewmhSupported()) ? True : False;
+    attributes.event_mask = eventMask;
+    bool override = style & style::tooltip || style & style::popup_menu;
+    attributes.override_redirect = ((fullscreen_ && !ewmhSupported()) || override) ? True : False;
 
 	window_ = XCreateWindow(display_,
-	                         DefaultRootWindow(display_),
-                             x, y,
-	                         width, height,
-	                         0,
-                             depth,
-	                         InputOutput,
-                             visual,
-	                         CWEventMask | CWOverrideRedirect | CWColormap,
-	                         &attributes);
+                            DefaultRootWindow(display_),
+                            x, y,
+                            width, height,
+                            0,
+                            depth,
+                            InputOutput,
+                            visual,
+                            CWEventMask | CWOverrideRedirect | CWColormap,
+                            &attributes);
 
 	if (!window_)
 	{
@@ -583,8 +615,8 @@ last_input_time_  (0)
 		return;
 	}
 
-    XSizeHints    my_hints = {0};
-
+    XSizeHints    my_hints{};
+    std::memset(&my_hints, 0, sizeof(my_hints));
     my_hints.flags  = PPosition | PSize;     /* I want to specify position and size */
     my_hints.x      = x;       /* The origin and size coords I want */
     my_hints.y      = y;
@@ -602,6 +634,37 @@ last_input_time_  (0)
 	hints->initial_state = NormalState;
 	XSetWMHints(display_, window_, hints);
 	XFree(hints);
+
+
+    long compositor = 2;  /* don't disable compositing except for "normal" windows */
+
+    const char *wintype_name = nullptr;
+    if (style & style::utility) {
+        wintype_name = "_NET_WM_WINDOW_TYPE_UTILITY";
+    } else if (style & style::tooltip) {
+        wintype_name = "_NET_WM_WINDOW_TYPE_TOOLTIP";
+    } else if (style & style::popup_menu) {
+        wintype_name = "_NET_WM_WINDOW_TYPE_POPUP_MENU";
+    } else {
+        wintype_name = "_NET_WM_WINDOW_TYPE_NORMAL";
+        compositor = 1;  /* disable compositing for "normal" windows */
+    }
+    {
+        auto _NET_WM_WINDOW_TYPE = get_atom("_NET_WM_WINDOW_TYPE", False);
+        auto wintype = get_atom(wintype_name, False);
+        XChangeProperty(display_, window_, _NET_WM_WINDOW_TYPE, XA_ATOM, 32,
+                            PropModeReplace, (unsigned char *)&wintype, 1);
+    }
+
+    {
+        auto _NET_WM_BYPASS_COMPOSITOR = get_atom("_NET_WM_BYPASS_COMPOSITOR", False);
+        XChangeProperty(display_, window_, _NET_WM_BYPASS_COMPOSITOR, XA_CARDINAL, 32,
+                            PropModeReplace,
+                            (unsigned char *)&compositor, 1);
+    }
+
+
+    set_net_wm_state(display_, window_, style);
 
 	// If not in fullscreen, set the window's style (tell the window manager to
 	// change our window's decorations and functions according to the requested style)
@@ -675,6 +738,7 @@ last_input_time_  (0)
 	{
 		use_size_hints_ = true;
 		XSizeHints* sizeHints = XAllocSizeHints();
+
 		sizeHints->flags = PMinSize | PMaxSize | USPosition;
 		sizeHints->min_width = sizeHints->max_width = width;
 		sizeHints->min_height = sizeHints->max_height = height;
@@ -896,7 +960,11 @@ void window_impl_x11::set_size(const std::array<std::uint32_t, 2>& size)
 	if (use_size_hints_)
 	{
 		XSizeHints* sizeHints = XAllocSizeHints();
-		sizeHints->flags = PMinSize | PMaxSize;
+
+        long userhints;
+        XGetWMNormalHints(display_, window_, sizeHints, &userhints);
+
+        sizeHints->flags |= PMinSize | PMaxSize;
 		sizeHints->min_width = sizeHints->max_width = size[0];
 		sizeHints->min_height = sizeHints->max_height = size[1];
 		XSetWMNormalHints(display_, window_, sizeHints);
@@ -1122,7 +1190,7 @@ void window_impl_x11::minimize()
 
     XFlush(display_);
 }
-static Bool is_map_notify(Display *dpy, XEvent *ev, XPointer win)
+static Bool is_map_notify(Display */*dpy*/, XEvent *ev, XPointer win)
 {
     return ev->type == MapNotify && ev->xmap.window == *((Window*)win);
 
@@ -1685,6 +1753,30 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
 		// Resize event
 	    case ConfigureNotify:
 	    {
+            /* Real configure notify events are relative to the parent, synthetic events are absolute. */
+            if (!windowEvent.xconfigure.send_event) {
+                unsigned int NumChildren;
+                Window ChildReturn, Root, Parent;
+                Window * Children;
+                /* Translate these coodinates back to relative to root */
+                XQueryTree(display_, windowEvent.xconfigure.window, &Root, &Parent, &Children, &NumChildren);
+                XTranslateCoordinates(windowEvent.xconfigure.display,
+                                          Parent, DefaultRootWindow(windowEvent.xconfigure.display),
+                                          windowEvent.xconfigure.x, windowEvent.xconfigure.y,
+                                          &windowEvent.xconfigure.x, &windowEvent.xconfigure.y,
+                                          &ChildReturn);
+            }
+            if ((windowEvent.xconfigure.x != previous_pos_[0]) || (windowEvent.xconfigure.y != previous_pos_[1]))
+            {
+                platform_event event;
+                event.type   = platform_event::moved;
+                event.move.x = windowEvent.xconfigure.x;
+                event.move.y = windowEvent.xconfigure.y;
+                push_event(event);
+
+                previous_pos_[0] = windowEvent.xconfigure.x;
+                previous_pos_[1] = windowEvent.xconfigure.y;
+            }
 		    // ConfigureNotify can be triggered for other reasons, check if the size has actually changed
 		    if ((windowEvent.xconfigure.width != previous_size_[0]) || (windowEvent.xconfigure.height != previous_size_[1]))
 			{

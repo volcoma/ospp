@@ -10,6 +10,7 @@ namespace mml
 {
 namespace priv
 {
+
 struct monitor_data
 {
     WCHAR adapterName[CCHDEVICENAME] {};
@@ -259,12 +260,8 @@ video_bounds video_mode_impl::get_display_bounds(int index)
 
                 monitor_data monitor;
 
-                wcscpy(monitor.adapterName, adapter.DeviceName);
-
-
-
+                wcscpy_s(monitor.adapterName, adapter.DeviceName);
                 EnumDisplayMonitors(nullptr, &rect, callback, (LPARAM)&monitor);
-
 
                 MONITORINFO mi{};
                 mi.cbSize = { sizeof(mi) };

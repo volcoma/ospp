@@ -1,10 +1,11 @@
 #pragma once
 
 #include "types.hpp"
-#include "window.h"
 
 namespace os
 {
+    class window;
+
     namespace mouse
     {
         enum class button : uint8_t

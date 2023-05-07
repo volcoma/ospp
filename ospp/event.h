@@ -2,7 +2,6 @@
 
 #include "keyboard.h"
 #include "mouse.h"
-#include <chrono>
 #include <cstdint>
 #include <string>
 
@@ -32,7 +31,7 @@ namespace os
 
     enum class events : uint8_t
     {
-        unkwnown = 0,
+        unknown = 0,
         quit,
         app_terminating,
         app_low_memory,

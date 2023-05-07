@@ -128,10 +128,6 @@ elseif(MML_OS_FREEBSD)
     list(APPEND WINDOW_EXT_LIBS ${X11_X11_LIB} ${X11_Xrandr_LIB} usbhid)
 endif()
 
-if(MSVC)
-	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
-
 # define the mml-window target
 add_library(mml-window ${SRC} ${PLATFORM_SRC} )
 target_link_libraries(mml-window PUBLIC mml-system ${WINDOW_EXT_LIBS})

@@ -69,11 +69,11 @@ inline auto get_position() noexcept -> point
 }
 inline auto get_position(const window& relative_to) noexcept -> point
 {
-	auto pos = ::mml::mouse::get_position(to_win_impl(relative_to).get_impl());
-	point result{};
-	result.x = pos[0];
-	result.y = pos[1];
-	return result;
+    auto pos = ::mml::mouse::get_position(to_win_impl(relative_to).get_impl());
+    point result{};
+    result.x = pos[0];
+    result.y = pos[1];
+    return result;
 }
 
 inline void set_position(const point& pos) noexcept

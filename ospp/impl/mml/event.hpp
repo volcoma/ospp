@@ -34,6 +34,13 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
             ev.window.data1 = static_cast<int32_t>(e.size.width);
             ev.window.data2 = static_cast<int32_t>(e.size.height);
             break;
+        case ::mml::platform_event::moved:
+            ev.type = events::window;
+            ev.window.window_id = window_id;
+            ev.window.type = window_event_id::moved;
+            ev.window.data1 = static_cast<int32_t>(e.move.x);
+            ev.window.data2 = static_cast<int32_t>(e.move.y);
+            break;
         case ::mml::platform_event::lost_focus:
             ev.type = events::window;
             ev.window.window_id = window_id;
@@ -136,7 +143,7 @@ inline auto to_event(const ::mml::platform_event& e, uint32_t window_id) -> even
             break;
 
         default:
-            ev.type = events::unkwnown;
+            ev.type = events::unknown;
     }
 
     return ev;

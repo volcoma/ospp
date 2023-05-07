@@ -13,8 +13,10 @@
 #include <mml/window/sensor.hpp>
 #include <mml/window/sensor_impl.hpp>
 #include <mml/window/video_mode.hpp>
-#include <mml/window/window_handle.hpp>
 #include <mml/window/window.hpp>
+#include <mml/window/window_handle.hpp>
+
+#include <limits>
 #include <queue>
 #include <set>
 #include <string>
@@ -56,8 +58,6 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     static window_impl* create(window_handle handle);
-
-public:
 
     ////////////////////////////////////////////////////////////
     /// \brief Destructor

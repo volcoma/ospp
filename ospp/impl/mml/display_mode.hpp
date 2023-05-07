@@ -25,7 +25,7 @@ inline auto from_impl(const ::mml::video_mode& mode) -> ::os::display::mode
 
 inline auto from_impl(const ::mml::video_bounds& bounds) -> ::os::display::bounds
 {
-    return ::os::display::bounds{bounds.x, bounds.y, bounds.width, bounds.height};
+    return {bounds.x, bounds.y, bounds.width, bounds.height};
 }
 }
 

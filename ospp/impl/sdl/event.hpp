@@ -164,7 +164,7 @@ namespace os
                     }
                     break;
                 default:
-                    ev.type = events::unkwnown;
+                    ev.type = events::unknown;
                 }
 
                 return ev;

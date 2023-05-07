@@ -87,5 +87,22 @@ endif()
 
 mark_as_advanced(MML_BUILD_WINDOW)
 # add the MML header path
+
+file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/mml/*.hpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/include/mml/window/*.hpp"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/include/mml/system/*.hpp")
+
+add_library(mml_include INTERFACE)
+target_sources(mml_include INTERFACE ${SOURCES})
+target_include_directories(mml_include INTERFACE ${SOURCES})
+
+set (mml_target_for_ide "mml_include_ide")
+if (NOT TARGET ${mml_target_for_ide})
+    add_custom_target(${mml_target_for_ide} SOURCES ${SOURCES})
+endif()
+
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+
 add_subdirectory(src/mml)

@@ -44,14 +44,34 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	}
 	if(flags & window::resizable)
 	{
-		result |= ::mml::style::resize;
-	}
+        result |= ::mml::style::resize;
+    }
+    if(flags & window::always_on_top)
+    {
+        result |= ::mml::style::always_on_top;
+    }
+    if(flags & window::no_taskbar)
+    {
+        result |= ::mml::style::no_taskbar;
+    }
 	if(flags & window::minimized)
 	{
 	}
 	if(flags & window::maximized)
 	{
 	}
+    if(flags & window::tooltip)
+    {
+        result |= ::mml::style::tooltip;
+    }
+    if(flags & window::popup)
+    {
+        result |= ::mml::style::popup_menu;
+    }
+    if(flags & window::utility)
+    {
+        result |= ::mml::style::utility;
+    }
 
 	return result;
 }
@@ -172,7 +192,7 @@ public:
         impl_.set_position(std::array<int32_t, 2>{{pos.x, pos.y}});
 	}
 
-	auto get_position() noexcept -> point
+    auto get_position() const noexcept -> point
 	{
 		point result;
 		auto pos = impl_.get_position();
@@ -221,7 +241,7 @@ public:
 	{
 	}
 
-	void set_border(bool b) noexcept
+    void set_border(bool /*b*/) noexcept
 	{
 		// these will invalidate the native_handle
 
@@ -240,7 +260,7 @@ public:
 		//		}
 	}
 
-	void set_fullscreen(bool b)
+    void set_fullscreen(bool /*b*/)
 	{
 		// these will invalidate the native_handle
 
