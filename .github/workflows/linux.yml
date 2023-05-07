@@ -16,7 +16,7 @@ jobs:
         - { os: "ubuntu-22.04", cc: "clang-14", cxx: "clang++-14" }
         
         backend: ["MML", "SDL", "GLFW"]
-    name: "${{matrix.config.cxx}}"
+    #name: "${{matrix.config.cxx}}"
     steps:
     - name: Setup
       run: |
