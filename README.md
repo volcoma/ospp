@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/volcoma/ospp.svg?branch=master)](https://travis-ci.org/volcoma/ospp)
-[![Build status](https://ci.appveyor.com/api/projects/status/ehyrmrsyr49xj06q?svg=true)](https://ci.appveyor.com/project/volcoma/ospp)
+![windows](https://github.com/volcoma/ospp/actions/workflows/windows.yml/badge.svg)
+![linux](https://github.com/volcoma/ospp/actions/workflows/linux.yml/badge.svg)
 
 ## ospp c++14 cross-platform window and input library
 - The library is JUST windowing and input.
