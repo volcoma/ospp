@@ -33,5 +33,5 @@ jobs:
       uses: egor-tensin/setup-mingw@v2
     - name: Build
       run: |
-        cmake --preset windows-${{matrix.config.arch}}-${{matrix.config.vc}} -DBACKEND_TYPE=${{matrix.backend}}
-        cmake --build --preset windows-${{matrix.config.arch}}-${{matrix.config.vc}}-release
+        cmake --preset windows-${{matrix.config.arch}}-${{matrix.config.cc}} -DBACKEND_TYPE=${{matrix.backend}}
+        cmake --build --preset windows-${{matrix.config.arch}}-${{matrix.config.cc}}-release

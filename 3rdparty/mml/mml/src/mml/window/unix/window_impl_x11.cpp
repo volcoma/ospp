@@ -355,9 +355,9 @@ namespace
 		    case XK_bracketright: return mml::keyboard::RBracket;
 		    case XK_comma:        return mml::keyboard::Comma;
 		    case XK_period:       return mml::keyboard::Period;
-		    case XK_apostrophe:   return mml::keyboard::Quote;
+		    case XK_apostrophe:   return mml::keyboard::Apostrophe;
 		    case XK_backslash:    return mml::keyboard::Backslash;
-		    case XK_grave:        return mml::keyboard::Tilde;
+		    case XK_grave:        return mml::keyboard::Grave;
 		    case XK_space:        return mml::keyboard::Space;
 		    case XK_Return:       return mml::keyboard::Enter;
 		    case XK_KP_Enter:     return mml::keyboard::Enter;
