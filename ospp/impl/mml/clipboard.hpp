@@ -21,7 +21,7 @@ inline void set_text(const std::string& text)
 {
 	::mml::clipboard::set_string(text);
 }
-}
-}
-}
-}
+} // namespace mml
+} // namespace detail
+} // namespace clipboard
+} // namespace os

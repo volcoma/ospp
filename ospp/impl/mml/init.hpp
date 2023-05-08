@@ -13,8 +13,8 @@ inline void shutdown() noexcept
 
 inline auto init() -> bool
 {
-    return true;
+	return true;
 }
-}
-}
-}
+} // namespace mml
+} // namespace detail
+} // namespace os

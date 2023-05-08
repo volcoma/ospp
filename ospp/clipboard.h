@@ -4,9 +4,9 @@
 
 namespace os
 {
-    namespace clipboard
-    {
-        auto get_text() noexcept -> std::string;
-        void set_text(const std::string& text);
-    }
-}
+namespace clipboard
+{
+auto get_text() noexcept -> std::string;
+void set_text(const std::string& text);
+} // namespace clipboard
+} // namespace os

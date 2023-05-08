@@ -238,6 +238,16 @@ private:
     static keyboard::key virtual_key_code_to_mml(WPARAM key, LPARAM flags);
 
     ////////////////////////////////////////////////////////////
+    /// \brief Convert a Win32 scancode to an mml scancode
+    ///
+    /// \param flags input flags
+    ///
+    /// \return MML scancode corresponding to the key
+    ///
+    ////////////////////////////////////////////////////////////
+    static keyboard::scancode to_scancode(WPARAM wParam, LPARAM lParam);
+
+    ////////////////////////////////////////////////////////////
     /// \brief Function called whenever one of our windows receives a message
     ///
     /// \param handle  Win32 handle of the window

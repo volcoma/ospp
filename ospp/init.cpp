@@ -16,14 +16,14 @@
 
 namespace os
 {
-    void shutdown() noexcept
-    {
-        system_cursors().clear();
-        impl::shutdown();
-    }
-
-    auto init() -> bool
-    {
-        return impl::init();
-    }
+void shutdown() noexcept
+{
+	system_cursors().clear();
+	impl::shutdown();
 }
+
+auto init() -> bool
+{
+	return impl::init();
+}
+} // namespace os

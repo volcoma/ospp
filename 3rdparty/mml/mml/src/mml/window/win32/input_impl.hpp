@@ -31,6 +31,30 @@ public:
     static bool is_key_pressed(keyboard::key key);
 
     ////////////////////////////////////////////////////////////
+    /// \copydoc sf::Keyboard::isKeyPressed(Scancode)
+    ///
+    ////////////////////////////////////////////////////////////
+    static bool is_key_pressed(keyboard::scancode code);
+
+    ////////////////////////////////////////////////////////////
+    /// \copydoc sf::Keyboard::localize
+    ///
+    ////////////////////////////////////////////////////////////
+    static keyboard::key localize(keyboard::scancode code);
+
+    ////////////////////////////////////////////////////////////
+    /// \copydoc sf::Keyboard::delocalize
+    ///
+    ////////////////////////////////////////////////////////////
+    static keyboard::scancode delocalize(keyboard::key key);
+
+    ////////////////////////////////////////////////////////////
+    /// \copydoc sf::Keyboard::getDescription
+    ///
+    ////////////////////////////////////////////////////////////
+    static std::string get_description(keyboard::scancode code);
+
+    ////////////////////////////////////////////////////////////
     /// \brief Show or hide the virtual keyboard
     ///
     /// \param visible True to show, false to hide
@@ -134,6 +158,18 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     static std::array<std::int32_t, 2> get_touch_position(unsigned int finger, const window& relativeTo);
+
+private:
+    ////////////////////////////////////////////////////////////
+    /// Ensure the mappings are generated from/to Key and Scancode.
+    ///
+    ////////////////////////////////////////////////////////////
+    static void ensure_mappings();
+
+    // NOLINTBEGIN(readability-identifier-naming)
+    static keyboard::scancode key_to_scancode_mapping_[keyboard::KeyCount]; ///< Mapping from Key to Scancode
+    static keyboard::key scancode_to_key_mapping_[static_cast<std::size_t>(keyboard::scan::ScancodeCount)]; ///< Mapping from Scancode to Key
+    // NOLINTEND(readability-identifier-naming)
 };
 
 } // namespace priv

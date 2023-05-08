@@ -154,6 +154,29 @@ bool input_impl::is_key_pressed(keyboard::key key)
     }
 }
 
+////////////////////////////////////////////////////////////
+bool input_impl::is_key_pressed(keyboard::scancode code)
+{
+    return false;
+}
+
+////////////////////////////////////////////////////////////
+keyboard::key input_impl::localize(keyboard::scancode code)
+{
+    return keyboard::Unknown;
+}
+
+////////////////////////////////////////////////////////////
+keyboard::scancode input_impl::delocalize(keyboard::key key)
+{
+    return keyboard::scan::Unknown;
+}
+
+////////////////////////////////////////////////////////////
+std::string input_impl::get_description(keyboard::scancode code)
+{
+    return "Unknown";
+}
 
 ////////////////////////////////////////////////////////////
 void input_impl::set_virtual_keyboard_visible(bool /*visible*/)

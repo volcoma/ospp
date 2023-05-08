@@ -36,7 +36,7 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	}
 	if(flags & window::hidden)
 	{
-        result |= ::mml::style::hidden;
+		result |= ::mml::style::hidden;
 	}
 	if(flags & window::borderless)
 	{
@@ -44,34 +44,34 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 	}
 	if(flags & window::resizable)
 	{
-        result |= ::mml::style::resize;
-    }
-    if(flags & window::always_on_top)
-    {
-        result |= ::mml::style::always_on_top;
-    }
-    if(flags & window::no_taskbar)
-    {
-        result |= ::mml::style::no_taskbar;
-    }
+		result |= ::mml::style::resize;
+	}
+	if(flags & window::always_on_top)
+	{
+		result |= ::mml::style::always_on_top;
+	}
+	if(flags & window::no_taskbar)
+	{
+		result |= ::mml::style::no_taskbar;
+	}
 	if(flags & window::minimized)
 	{
 	}
 	if(flags & window::maximized)
 	{
 	}
-    if(flags & window::tooltip)
-    {
-        result |= ::mml::style::tooltip;
-    }
-    if(flags & window::popup)
-    {
-        result |= ::mml::style::popup_menu;
-    }
-    if(flags & window::utility)
-    {
-        result |= ::mml::style::utility;
-    }
+	if(flags & window::tooltip)
+	{
+		result |= ::mml::style::tooltip;
+	}
+	if(flags & window::popup)
+	{
+		result |= ::mml::style::popup_menu;
+	}
+	if(flags & window::utility)
+	{
+		result |= ::mml::style::utility;
+	}
 
 	return result;
 }
@@ -104,8 +104,8 @@ class window_impl
 {
 
 public:
-    window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
-        : impl_(::mml::video_mode{size.w, size.h}, {{pos.x, pos.y}}, title, get_impl_flags(flags))
+	window_impl(const std::string& title, const point& pos, const area& size, uint32_t flags)
+		: impl_(::mml::video_mode{size.w, size.h}, {{pos.x, pos.y}}, title, get_impl_flags(flags))
 		, title_(title)
 		, style_(get_impl_flags(flags))
 	{
@@ -157,7 +157,7 @@ public:
 
 	void set_size(const area& size) noexcept
 	{
-        impl_.set_size(std::array<uint32_t, 2>{{size.w, size.h}});
+		impl_.set_size(std::array<uint32_t, 2>{{size.w, size.h}});
 	}
 
 	auto get_size() const noexcept -> area
@@ -189,10 +189,10 @@ public:
 
 	void set_position(const point& pos) noexcept
 	{
-        impl_.set_position(std::array<int32_t, 2>{{pos.x, pos.y}});
+		impl_.set_position(std::array<int32_t, 2>{{pos.x, pos.y}});
 	}
 
-    auto get_position() const noexcept -> point
+	auto get_position() const noexcept -> point
 	{
 		point result;
 		auto pos = impl_.get_position();
@@ -241,7 +241,7 @@ public:
 	{
 	}
 
-    void set_border(bool /*b*/) noexcept
+	void set_border(bool /*b*/) noexcept
 	{
 		// these will invalidate the native_handle
 
@@ -260,7 +260,7 @@ public:
 		//		}
 	}
 
-    void set_fullscreen(bool /*b*/)
+	void set_fullscreen(bool /*b*/)
 	{
 		// these will invalidate the native_handle
 
@@ -328,10 +328,10 @@ public:
 		impl_.set_icon(img.size.w, img.size.h, img.pixels.data());
 	}
 
-    bool has_focus() const
-    {
-        return impl_.has_focus();
-    }
+	bool has_focus() const
+	{
+		return impl_.has_focus();
+	}
 
 private:
 	::mml::window impl_;
@@ -343,6 +343,6 @@ private:
 	bool grabbed_{false};
 	bool recieved_close_event_{false};
 };
-}
-}
-}
+} // namespace mml
+} // namespace detail
+} // namespace os

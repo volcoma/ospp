@@ -1,454 +1,348 @@
 #pragma once
 #include "../../keyboard.h"
-
 #include <mml/window/window.hpp>
 
+#include <algorithm>
+#include <cassert>
+#include <map>
 namespace os
 {
 namespace detail
 {
 namespace mml
 {
-
-inline auto from_layout_independent_impl(::mml::keyboard::key code) -> key::code
+namespace
 {
-	switch(code)
+struct mappings
+{
+	void to_lower(std::string& data)
 	{
-		case ::mml::keyboard::key::A:
-			return key::a;
-		case ::mml::keyboard::key::B:
-			return key::b;
-		case ::mml::keyboard::key::C:
-			return key::c;
-		case ::mml::keyboard::key::D:
-			return key::d;
-		case ::mml::keyboard::key::E:
-			return key::e;
-		case ::mml::keyboard::key::F:
-			return key::f;
-		case ::mml::keyboard::key::G:
-			return key::g;
-		case ::mml::keyboard::key::H:
-			return key::h;
-		case ::mml::keyboard::key::I:
-			return key::i;
-		case ::mml::keyboard::key::J:
-			return key::j;
-		case ::mml::keyboard::key::K:
-			return key::k;
-		case ::mml::keyboard::key::L:
-			return key::l;
-		case ::mml::keyboard::key::M:
-			return key::m;
-		case ::mml::keyboard::key::N:
-			return key::n;
-		case ::mml::keyboard::key::O:
-			return key::o;
-		case ::mml::keyboard::key::P:
-			return key::p;
-		case ::mml::keyboard::key::Q:
-			return key::q;
-		case ::mml::keyboard::key::R:
-			return key::r;
-		case ::mml::keyboard::key::S:
-			return key::s;
-		case ::mml::keyboard::key::T:
-			return key::t;
-		case ::mml::keyboard::key::U:
-			return key::u;
-		case ::mml::keyboard::key::V:
-			return key::v;
-		case ::mml::keyboard::key::W:
-			return key::w;
-		case ::mml::keyboard::key::X:
-			return key::x;
-		case ::mml::keyboard::key::Y:
-			return key::y;
-		case ::mml::keyboard::key::Z:
-			return key::z;
-		case ::mml::keyboard::key::Num0:
-			return key::digit0;
-		case ::mml::keyboard::key::Num1:
-			return key::digit1;
-		case ::mml::keyboard::key::Num2:
-			return key::digit2;
-		case ::mml::keyboard::key::Num3:
-			return key::digit3;
-		case ::mml::keyboard::key::Num4:
-			return key::digit4;
-		case ::mml::keyboard::key::Num5:
-			return key::digit5;
-		case ::mml::keyboard::key::Num6:
-			return key::digit6;
-		case ::mml::keyboard::key::Num7:
-			return key::digit7;
-		case ::mml::keyboard::key::Num8:
-			return key::digit8;
-		case ::mml::keyboard::key::Num9:
-			return key::digit9;
-		case ::mml::keyboard::key::Escape:
-			return key::escape;
-		case ::mml::keyboard::key::LControl:
-			return key::lctrl;
-		case ::mml::keyboard::key::LShift:
-			return key::lshift;
-		case ::mml::keyboard::key::LAlt:
-			return key::lalt;
-		case ::mml::keyboard::key::LSystem:
-			return key::lgui;
-		case ::mml::keyboard::key::RControl:
-			return key::rctrl;
-		case ::mml::keyboard::key::RShift:
-			return key::rshift;
-		case ::mml::keyboard::key::RAlt:
-			return key::ralt;
-		case ::mml::keyboard::key::RSystem:
-			return key::rgui;
-		case ::mml::keyboard::key::Menu:
-			return key::menu;
-		case ::mml::keyboard::key::LBracket:
-			return key::leftbracket;
-		case ::mml::keyboard::key::RBracket:
-			return key::rightbracket;
-		case ::mml::keyboard::key::Semicolon:
-			return key::semicolon;
-		case ::mml::keyboard::key::Comma:
-			return key::comma;
-		case ::mml::keyboard::key::Period:
-			return key::period;
-		case ::mml::keyboard::key::Quote:
-			return key::apostrophe;
-		case ::mml::keyboard::key::Slash:
-			return key::slash;
-		case ::mml::keyboard::key::Backslash:
-			return key::backslash;
-		case ::mml::keyboard::key::Tilde:
-			return key::grave;
-		case ::mml::keyboard::key::Equal:
-			return key::equals;
-		case ::mml::keyboard::key::Hyphen:
-			return key::minus;
-		case ::mml::keyboard::key::Space:
-			return key::space;
-		case ::mml::keyboard::key::Enter:
-			return key::enter;
-		case ::mml::keyboard::key::Backspace:
-			return key::backspace;
-		case ::mml::keyboard::key::Tab:
-			return key::tab;
-		case ::mml::keyboard::key::PageUp:
-			return key::pageup;
-		case ::mml::keyboard::key::PageDown:
-			return key::pagedown;
-		case ::mml::keyboard::key::End:
-			return key::end;
-		case ::mml::keyboard::key::Home:
-			return key::home;
-		case ::mml::keyboard::key::Insert:
-			return key::insert;
-		case ::mml::keyboard::key::Delete:
-			return key::del;
-		case ::mml::keyboard::key::Add:
-			return key::kp_plus;
-		case ::mml::keyboard::key::Subtract:
-			return key::minus;
-		case ::mml::keyboard::key::Multiply:
-			return key::kp_multiply;
-		case ::mml::keyboard::key::Divide:
-			return key::kp_divide;
-		case ::mml::keyboard::key::Left:
-			return key::left;
-		case ::mml::keyboard::key::Right:
-			return key::right;
-		case ::mml::keyboard::key::Up:
-			return key::up;
-		case ::mml::keyboard::key::Down:
-			return key::down;
-		case ::mml::keyboard::key::Numpad0:
-			return key::kp_digit0;
-		case ::mml::keyboard::key::Numpad1:
-			return key::kp_digit1;
-		case ::mml::keyboard::key::Numpad2:
-			return key::kp_digit2;
-		case ::mml::keyboard::key::Numpad3:
-			return key::kp_digit3;
-		case ::mml::keyboard::key::Numpad4:
-			return key::kp_digit4;
-		case ::mml::keyboard::key::Numpad5:
-			return key::kp_digit5;
-		case ::mml::keyboard::key::Numpad6:
-			return key::kp_digit6;
-		case ::mml::keyboard::key::Numpad7:
-			return key::kp_digit7;
-		case ::mml::keyboard::key::Numpad8:
-			return key::kp_digit8;
-		case ::mml::keyboard::key::Numpad9:
-			return key::kp_digit9;
-		case ::mml::keyboard::key::F1:
-			return key::f1;
-		case ::mml::keyboard::key::F2:
-			return key::f2;
-		case ::mml::keyboard::key::F3:
-			return key::f3;
-		case ::mml::keyboard::key::F4:
-			return key::f4;
-		case ::mml::keyboard::key::F5:
-			return key::f5;
-		case ::mml::keyboard::key::F6:
-			return key::f6;
-		case ::mml::keyboard::key::F7:
-			return key::f7;
-		case ::mml::keyboard::key::F8:
-			return key::f8;
-		case ::mml::keyboard::key::F9:
-			return key::f9;
-		case ::mml::keyboard::key::F10:
-			return key::f10;
-		case ::mml::keyboard::key::F11:
-			return key::f11;
-		case ::mml::keyboard::key::F12:
-			return key::f12;
-		case ::mml::keyboard::key::F13:
-			return key::f13;
-		case ::mml::keyboard::key::F14:
-			return key::f14;
-		case ::mml::keyboard::key::F15:
-			return key::f15;
-		case ::mml::keyboard::key::Pause:
-			return key::pause;
-
-		default:
-			return key::unknown;
+		std::transform(data.begin(), data.end(), data.begin(),
+					   [](unsigned char c) { return std::tolower(c); });
 	}
+
+	void init_from(const std::map<key::code, ::mml::keyboard::scancode>& map)
+	{
+		os_to_impl_scancode = map;
+
+		for(const auto& kvp : map)
+		{
+			auto it = impl_scancode_to_os.find(kvp.second);
+			if(it != std::end(impl_scancode_to_os))
+			{
+				assert(false && "scancode already added");
+			}
+			impl_scancode_to_os[kvp.second] = kvp.first;
+
+			auto name = ::mml::keyboard::get_description(kvp.second);
+			to_lower(name);
+			string_to_key_code[name] = kvp.first;
+		}
+	}
+
+	std::map<std::string, key::code> string_to_key_code;
+	std::map<::mml::keyboard::scancode, key::code> impl_scancode_to_os;
+	std::map<key::code, ::mml::keyboard::scancode> os_to_impl_scancode;
+};
+
+mappings key_map = []()
+{
+	mappings m;
+	m.init_from({
+		{key::a, ::mml::keyboard::scan::A},
+		{key::b, ::mml::keyboard::scan::B},
+		{key::c, ::mml::keyboard::scan::C},
+		{key::d, ::mml::keyboard::scan::D},
+		{key::e, ::mml::keyboard::scan::E},
+		{key::f, ::mml::keyboard::scan::F},
+		{key::g, ::mml::keyboard::scan::G},
+		{key::h, ::mml::keyboard::scan::H},
+		{key::i, ::mml::keyboard::scan::I},
+		{key::j, ::mml::keyboard::scan::J},
+		{key::k, ::mml::keyboard::scan::K},
+		{key::l, ::mml::keyboard::scan::L},
+		{key::m, ::mml::keyboard::scan::M},
+		{key::n, ::mml::keyboard::scan::N},
+		{key::o, ::mml::keyboard::scan::O},
+		{key::p, ::mml::keyboard::scan::P},
+		{key::q, ::mml::keyboard::scan::Q},
+		{key::r, ::mml::keyboard::scan::R},
+		{key::s, ::mml::keyboard::scan::S},
+		{key::t, ::mml::keyboard::scan::T},
+		{key::u, ::mml::keyboard::scan::U},
+		{key::v, ::mml::keyboard::scan::V},
+		{key::w, ::mml::keyboard::scan::W},
+		{key::x, ::mml::keyboard::scan::X},
+		{key::y, ::mml::keyboard::scan::Y},
+		{key::z, ::mml::keyboard::scan::Z},
+		{key::digit1, ::mml::keyboard::scan::Num1},
+		{key::digit2, ::mml::keyboard::scan::Num2},
+		{key::digit3, ::mml::keyboard::scan::Num3},
+		{key::digit4, ::mml::keyboard::scan::Num4},
+		{key::digit5, ::mml::keyboard::scan::Num5},
+		{key::digit6, ::mml::keyboard::scan::Num6},
+		{key::digit7, ::mml::keyboard::scan::Num7},
+		{key::digit8, ::mml::keyboard::scan::Num8},
+		{key::digit9, ::mml::keyboard::scan::Num9},
+		{key::digit0, ::mml::keyboard::scan::Num0},
+		{key::enter, ::mml::keyboard::scan::Enter},
+		{key::escape, ::mml::keyboard::scan::Escape},
+		{key::backspace, ::mml::keyboard::scan::Backspace},
+		{key::tab, ::mml::keyboard::scan::Tab},
+		{key::space, ::mml::keyboard::scan::Space},
+		{key::minus, ::mml::keyboard::scan::Hyphen},
+		{key::equals, ::mml::keyboard::scan::Equal},
+		{key::leftbracket, ::mml::keyboard::scan::LBracket},
+		{key::rightbracket, ::mml::keyboard::scan::RBracket},
+		{key::backslash, ::mml::keyboard::scan::Backslash},
+		//{key::nonushash, ::mml::keyboard::scan::},
+		{key::semicolon, ::mml::keyboard::scan::Semicolon},
+		{key::apostrophe, ::mml::keyboard::scan::Apostrophe},
+		{key::grave, ::mml::keyboard::scan::Grave},
+		{key::comma, ::mml::keyboard::scan::Comma},
+		{key::period, ::mml::keyboard::scan::Period},
+		{key::slash, ::mml::keyboard::scan::Slash},
+		{key::capslock, ::mml::keyboard::scan::CapsLock},
+		{key::f1, ::mml::keyboard::scan::F1},
+		{key::f2, ::mml::keyboard::scan::F2},
+		{key::f3, ::mml::keyboard::scan::F3},
+		{key::f4, ::mml::keyboard::scan::F4},
+		{key::f5, ::mml::keyboard::scan::F5},
+		{key::f6, ::mml::keyboard::scan::F6},
+		{key::f7, ::mml::keyboard::scan::F7},
+		{key::f8, ::mml::keyboard::scan::F8},
+		{key::f9, ::mml::keyboard::scan::F9},
+		{key::f10, ::mml::keyboard::scan::F10},
+		{key::f11, ::mml::keyboard::scan::F11},
+		{key::f12, ::mml::keyboard::scan::F12},
+		{key::printscreen, ::mml::keyboard::scan::PrintScreen},
+		{key::scrolllock, ::mml::keyboard::scan::ScrollLock},
+		{key::pause, ::mml::keyboard::scan::Pause},
+		{key::insert, ::mml::keyboard::scan::Insert},
+		{key::home, ::mml::keyboard::scan::Home},
+		{key::pageup, ::mml::keyboard::scan::PageUp},
+		{key::del, ::mml::keyboard::scan::Delete},
+		{key::end, ::mml::keyboard::scan::End},
+		{key::pagedown, ::mml::keyboard::scan::PageDown},
+		{key::right, ::mml::keyboard::scan::Right},
+		{key::left, ::mml::keyboard::scan::Left},
+		{key::down, ::mml::keyboard::scan::Down},
+		{key::up, ::mml::keyboard::scan::Up},
+		{key::numlockclear, ::mml::keyboard::scan::NumLock},
+		{key::kp_divide, ::mml::keyboard::scan::NumpadDivide},
+		{key::kp_multiply, ::mml::keyboard::scan::NumpadMultiply},
+		{key::kp_minus, ::mml::keyboard::scan::NumpadMinus},
+		{key::kp_plus, ::mml::keyboard::scan::NumpadPlus},
+		{key::kp_enter, ::mml::keyboard::scan::NumpadEnter},
+		{key::kp_digit1, ::mml::keyboard::scan::Numpad0},
+		{key::kp_digit2, ::mml::keyboard::scan::Numpad1},
+		{key::kp_digit3, ::mml::keyboard::scan::Numpad2},
+		{key::kp_digit4, ::mml::keyboard::scan::Numpad3},
+		{key::kp_digit5, ::mml::keyboard::scan::Numpad4},
+		{key::kp_digit6, ::mml::keyboard::scan::Numpad5},
+		{key::kp_digit7, ::mml::keyboard::scan::Numpad6},
+		{key::kp_digit8, ::mml::keyboard::scan::Numpad7},
+		{key::kp_digit9, ::mml::keyboard::scan::Numpad8},
+		{key::kp_digit0, ::mml::keyboard::scan::Numpad9},
+		{key::kp_period, ::mml::keyboard::scan::NumpadDecimal},
+		{key::nonusbackslash, ::mml::keyboard::scan::NonUsBackslash},
+		{key::application, ::mml::keyboard::scan::Application},
+		//{key::power, ::mml::keyboard::scan::},
+		{key::kp_equals, ::mml::keyboard::scan::NumpadEqual},
+		{key::f13, ::mml::keyboard::scan::F13},
+		{key::f14, ::mml::keyboard::scan::F14},
+		{key::f15, ::mml::keyboard::scan::F15},
+		{key::f16, ::mml::keyboard::scan::F16},
+		{key::f17, ::mml::keyboard::scan::F17},
+		{key::f18, ::mml::keyboard::scan::F18},
+		{key::f19, ::mml::keyboard::scan::F19},
+		{key::f20, ::mml::keyboard::scan::F20},
+		{key::f21, ::mml::keyboard::scan::F21},
+		{key::f22, ::mml::keyboard::scan::F22},
+		{key::f23, ::mml::keyboard::scan::F23},
+		{key::f24, ::mml::keyboard::scan::F24},
+		{key::execute, ::mml::keyboard::scan::Execute},
+		{key::help, ::mml::keyboard::scan::Help},
+		{key::menu, ::mml::keyboard::scan::Menu},
+		{key::select, ::mml::keyboard::scan::Select},
+		{key::stop, ::mml::keyboard::scan::Stop},
+		//{key::again, ::mml::keyboard::scan::},
+		{key::undo, ::mml::keyboard::scan::Undo},
+		{key::cut, ::mml::keyboard::scan::Cut},
+		{key::copy, ::mml::keyboard::scan::Copy},
+		{key::paste, ::mml::keyboard::scan::Paste},
+		{key::find, ::mml::keyboard::scan::Search},
+		{key::mute, ::mml::keyboard::scan::VolumeMute},
+		{key::volumeup, ::mml::keyboard::scan::VolumeUp},
+		{key::volumedown, ::mml::keyboard::scan::VolumeDown},
+		//{key::kp_comma, ::mml::keyboard::scan::},
+		//{key::kp_equalsas400, ::mml::keyboard::scan::},
+		//{key::international1, ::mml::keyboard::scan::},
+		//{key::international2, ::mml::keyboard::scan::},
+		//{key::international3, ::mml::keyboard::scan::},
+		//{key::international4, ::mml::keyboard::scan::},
+		//{key::international5, ::mml::keyboard::scan::},
+		//{key::international6, ::mml::keyboard::scan::},
+		//{key::international7, ::mml::keyboard::scan::},
+		//{key::international8, ::mml::keyboard::scan::},
+		//{key::international9, ::mml::keyboard::scan::},
+		//{key::lang1, ::mml::keyboard::scan::},
+		//{key::lang2, ::mml::keyboard::scan::},
+		//{key::lang3, ::mml::keyboard::scan::},
+		//{key::lang4, ::mml::keyboard::scan::},
+		//{key::lang5, ::mml::keyboard::scan::},
+		//{key::lang6, ::mml::keyboard::scan::},
+		//{key::lang7, ::mml::keyboard::scan::},
+		//{key::lang8, ::mml::keyboard::scan::},
+		//{key::lang9, ::mml::keyboard::scan::},
+		//{key::alterase, ::mml::keyboard::scan::},
+		//{key::sysreq, ::mml::keyboard::scan::},
+		//{key::cancel, ::mml::keyboard::scan::},
+		//{key::clear, ::mml::keyboard::scan::},
+		//{key::prior, ::mml::keyboard::scan::},
+		//{key::return2, ::mml::keyboard::scan::},
+		//{key::separator, ::mml::keyboard::scan::},
+		//{key::out, ::mml::keyboard::scan::},
+		//{key::oper, ::mml::keyboard::scan::},
+		//{key::clearagain, ::mml::keyboard::scan::},
+		//{key::crsel, ::mml::keyboard::scan::},
+		//{key::exsel, ::mml::keyboard::scan::},
+		//{key::kp_digit00, ::mml::keyboard::scan::},
+		//{key::kp_digit000, ::mml::keyboard::scan::},
+		//{key::thousandsseparator, ::mml::keyboard::scan::},
+		//{key::decimalseparator, ::mml::keyboard::scan::},
+		//{key::currencyunit, ::mml::keyboard::scan::},
+		//{key::currencysubunit, ::mml::keyboard::scan::},
+		//{key::kp_leftparen, ::mml::keyboard::scan::},
+		//{key::kp_rightparen, ::mml::keyboard::scan::},
+		//{key::kp_leftbrace, ::mml::keyboard::scan::},
+		//{key::kp_rightbrace, ::mml::keyboard::scan::},
+		//{key::kp_tab, ::mml::keyboard::scan::},
+		//{key::kp_backspace, ::mml::keyboard::scan::},
+		//{key::kp_a, ::mml::keyboard::scan::},
+		//{key::kp_b, ::mml::keyboard::scan::},
+		//{key::kp_c, ::mml::keyboard::scan::},
+		//{key::kp_d, ::mml::keyboard::scan::},
+		//{key::kp_e, ::mml::keyboard::scan::},
+		//{key::kp_f, ::mml::keyboard::scan::},
+		//{key::kp_xor, ::mml::keyboard::scan::},
+		//{key::kp_power, ::mml::keyboard::scan::},
+		//{key::kp_percent, ::mml::keyboard::scan::},
+		//{key::kp_less, ::mml::keyboard::scan::},
+		//{key::kp_greater, ::mml::keyboard::scan::},
+		//{key::kp_ampersand, ::mml::keyboard::scan::},
+		//{key::kp_dblampersand, ::mml::keyboard::scan::},
+		//{key::kp_verticalbar, ::mml::keyboard::scan::},
+		//{key::kp_dblverticalbar, ::mml::keyboard::scan::},
+		//{key::kp_colon, ::mml::keyboard::scan::},
+		//{key::kp_hash, ::mml::keyboard::scan::},
+		//{key::kp_space, ::mml::keyboard::scan::},
+		//{key::kp_at, ::mml::keyboard::scan::},
+		//{key::kp_exclam, ::mml::keyboard::scan::},
+		//{key::kp_memstore, ::mml::keyboard::scan::},
+		//{key::kp_memrecall, ::mml::keyboard::scan::},
+		//{key::kp_memclear, ::mml::keyboard::scan::},
+		//{key::kp_memadd, ::mml::keyboard::scan::},
+		//{key::kp_memsubtract, ::mml::keyboard::scan::},
+		//{key::kp_memmultiply, ::mml::keyboard::scan::},
+		//{key::kp_memdivide, ::mml::keyboard::scan::},
+		//{key::kp_plusminus, ::mml::keyboard::scan::},
+		//{key::kp_clear, ::mml::keyboard::scan::},
+		//{key::kp_clearentry, ::mml::keyboard::scan::},
+		//{key::kp_binary, ::mml::keyboard::scan::},
+		//{key::kp_octal, ::mml::keyboard::scan::},
+		//{key::kp_decimal, ::mml::keyboard::scan::},
+		//{key::kp_hexadecimal, ::mml::keyboard::scan::},
+		{key::lctrl, ::mml::keyboard::scan::LControl},
+		{key::lshift, ::mml::keyboard::scan::LShift},
+		{key::lalt, ::mml::keyboard::scan::LAlt},
+		{key::lgui, ::mml::keyboard::scan::LSystem},
+		{key::rctrl, ::mml::keyboard::scan::RControl},
+		{key::rshift, ::mml::keyboard::scan::RShift},
+		{key::ralt, ::mml::keyboard::scan::RAlt},
+		{key::rgui, ::mml::keyboard::scan::RSystem},
+		{key::mode, ::mml::keyboard::scan::ModeChange},
+		{key::audionext, ::mml::keyboard::scan::MediaNextTrack},
+		{key::audioprev, ::mml::keyboard::scan::MediaPreviousTrack},
+		{key::audiostop, ::mml::keyboard::scan::MediaStop},
+		{key::audioplay, ::mml::keyboard::scan::MediaPlayPause},
+		//{key::audiomute, ::mml::keyboard::scan::},
+		{key::mediaselect, ::mml::keyboard::scan::LaunchMediaSelect},
+		//{key::www, ::mml::keyboard::scan::},
+		{key::mail, ::mml::keyboard::scan::LaunchMail},
+		//{key::calculator, ::mml::keyboard::scan::},
+		//{key::computer, ::mml::keyboard::scan::},
+		//{key::ac_search, ::mml::keyboard::scan::Search},
+		{key::ac_home, ::mml::keyboard::scan::HomePage},
+		{key::ac_back, ::mml::keyboard::scan::Back},
+		{key::ac_forward, ::mml::keyboard::scan::Forward},
+		//{key::ac_stop, ::mml::keyboard::scan::Stop},
+		{key::ac_refresh, ::mml::keyboard::scan::Refresh},
+		{key::ac_bookmarks, ::mml::keyboard::scan::Favorites},
+		//{key::brightnessdown, ::mml::keyboard::scan::},
+		//{key::brightnessup, ::mml::keyboard::scan::},
+		//{key::displayswitch, ::mml::keyboard::scan::},
+		//{key::kbdillumtoggle, ::mml::keyboard::scan::},
+		//{key::kbdillumdown, ::mml::keyboard::scan::},
+		//{key::kbdillumup, ::mml::keyboard::scan::},
+		//{key::eject, ::mml::keyboard::scan::},
+		//{key::sleep, ::mml::keyboard::scan::},
+		{key::app1, ::mml::keyboard::scan::LaunchApplication1},
+		{key::app2, ::mml::keyboard::scan::LaunchApplication2},
+		//{key::audiorewind, ::mml::keyboard::scan::},
+		//{key::audiofastforward, ::mml::keyboard::scan::},
+	});
+	return m;
+}();
+
+inline auto from_layout_independent_impl(::mml::keyboard::scancode code) -> key::code
+{
+	auto it = key_map.impl_scancode_to_os.find(code);
+	if(it != std::end(key_map.impl_scancode_to_os))
+	{
+		return it->second;
+	}
+
+	return key::code::unknown;
 }
 
-inline auto to_layout_independent_impl(key::code code) -> ::mml::keyboard::key
+inline auto to_layout_independent_impl(key::code code) -> ::mml::keyboard::scan
 {
-	switch(code)
+	auto it = key_map.os_to_impl_scancode.find(code);
+	if(it != std::end(key_map.os_to_impl_scancode))
 	{
-		case key::a:
-			return ::mml::keyboard::key::A;
-		case key::b:
-			return ::mml::keyboard::key::B;
-		case key::c:
-			return ::mml::keyboard::key::C;
-		case key::d:
-			return ::mml::keyboard::key::D;
-		case key::e:
-			return ::mml::keyboard::key::E;
-		case key::f:
-			return ::mml::keyboard::key::F;
-		case key::g:
-			return ::mml::keyboard::key::G;
-		case key::h:
-			return ::mml::keyboard::key::H;
-		case key::i:
-			return ::mml::keyboard::key::I;
-		case key::j:
-			return ::mml::keyboard::key::J;
-		case key::k:
-			return ::mml::keyboard::key::K;
-		case key::l:
-			return ::mml::keyboard::key::L;
-		case key::m:
-			return ::mml::keyboard::key::M;
-		case key::n:
-			return ::mml::keyboard::key::N;
-		case key::o:
-			return ::mml::keyboard::key::O;
-		case key::p:
-			return ::mml::keyboard::key::P;
-		case key::q:
-			return ::mml::keyboard::key::Q;
-		case key::r:
-			return ::mml::keyboard::key::R;
-		case key::s:
-			return ::mml::keyboard::key::S;
-		case key::t:
-			return ::mml::keyboard::key::T;
-		case key::u:
-			return ::mml::keyboard::key::U;
-		case key::v:
-			return ::mml::keyboard::key::V;
-		case key::w:
-			return ::mml::keyboard::key::W;
-		case key::x:
-			return ::mml::keyboard::key::X;
-		case key::y:
-			return ::mml::keyboard::key::Y;
-		case key::z:
-			return ::mml::keyboard::key::Z;
-		case key::digit0:
-			return ::mml::keyboard::key::Num0;
-		case key::digit1:
-			return ::mml::keyboard::key::Num1;
-		case key::digit2:
-			return ::mml::keyboard::key::Num2;
-		case key::digit3:
-			return ::mml::keyboard::key::Num3;
-		case key::digit4:
-			return ::mml::keyboard::key::Num4;
-		case key::digit5:
-			return ::mml::keyboard::key::Num5;
-		case key::digit6:
-			return ::mml::keyboard::key::Num6;
-		case key::digit7:
-			return ::mml::keyboard::key::Num7;
-		case key::digit8:
-			return ::mml::keyboard::key::Num8;
-		case key::digit9:
-			return ::mml::keyboard::key::Num9;
-		case key::escape:
-			return ::mml::keyboard::key::Escape;
-		case key::lctrl:
-			return ::mml::keyboard::key::LControl;
-		case key::lshift:
-			return ::mml::keyboard::key::LShift;
-		case key::lalt:
-			return ::mml::keyboard::key::LAlt;
-		case key::lgui:
-			return ::mml::keyboard::key::LSystem;
-		case key::rctrl:
-			return ::mml::keyboard::key::RControl;
-		case key::rshift:
-			return ::mml::keyboard::key::RShift;
-		case key::ralt:
-			return ::mml::keyboard::key::RAlt;
-		case key::rgui:
-			return ::mml::keyboard::key::RSystem;
-		case key::menu:
-			return ::mml::keyboard::key::Menu;
-		case key::leftbracket:
-			return ::mml::keyboard::key::LBracket;
-		case key::rightbracket:
-			return ::mml::keyboard::key::RBracket;
-		case key::semicolon:
-			return ::mml::keyboard::key::Semicolon;
-		case key::comma:
-			return ::mml::keyboard::key::Comma;
-		case key::period:
-			return ::mml::keyboard::key::Period;
-		case key::apostrophe:
-			return ::mml::keyboard::key::Quote;
-		case key::slash:
-			return ::mml::keyboard::key::Slash;
-		case key::backslash:
-			return ::mml::keyboard::key::Backslash;
-		case key::grave:
-			return ::mml::keyboard::key::Tilde;
-		case key::equals:
-			return ::mml::keyboard::key::Equal;
-		case key::space:
-			return ::mml::keyboard::key::Space;
-		case key::enter:
-			return ::mml::keyboard::key::Enter;
-		case key::backspace:
-			return ::mml::keyboard::key::Backspace;
-		case key::tab:
-			return ::mml::keyboard::key::Tab;
-		case key::pageup:
-			return ::mml::keyboard::key::PageUp;
-		case key::pagedown:
-			return ::mml::keyboard::key::PageDown;
-		case key::end:
-			return ::mml::keyboard::key::End;
-		case key::home:
-			return ::mml::keyboard::key::Home;
-		case key::insert:
-			return ::mml::keyboard::key::Insert;
-		case key::del:
-			return ::mml::keyboard::key::Delete;
-		case key::kp_plus:
-			return ::mml::keyboard::key::Add;
-		case key::minus:
-			return ::mml::keyboard::key::Subtract;
-		case key::kp_multiply:
-			return ::mml::keyboard::key::Multiply;
-		case key::kp_divide:
-			return ::mml::keyboard::key::Divide;
-		case key::left:
-			return ::mml::keyboard::key::Left;
-		case key::right:
-			return ::mml::keyboard::key::Right;
-		case key::up:
-			return ::mml::keyboard::key::Up;
-		case key::down:
-			return ::mml::keyboard::key::Down;
-		case key::kp_digit0:
-			return ::mml::keyboard::key::Numpad0;
-		case key::kp_digit1:
-			return ::mml::keyboard::key::Numpad1;
-		case key::kp_digit2:
-			return ::mml::keyboard::key::Numpad2;
-		case key::kp_digit3:
-			return ::mml::keyboard::key::Numpad3;
-		case key::kp_digit4:
-			return ::mml::keyboard::key::Numpad4;
-		case key::kp_digit5:
-			return ::mml::keyboard::key::Numpad5;
-		case key::kp_digit6:
-			return ::mml::keyboard::key::Numpad6;
-		case key::kp_digit7:
-			return ::mml::keyboard::key::Numpad7;
-		case key::kp_digit8:
-			return ::mml::keyboard::key::Numpad8;
-		case key::kp_digit9:
-			return ::mml::keyboard::key::Numpad9;
-		case key::f1:
-			return ::mml::keyboard::key::F1;
-		case key::f2:
-			return ::mml::keyboard::key::F2;
-		case key::f3:
-			return ::mml::keyboard::key::F3;
-		case key::f4:
-			return ::mml::keyboard::key::F4;
-		case key::f5:
-			return ::mml::keyboard::key::F5;
-		case key::f6:
-			return ::mml::keyboard::key::F6;
-		case key::f7:
-			return ::mml::keyboard::key::F7;
-		case key::f8:
-			return ::mml::keyboard::key::F8;
-		case key::f9:
-			return ::mml::keyboard::key::F9;
-		case key::f10:
-			return ::mml::keyboard::key::F10;
-		case key::f11:
-			return ::mml::keyboard::key::F11;
-		case key::f12:
-			return ::mml::keyboard::key::F12;
-		case key::f13:
-			return ::mml::keyboard::key::F13;
-		case key::f14:
-			return ::mml::keyboard::key::F14;
-		case key::f15:
-			return ::mml::keyboard::key::F15;
-		case key::pause:
-			return ::mml::keyboard::key::Pause;
-
-		default:
-			return ::mml::keyboard::Unknown;
+		return it->second;
 	}
+
+	return ::mml::keyboard::scan::Unknown;
 }
+
+} // namespace
 
 namespace key
 {
-inline auto from_string(const std::string&) noexcept -> os::key::code
+inline auto from_string(const std::string& key) noexcept -> os::key::code
 {
-	return from_layout_independent_impl(::mml::keyboard::Unknown);
+	auto lower_key = key;
+	key_map.to_lower(lower_key);
+	auto it = key_map.string_to_key_code.find(lower_key);
+	if(it != std::end(key_map.string_to_key_code))
+	{
+		return it->second;
+	}
+	return os::key::code::unknown;
 }
 
-inline auto to_string(os::key::code) noexcept -> std::string
+inline auto to_string(os::key::code c) noexcept -> std::string
 {
-	return {};
+	return ::mml::keyboard::get_description(to_layout_independent_impl(c));
 }
 
 inline auto is_pressed(os::key::code key_code) noexcept -> bool
 {
 	return ::mml::keyboard::is_key_pressed(to_layout_independent_impl(key_code));
 }
-}
+} // namespace key
 
 inline auto has_screen_keyboard() noexcept -> bool
 {
@@ -465,10 +359,10 @@ inline void stop_text_input() noexcept
 	::mml::keyboard::set_virtual_keyboard_visible(false);
 }
 
-inline bool is_text_input_active() noexcept
+inline auto is_text_input_active() noexcept -> bool
 {
 	return false;
 }
-}
-}
-}
+} // namespace mml
+} // namespace detail
+} // namespace os

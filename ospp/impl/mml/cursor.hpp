@@ -68,6 +68,6 @@ public:
 private:
 	::mml::cursor impl_;
 };
-}
-}
-}
+} // namespace mml
+} // namespace detail
+} // namespace os

@@ -772,12 +772,13 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
             if (key_repeat_enabled_ || ((HIWORD(lParam) & KF_REPEAT) == 0))
             {
                 platform_event event;
-                event.type        = platform_event::key_pressed;
-                event.key.alt     = HIWORD(GetKeyState(VK_MENU))    != 0;
-                event.key.control = HIWORD(GetKeyState(VK_CONTROL)) != 0;
-                event.key.shift   = HIWORD(GetKeyState(VK_SHIFT))   != 0;
-                event.key.system  = HIWORD(GetKeyState(VK_LWIN)) || HIWORD(GetKeyState(VK_RWIN));
-                event.key.code    = virtual_key_code_to_mml(wParam, lParam);
+                event.type         = platform_event::key_pressed;
+                event.key.alt      = HIWORD(GetKeyState(VK_MENU))    != 0;
+                event.key.control  = HIWORD(GetKeyState(VK_CONTROL)) != 0;
+                event.key.shift    = HIWORD(GetKeyState(VK_SHIFT))   != 0;
+                event.key.system   = HIWORD(GetKeyState(VK_LWIN)) || HIWORD(GetKeyState(VK_RWIN));
+                event.key.code     = virtual_key_code_to_mml(wParam, lParam);
+                event.key.scancode = to_scancode(wParam, lParam);
                 push_event(event);
             }
             break;
@@ -788,12 +789,13 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         case WM_SYSKEYUP:
         {
             platform_event event;
-            event.type        = platform_event::key_released;
-            event.key.alt     = HIWORD(GetKeyState(VK_MENU))    != 0;
-            event.key.control = HIWORD(GetKeyState(VK_CONTROL)) != 0;
-            event.key.shift   = HIWORD(GetKeyState(VK_SHIFT))   != 0;
-            event.key.system  = HIWORD(GetKeyState(VK_LWIN)) || HIWORD(GetKeyState(VK_RWIN));
-            event.key.code    = virtual_key_code_to_mml(wParam, lParam);
+            event.type         = platform_event::key_released;
+            event.key.alt      = HIWORD(GetKeyState(VK_MENU))    != 0;
+            event.key.control  = HIWORD(GetKeyState(VK_CONTROL)) != 0;
+            event.key.shift    = HIWORD(GetKeyState(VK_SHIFT))   != 0;
+            event.key.system   = HIWORD(GetKeyState(VK_LWIN)) || HIWORD(GetKeyState(VK_RWIN));
+            event.key.code     = virtual_key_code_to_mml(wParam, lParam);
+            event.key.scancode = to_scancode(wParam, lParam);
             push_event(event);
             break;
         }
@@ -1039,13 +1041,14 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
 ////////////////////////////////////////////////////////////
 keyboard::key window_impl_win32::virtual_key_code_to_mml(WPARAM key, LPARAM flags)
 {
+    // clang-format off
     switch (key)
     {
         // Check the scancode to distinguish between left and right shift
         case VK_SHIFT:
         {
-            static UINT lShift = MapVirtualKeyW(VK_LSHIFT, MAPVK_VK_TO_VSC);
-            UINT scancode = static_cast<UINT>((flags & (0xFF << 16)) >> 16);
+            static const UINT lShift = MapVirtualKeyW(VK_LSHIFT, MAPVK_VK_TO_VSC);
+            const UINT scancode = static_cast<UINT>((flags & (0xFF << 16)) >> 16);
             return scancode == lShift ? keyboard::LShift : keyboard::RShift;
         }
 
@@ -1067,9 +1070,9 @@ keyboard::key window_impl_win32::virtual_key_code_to_mml(WPARAM key, LPARAM flag
         case VK_OEM_6:      return keyboard::RBracket;
         case VK_OEM_COMMA:  return keyboard::Comma;
         case VK_OEM_PERIOD: return keyboard::Period;
-        case VK_OEM_7:      return keyboard::Quote;
+        case VK_OEM_7:      return keyboard::Apostrophe;
         case VK_OEM_5:      return keyboard::Backslash;
-        case VK_OEM_3:      return keyboard::Tilde;
+        case VK_OEM_3:      return keyboard::Grave;
         case VK_ESCAPE:     return keyboard::Escape;
         case VK_SPACE:      return keyboard::Space;
         case VK_RETURN:     return keyboard::Enter;
@@ -1152,10 +1155,138 @@ keyboard::key window_impl_win32::virtual_key_code_to_mml(WPARAM key, LPARAM flag
         case '8':           return keyboard::Num8;
         case '9':           return keyboard::Num9;
     }
+    // clang-format on
 
     return keyboard::Unknown;
 }
 
+////////////////////////////////////////////////////////////
+keyboard::scancode window_impl_win32::to_scancode(WPARAM wParam, LPARAM lParam)
+{
+    int code = (lParam & (0xFF << 16)) >> 16;
+
+    // Retrieve the scancode from the VirtualKey for synthetic key messages
+    if (code == 0)
+    {
+        code = static_cast<int>(MapVirtualKey(static_cast<UINT>(wParam), MAPVK_VK_TO_VSC));
+    }
+
+    // Windows scancodes
+    // Reference: https://msdn.microsoft.com/en-us/library/aa299374(v=vs.60).aspx
+    // clang-format off
+    switch (code)
+    {
+        case 1: return keyboard::scan::Escape;
+        case 2: return keyboard::scan::Num1;
+        case 3: return keyboard::scan::Num2;
+        case 4: return keyboard::scan::Num3;
+        case 5: return keyboard::scan::Num4;
+        case 6: return keyboard::scan::Num5;
+        case 7: return keyboard::scan::Num6;
+        case 8: return keyboard::scan::Num7;
+        case 9: return keyboard::scan::Num8;
+        case 10: return keyboard::scan::Num9;
+        case 11: return keyboard::scan::Num0;
+        case 12: return keyboard::scan::Hyphen;
+        case 13: return keyboard::scan::Equal;
+        case 14: return keyboard::scan::Backspace;
+        case 15: return keyboard::scan::Tab;
+        case 16: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::MediaPreviousTrack : keyboard::scan::Q;
+        case 17: return keyboard::scan::W;
+        case 18: return keyboard::scan::E;
+        case 19: return keyboard::scan::R;
+        case 20: return keyboard::scan::T;
+        case 21: return keyboard::scan::Y;
+        case 22: return keyboard::scan::U;
+        case 23: return keyboard::scan::I;
+        case 24: return keyboard::scan::O;
+        case 25: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::MediaNextTrack     : keyboard::scan::P;
+        case 26: return keyboard::scan::LBracket;
+        case 27: return keyboard::scan::RBracket;
+        case 28: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::NumpadEnter        : keyboard::scan::Enter;
+        case 29: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::RControl           : keyboard::scan::LControl;
+        case 30: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Select             : keyboard::scan::A;
+        case 31: return keyboard::scan::S;
+        case 32: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::VolumeMute         : keyboard::scan::D;
+        case 33: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::LaunchApplication1 : keyboard::scan::F;
+        case 34: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::MediaPlayPause     : keyboard::scan::G;
+        case 35: return keyboard::scan::H;
+        case 36: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::MediaStop          : keyboard::scan::J;
+        case 37: return keyboard::scan::K;
+        case 38: return keyboard::scan::L;
+        case 39: return keyboard::scan::Semicolon;
+        case 40: return keyboard::scan::Apostrophe;
+        case 41: return keyboard::scan::Grave;
+        case 42: return keyboard::scan::LShift;
+        case 43: return keyboard::scan::Backslash;
+        case 44: return keyboard::scan::Z;
+        case 45: return keyboard::scan::X;
+        case 46: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::VolumeDown   : keyboard::scan::C;
+        case 47: return keyboard::scan::V;
+        case 48: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::VolumeUp     : keyboard::scan::B;
+        case 49: return keyboard::scan::N;
+        case 50: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::HomePage     : keyboard::scan::M;
+        case 51: return keyboard::scan::Comma;
+        case 52: return keyboard::scan::Period;
+        case 53: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::NumpadDivide : keyboard::scan::Slash;
+        case 54: return keyboard::scan::RShift;
+        case 55: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::PrintScreen  : keyboard::scan::NumpadMultiply;
+        case 56: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::RAlt         : keyboard::scan::LAlt;
+        case 57: return keyboard::scan::Space;
+        case 58: return keyboard::scan::CapsLock;
+        case 59: return keyboard::scan::F1;
+        case 60: return keyboard::scan::F2;
+        case 61: return keyboard::scan::F3;
+        case 62: return keyboard::scan::F4;
+        case 63: return keyboard::scan::F5;
+        case 64: return keyboard::scan::F6;
+        case 65: return keyboard::scan::F7;
+        case 66: return keyboard::scan::F8;
+        case 67: return keyboard::scan::F9;
+        case 68: return keyboard::scan::F10;
+        case 69: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::NumLock  : keyboard::scan::Pause;
+        case 70: return keyboard::scan::ScrollLock;
+        case 71: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Home     : keyboard::scan::Numpad7;
+        case 72: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Up       : keyboard::scan::Numpad8;
+        case 73: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::PageUp   : keyboard::scan::Numpad9;
+        case 74: return keyboard::scan::NumpadMinus;
+        case 75: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Left     : keyboard::scan::Numpad4;
+        case 76: return keyboard::scan::Numpad5;
+        case 77: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Right    : keyboard::scan::Numpad6;
+        case 78: return keyboard::scan::NumpadPlus;
+        case 79: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::End      : keyboard::scan::Numpad1;
+        case 80: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Down     : keyboard::scan::Numpad2;
+        case 81: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::PageDown : keyboard::scan::Numpad3;
+        case 82: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Insert   : keyboard::scan::Numpad0;
+        case 83: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Delete   : keyboard::scan::NumpadDecimal;
+
+        case 86: return keyboard::scan::NonUsBackslash;
+        case 87: return keyboard::scan::F11;
+        case 88: return keyboard::scan::F12;
+
+        case 91: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::LSystem : keyboard::scan::Unknown;
+        case 92: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::RSystem : keyboard::scan::Unknown;
+        case 93: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Menu    : keyboard::scan::Unknown;
+
+        case 99: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Help    : keyboard::scan::Unknown;
+        case 100: return keyboard::scan::F13;
+        case 101: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Search             : keyboard::scan::F14;
+        case 102: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Favorites          : keyboard::scan::F15;
+        case 103: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Refresh            : keyboard::scan::F16;
+        case 104: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Stop               : keyboard::scan::F17;
+        case 105: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Forward            : keyboard::scan::F18;
+        case 106: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::Back               : keyboard::scan::F19;
+        case 107: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::LaunchApplication1 : keyboard::scan::F20;
+        case 108: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::LaunchMail         : keyboard::scan::F21;
+        case 109: return (HIWORD(lParam) & KF_EXTENDED) ? keyboard::scan::LaunchMediaSelect  : keyboard::scan::F22;
+        case 110: return keyboard::scan::F23;
+
+        case 118: return keyboard::scan::F24;
+
+        default: return keyboard::scan::Unknown;
+    }
+    // clang-format on
+}
 
 ////////////////////////////////////////////////////////////
 LRESULT CALLBACK window_impl_win32::global_on_event(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)

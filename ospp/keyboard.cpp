@@ -15,41 +15,41 @@
 
 namespace os
 {
-    namespace key
-    {
-        os::key::code from_string(const std::string& str) noexcept
-        {
-            return impl::key::from_string(str);
-        }
-
-        std::string to_string(os::key::code key_code) noexcept
-        {
-            return impl::key::to_string(key_code);
-        }
-
-        bool is_pressed(os::key::code key_code) noexcept
-        {
-            return impl::key::is_pressed(key_code);
-        }
-    }
-
-    bool has_screen_keyboard() noexcept
-    {
-        return impl::has_screen_keyboard();
-    }
-
-    void start_text_input() noexcept
-    {
-        impl::start_text_input();
-    }
-
-    void stop_text_input() noexcept
-    {
-        impl::stop_text_input();
-    }
-
-    bool is_text_input_active() noexcept
-    {
-        return impl::is_text_input_active();
-    }
+namespace key
+{
+auto from_string(const std::string& str) noexcept -> code
+{
+	return impl::key::from_string(str);
 }
+
+auto to_string(os::key::code key_code) noexcept -> std::string
+{
+	return impl::key::to_string(key_code);
+}
+
+auto is_pressed(os::key::code key_code) noexcept -> bool
+{
+	return impl::key::is_pressed(key_code);
+}
+} // namespace key
+
+auto has_screen_keyboard() noexcept -> bool
+{
+	return impl::has_screen_keyboard();
+}
+
+void start_text_input() noexcept
+{
+	impl::start_text_input();
+}
+
+void stop_text_input() noexcept
+{
+	impl::stop_text_input();
+}
+
+auto is_text_input_active() noexcept -> bool
+{
+	return impl::is_text_input_active();
+}
+} // namespace os
