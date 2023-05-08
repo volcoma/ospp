@@ -2,6 +2,7 @@
 #include "config.hpp"
 
 #include <stdexcept>
+#include <string>
 
 namespace os
 {
