@@ -38,9 +38,9 @@ bool input_impl::is_key_pressed(keyboard::key key)
         case keyboard::RBracket:   keysym = XK_bracketright; break;
         case keyboard::Comma:      keysym = XK_comma;        break;
         case keyboard::Period:     keysym = XK_period;       break;
-        case keyboard::Quote:      keysym = XK_apostrophe;   break;
+        case keyboard::Apostrophe: keysym = XK_apostrophe;   break;
         case keyboard::Backslash:  keysym = XK_backslash;    break;
-        case keyboard::Tilde:      keysym = XK_grave;        break;
+        case keyboard::Grave:      keysym = XK_grave;        break;
         case keyboard::Space:      keysym = XK_space;        break;
         case keyboard::Enter:      keysym = XK_Return;       break;
         case keyboard::Backspace:  keysym = XK_BackSpace;    break;
