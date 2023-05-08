@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace os
-{b
+{
 namespace detail
 {
 namespace sdl

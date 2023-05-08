@@ -201,6 +201,18 @@
                 "CMAKE_C_COMPILER": "cl",
                 "CMAKE_CXX_COMPILER": "cl"
             }
+        },
+        {
+            "name": "windows-x64-mingw",
+            "inherits": "windows-base",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
         }
     ],
 
@@ -334,6 +346,11 @@
             "name": "windows-x64-msvc2022-release",
             "configuration": "Release",
             "configurePreset": "windows-x64-msvc2022"
+        },
+        {
+            "name": "windows-x64-mingw-release",
+            "configuration": "Release",
+            "configurePreset": "windows-x64-mingw"
         }
     ],
 
@@ -395,6 +412,11 @@
             "name": "windows-x64-msvc2022-release",
             "inherits": "test-base",
             "configurePreset": "windows-x64-msvc2022"
+        },
+        {
+            "name": "windows-x64-mingw-release",
+            "inherits": "test-base",
+            "configurePreset": "windows-x64-mingw"
         }
     ]
 }
