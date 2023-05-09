@@ -1,15 +1,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <X11/Xatom.h>
-#include <X11/Xlibint.h>
-#include <X11/Xutil.h>
-#include <X11/extensions/Xrandr.h>
-#include <X11/keysym.h>
-#include <algorithm>
-#include <cstring>
-#include <fcntl.h>
-#include <libgen.h>
+// clang-format off
 #include <mml/system/err.hpp>
 #include <mml/system/utf.hpp>
 #include <mml/window/unix/clipboard_impl.hpp>
@@ -18,10 +10,22 @@
 #include <mml/window/unix/keyboard_impl.hpp>
 #include <mml/window/unix/window_impl_x11.hpp>
 #include <mml/window/window_style.hpp> // important to be included first (conflict with None)
-#include <string>
+
+#include <X11/Xatom.h>
+#include <X11/Xlibint.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/Xrandr.h>
+#include <X11/keysym.h>
+
+#include <fcntl.h>
+#include <libgen.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <algorithm>
+#include <cstring>
+#include <string>
 #include <vector>
 
 #undef max
@@ -29,6 +33,8 @@
 #include <bitset>
 #include <mutex>
 #include <thread>
+
+//clang-format on
 
 #define _NET_WM_STATE_REMOVE 0l
 #define _NET_WM_STATE_ADD 1l
