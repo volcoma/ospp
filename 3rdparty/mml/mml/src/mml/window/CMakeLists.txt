@@ -73,6 +73,12 @@ elseif(MML_OS_LINUX OR MML_OS_FREEBSD OR MML_OS_OPENBSD)
         ${SRCROOT}/unix/display.hpp
         ${SRCROOT}/unix/input_impl.cpp
         ${SRCROOT}/unix/input_impl.hpp
+        ${SRCROOT}/unix/keyboard_impl.cpp
+        ${SRCROOT}/unix/keyboard_impl.hpp
+        ${SRCROOT}/unix/key_sym_to_key_mapping.cpp
+        ${SRCROOT}/unix/key_sym_to_key_mapping.hpp
+        ${SRCROOT}/unix/key_sym_to_unicode_mapping.cpp
+        ${SRCROOT}/unix/key_sym_to_unicode_mapping.hpp
         ${SRCROOT}/unix/sensor_impl.cpp
         ${SRCROOT}/unix/sensor_impl.hpp
         ${SRCROOT}/unix/video_mode_impl.cpp

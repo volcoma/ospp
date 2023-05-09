@@ -506,7 +506,7 @@ In utf<32>::next(In begin, In /*end*/)
 template <typename In>
 std::size_t utf<32>::count(In begin, In end)
 {
-    return begin - end;
+	return std::distance(begin, end);
 }
 
 

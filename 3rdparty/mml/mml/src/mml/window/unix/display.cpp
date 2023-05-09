@@ -1,25 +1,25 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <mml/window/unix/display.hpp>
-#include <mml/system/err.hpp>
 #include <X11/keysym.h>
 #include <cassert>
 #include <cstdlib>
 #include <map>
+#include <mml/system/err.hpp>
+#include <mml/window/unix/display.hpp>
 #include <mutex>
 
 namespace
 {
-    // The shared display and its reference counter
-	std::once_flag flag;
-    Display* sharedDisplay = nullptr;
-	unsigned int referenceCount = 0;
-	std::mutex mutex;
+// The shared display and its reference counter
+std::once_flag flag;
+Display* sharedDisplay = nullptr;
+unsigned int referenceCount = 0;
+std::mutex mutex;
 
-	typedef std::map<std::string, Atom> AtomMap;
-	AtomMap atoms;
-}
+typedef std::map<std::string, Atom> AtomMap;
+AtomMap atoms;
+} // namespace
 
 namespace mml
 {
@@ -32,15 +32,16 @@ Display* open_display()
 
 	std::lock_guard<std::mutex> lock(mutex);
 
-	if (referenceCount == 0)
+	if(referenceCount == 0)
 	{
-        sharedDisplay = XOpenDisplay(nullptr);
+		sharedDisplay = XOpenDisplay(nullptr);
 
 		// Opening display failed: The best we can do at the moment is to output a meaningful error message
 		// and cause an abnormal program termination
-		if (!sharedDisplay)
+		if(!sharedDisplay)
 		{
-			err() << "Failed to open X11 display; make sure the DISPLAY environment variable is set correctly" << std::endl;
+			err() << "Failed to open X11 display; make sure the DISPLAY environment variable is set correctly"
+				  << std::endl;
 			std::abort();
 		}
 	}
@@ -48,7 +49,6 @@ Display* open_display()
 	referenceCount++;
 	return sharedDisplay;
 }
-
 
 ////////////////////////////////////////////////////////////
 void close_display(Display* display)
@@ -58,17 +58,16 @@ void close_display(Display* display)
 	assert(display == sharedDisplay);
 
 	referenceCount--;
-	if (referenceCount == 0)
+	if(referenceCount == 0)
 		XCloseDisplay(display);
 }
-
 
 ////////////////////////////////////////////////////////////
 Atom get_atom(const std::string& name, bool onlyIfExists)
 {
 	AtomMap::const_iterator iter = atoms.find(name);
 
-	if (iter != atoms.end())
+	if(iter != atoms.end())
 		return iter->second;
 
 	Display* display = open_display();

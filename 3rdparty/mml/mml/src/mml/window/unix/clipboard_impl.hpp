@@ -5,6 +5,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <X11/Xlib.h>
+
 #include <deque>
 #include <string>
 
@@ -108,16 +109,16 @@ private:
 	////////////////////////////////////////////////////////////
 	// Member data
 	////////////////////////////////////////////////////////////
-    ::Window window_;				 ///< X identifier defining our window
-    ::Display* display_;			 ///< Pointer to the display
-    Atom clipboard_;				 ///< X Atom identifying the CLIPBOARD selection
-    Atom targets_;					 ///< X Atom identifying TARGETS
-    Atom text_;					 ///< X Atom identifying TEXT
-    Atom utf8_string_;				 ///< X Atom identifying UTF8_STRING
-    Atom target_property_;			 ///< X Atom identifying our destination window property
-    std::string clipboard_contents_; ///< Our clipboard contents
-    std::deque<XEvent> events_;	 ///< Queue we use to store pending events for this window
-    bool request_responded_;		 ///< Holds whether our selection request has been responded to or not
+	::Window window_;				 ///< X identifier defining our window
+	::Display* display_;			 ///< Pointer to the display
+	Atom clipboard_;				 ///< X Atom identifying the CLIPBOARD selection
+	Atom targets_;					 ///< X Atom identifying TARGETS
+	Atom text_;						 ///< X Atom identifying TEXT
+	Atom utf8_string_;				 ///< X Atom identifying UTF8_STRING
+	Atom target_property_;			 ///< X Atom identifying our destination window property
+	std::string clipboard_contents_; ///< Our clipboard contents
+	std::deque<XEvent> events_;		 ///< Queue we use to store pending events for this window
+	bool request_responded_;		 ///< Holds whether our selection request has been responded to or not
 };
 
 } // namespace priv

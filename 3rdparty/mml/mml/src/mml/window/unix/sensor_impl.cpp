@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////
 #include <mml/window/sensor_impl.hpp>
 
-
 namespace mml
 {
 namespace priv
@@ -11,52 +10,46 @@ namespace priv
 ////////////////////////////////////////////////////////////
 void sensor_impl::initialize()
 {
-    // To be implemented
+	// To be implemented
 }
-
 
 ////////////////////////////////////////////////////////////
 void sensor_impl::cleanup()
 {
-    // To be implemented
+	// To be implemented
 }
-
 
 ////////////////////////////////////////////////////////////
 bool sensor_impl::is_available(sensor::type /*sensor*/)
 {
-    // To be implemented
-    return false;
+	// To be implemented
+	return false;
 }
-
 
 ////////////////////////////////////////////////////////////
 bool sensor_impl::open(sensor::type /*sensor*/)
 {
-    // To be implemented
-    return false;
+	// To be implemented
+	return false;
 }
-
 
 ////////////////////////////////////////////////////////////
 void sensor_impl::close()
 {
-    // To be implemented
+	// To be implemented
 }
-
 
 ////////////////////////////////////////////////////////////
 std::array<float, 3> sensor_impl::update()
 {
-    // To be implemented
-    return std::array<float, 3>({{ 0, 0, 0 }});
+	// To be implemented
+	return std::array<float, 3>({{0, 0, 0}});
 }
-
 
 ////////////////////////////////////////////////////////////
 void sensor_impl::set_enabled(bool /*enabled*/)
 {
-    // To be implemented
+	// To be implemented
 }
 
 } // namespace priv

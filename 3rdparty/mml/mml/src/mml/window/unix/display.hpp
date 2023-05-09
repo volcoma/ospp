@@ -7,7 +7,6 @@
 #include <X11/Xlib.h>
 #include <string>
 
-
 namespace mml
 {
 namespace priv
@@ -45,6 +44,5 @@ Atom get_atom(const std::string& name, bool onlyIfExists = false);
 } // namespace priv
 
 } // namespace mml
-
 
 #endif // MML_SHAREDDISPLAY_HPP

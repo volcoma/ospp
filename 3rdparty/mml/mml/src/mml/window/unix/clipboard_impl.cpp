@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <X11/Xatom.h>
 #include <mml/system/err.hpp>
 #include <mml/window/unix/clipboard_impl.hpp>
 #include <mml/window/unix/display.hpp>
-#include <vector>
+
+#include <X11/Xatom.h>
+
 #include <chrono>
+#include <vector>
 
 namespace
 {
@@ -106,11 +108,11 @@ std::string clipboard_impl::get_string_impl()
 	XConvertSelection(display_, clipboard_, (utf8_string_ != None) ? utf8_string_ : XA_STRING,
 					  target_property_, window_, CurrentTime);
 
-
 	auto last = std::chrono::steady_clock::now();
 	// Wait for a response for up to 1000ms
-	while(!request_responded_ && (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - last) <
-								  std::chrono::milliseconds(1000)))
+	while(!request_responded_ &&
+		  (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - last) <
+		   std::chrono::milliseconds(1000)))
 		process_events();
 
 	// If no response was received within the time period, clear our clipboard contents
@@ -248,8 +250,8 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 					if(utf8_string_ != None)
 						targets.push_back(utf8_string_);
 
-					XChangeProperty(display_, selectionRequestEvent.requestor,
-									selectionRequestEvent.property, XA_ATOM, 32, PropModeReplace,
+					XChangeProperty(display_, selectionRequestEvent.requestor, selectionRequestEvent.property,
+									XA_ATOM, 32, PropModeReplace,
 									reinterpret_cast<unsigned char*>(&targets[0]), targets.size());
 
 					// Notify the requestor that they can read the targets from their window property
@@ -266,8 +268,8 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 					// Respond to a request for conversion to a Latin-1 string
 					std::string data = clipboard_contents_;
 
-					XChangeProperty(display_, selectionRequestEvent.requestor,
-									selectionRequestEvent.property, XA_STRING, 8, PropModeReplace,
+					XChangeProperty(display_, selectionRequestEvent.requestor, selectionRequestEvent.property,
+									XA_STRING, 8, PropModeReplace,
 									reinterpret_cast<const unsigned char*>(data.c_str()), data.size());
 
 					// Notify the requestor that they can read the data from their window property
@@ -286,8 +288,8 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 					// std::basic_string<uint8> data = m_clipboardContents.toUtf8();
 					std::string data = clipboard_contents_;
 
-					XChangeProperty(display_, selectionRequestEvent.requestor,
-									selectionRequestEvent.property, utf8_string_, 8, PropModeReplace,
+					XChangeProperty(display_, selectionRequestEvent.requestor, selectionRequestEvent.property,
+									utf8_string_, 8, PropModeReplace,
 									reinterpret_cast<const unsigned char*>(data.c_str()), data.size());
 
 					// Notify the requestor that they can read the data from their window property
