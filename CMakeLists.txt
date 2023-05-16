@@ -44,7 +44,7 @@ add_subdirectory(ospp)
 
 
 if(BUILD_OSPP_TESTS)
-	add_subdirectory(tests
+	add_subdirectory(tests)
     
     set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
     include(InstallRequiredSystemLibraries)
