@@ -14,7 +14,7 @@ namespace detail
 {
 namespace sdl
 {
-inline auto to_window_event_id(uint8_t id) -> window_event_id
+inline auto to_window_event_id(uint32_t id) -> window_event_id
 {
 	switch(id)
 	{

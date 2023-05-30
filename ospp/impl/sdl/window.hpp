@@ -16,7 +16,7 @@ namespace detail
 namespace sdl
 {
 
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+#if defined(SDL_ENABLE_SYSWM_WINDOWS)
 namespace
 {
 void set_process_dpi_aware()
@@ -86,23 +86,21 @@ inline auto to_cursor_impl(const cursor& c) -> const cursor_impl&
 inline auto get_native_window_handle(const SDL_SysWMinfo& wmi) noexcept -> native_handle
 {
 	(void)wmi;
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+#if defined(SDL_ENABLE_SYSWM_WINDOWS)
 	return wmi.info.win.window;
-#elif defined(SDL_VIDEO_DRIVER_WINRT)
+#elif defined(SDL_ENABLE_SYSWM_WINRT)
 	return wmi.info.winrt.window;
-#elif defined(SDL_VIDEO_DRIVER_X11)
+#elif defined(SDL_ENABLE_SYSWM_X11)
 	return (void*)(uintptr_t)wmi.info.x11.window;
-#elif defined(SDL_VIDEO_DRIVER_DIRECTFB)
-	return wmi.info.dfb.window;
-#elif defined(SDL_VIDEO_DRIVER_COCOA)
+#elif defined(SDL_ENABLE_SYSWM_COCOA)
 	return wmi.info.cocoa.window;
-#elif defined(SDL_VIDEO_DRIVER_UIKIT)
+#elif defined(SDL_ENABLE_SYSWM_UIKIT)
 	return wmi.info.uikit.window;
-#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
+#elif defined(SDL_ENABLE_SYSWM_WAYLAND)
 	return wmi.info.wl.surface;
-#elif defined(SDL_VIDEO_DRIVER_ANDROID)
+#elif defined(SDL_ENABLE_SYSWM_ANDROID)
 	return wmi.info.android.window;
-#elif defined(SDL_VIDEO_DRIVER_VIVANTE)
+#elif defined(SDL_ENABLE_SYSWM_VIVANTE)
 	return (void*)(uintptr_t)wmi.info.vivante.window;
 #else
 	return nullptr;
@@ -112,23 +110,21 @@ inline auto get_native_window_handle(const SDL_SysWMinfo& wmi) noexcept -> nativ
 inline auto get_native_display_handle(const SDL_SysWMinfo& wmi) noexcept -> native_display
 {
 	(void)wmi;
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+#if defined(SDL_ENABLE_SYSWM_WINDOWS)
 	return wmi.info.win.hdc;
-#elif defined(SDL_VIDEO_DRIVER_WINRT)
+#elif defined(SDL_ENABLE_SYSWM_WINRT)
 	return nullptr;
-#elif defined(SDL_VIDEO_DRIVER_X11)
+#elif defined(SDL_ENABLE_SYSWM_X11)
 	return wmi.info.x11.display;
-#elif defined(SDL_VIDEO_DRIVER_DIRECTFB)
+#elif defined(SDL_ENABLE_SYSWM_COCOA)
 	return nullptr;
-#elif defined(SDL_VIDEO_DRIVER_COCOA)
+#elif defined(SDL_ENABLE_SYSWM_UIKIT)
 	return nullptr;
-#elif defined(SDL_VIDEO_DRIVER_UIKIT)
-	return nullptr;
-#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
+#elif defined(SDL_ENABLE_SYSWM_WAYLAND)
 	return wmi.info.wl.display;
-#elif defined(SDL_VIDEO_DRIVER_ANDROID)
+#elif defined(SDL_ENABLE_SYSWM_ANDROID)
 	return nullptr;
-#elif defined(SDL_VIDEO_DRIVER_VIVANTE)
+#elif defined(SDL_ENABLE_SYSWM_VIVANTE)
 	return (void*)(uintptr_t)wmi.info.vivante.display;
 #else
 	return nullptr;
@@ -167,7 +163,7 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 		result |= SDL_WINDOW_MAXIMIZED;
 	}
 
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+#if defined(SDL_ENABLE_SYSWM_WINDOWS)
 	// due to sdl's current lack of dpi awarenes on windows
 	// we have to implement it ourselves
 	set_process_dpi_aware();
@@ -210,7 +206,7 @@ public:
 	auto get_native_handle() const -> native_handle
 	{
 		SDL_SysWMinfo wmi;
-		if(!SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION))
+		if(SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION) != 0)
 		{
 			OS_SDL_ERROR_HANDLER({});
 		}
@@ -220,7 +216,7 @@ public:
 	auto get_native_display() const -> native_display
 	{
 		SDL_SysWMinfo wmi;
-		if(!SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION))
+		if(SDL_GetWindowWMInfo(impl_.get(), &wmi, SDL_SYSWM_CURRENT_VERSION) != 0)
 		{
 			OS_SDL_ERROR_HANDLER({});
 		}
@@ -358,7 +354,7 @@ public:
 
 	void set_fullscreen(bool b)
 	{
-		if(SDL_SetWindowFullscreen(impl_.get(), b ? SDL_TRUE : SDL_FALSE))
+		if(SDL_SetWindowFullscreen(impl_.get(), b ? SDL_TRUE : SDL_FALSE) != 0)
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
@@ -366,7 +362,7 @@ public:
 
 	void set_opacity(float opacity)
 	{
-		if(SDL_SetWindowOpacity(impl_.get(), opacity))
+		if(SDL_SetWindowOpacity(impl_.get(), opacity) != 0)
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
@@ -375,7 +371,7 @@ public:
 	auto get_opacity() const -> float
 	{
 		float opacity{1.0f};
-		if(SDL_GetWindowOpacity(impl_.get(), &opacity))
+		if(SDL_GetWindowOpacity(impl_.get(), &opacity) != 0)
 		{
 			OS_SDL_ERROR_HANDLER(opacity);
 		}
@@ -395,7 +391,7 @@ public:
 
 	void request_focus()
 	{
-		if(SDL_SetWindowInputFocus(impl_.get()))
+		if(SDL_RaiseWindow(impl_.get()) != 0)
 		{
 			OS_SDL_ERROR_HANDLER_VOID();
 		}
