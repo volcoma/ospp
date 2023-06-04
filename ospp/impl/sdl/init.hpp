@@ -15,6 +15,7 @@ inline void shutdown() noexcept
 
 inline auto init() -> bool
 {
+    SDL_SetHint("SDL_WINDOWS_DPI_SCALING", "false");
 	auto result =
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMEPAD);
 	if(result < 0)
@@ -24,6 +25,11 @@ inline auto init() -> bool
 	}
 
 	return true;
+}
+
+inline auto get_current_backend() -> const char*
+{
+    return "SDL";
 }
 } // namespace sdl
 } // namespace detail

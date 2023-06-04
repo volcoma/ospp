@@ -240,6 +240,11 @@ public:
 		}
 
 		set_position(pos);
+
+        if(has_focus())
+        {
+            get_focused_win() = this;
+        }
 	}
 
 	~window_impl()

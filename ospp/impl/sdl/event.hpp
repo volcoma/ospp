@@ -77,6 +77,22 @@ inline auto to_event(const SDL_Event& e) -> event
 		case SDL_EVENT_DID_ENTER_FOREGROUND:
 			ev.type = events::app_did_enter_foreground;
 			break;
+		case SDL_EVENT_DISPLAY_ORIENTATION:
+			ev.type = events::display_orientation;
+			break;
+		case SDL_EVENT_DISPLAY_CONNECTED:
+			ev.type = events::display_connected;
+			break;
+		case SDL_EVENT_DISPLAY_DISCONNECTED:
+			ev.type = events::display_disconnected;
+			break;
+		case SDL_EVENT_DISPLAY_MOVED:
+			ev.type = events::display_moved;
+			break;
+		case SDL_EVENT_DISPLAY_SCALE_CHANGED:
+        e.display.
+			ev.type = events::display_content_scale_changed;
+			break;
 		case SDL_EVENT_KEY_DOWN:
 			ev.type = events::key_down;
 			ev.key.window_id = e.key.windowID;

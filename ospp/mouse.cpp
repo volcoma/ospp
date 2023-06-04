@@ -39,7 +39,13 @@ void set_position(const point& pos) noexcept
 
 void set_position(const point& pos, const window& relative_to) noexcept
 {
-	impl::set_position(pos, relative_to);
+    impl::set_position(pos, relative_to);
 }
+
+void capture(bool enabled)
+{
+    impl::capture(enabled);
+}
+
 } // namespace mouse
 } // namespace os

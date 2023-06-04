@@ -15,6 +15,11 @@ inline auto init() -> bool
 {
 	return true;
 }
+
+inline auto get_current_backend() -> const char*
+{
+    return "MML";
+}
 } // namespace mml
 } // namespace detail
 } // namespace os

@@ -24,6 +24,12 @@ void shutdown() noexcept
 
 auto init() -> bool
 {
-	return impl::init();
+    return impl::init();
 }
+
+auto get_current_backend() -> const char*
+{
+    return impl::get_current_backend();
+}
+
 } // namespace os

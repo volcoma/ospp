@@ -80,12 +80,13 @@ inline auto get_position() noexcept -> point
 	auto& focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
+        auto window_pos = focused_win->get_position();
 		point result{};
 		double x{};
 		double y{};
 		glfwGetCursorPos(focused_win->get_impl(), &x, &y);
-		result.x = static_cast<int32_t>(x);
-		result.y = static_cast<int32_t>(y);
+		result.x = window_pos.x + static_cast<int32_t>(x);
+		result.y = window_pos.y + static_cast<int32_t>(y);
 		return result;
 	}
 	return {};
@@ -100,8 +101,18 @@ inline void set_position(const point& pos) noexcept
 	auto& focused_win = os::detail::glfw::get_focused_win();
 	if(focused_win)
 	{
-		glfwSetCursorPos(focused_win->get_impl(), static_cast<double>(pos.x), static_cast<double>(pos.y));
+        auto window_pos = focused_win->get_position();
+		glfwSetCursorPos(focused_win->get_impl(), static_cast<double>(pos.x - window_pos.x), static_cast<double>(pos.y - window_pos.x));
 	}
+}
+
+inline void capture(bool enabled)
+{
+//    auto& focused_win = os::detail::glfw::get_focused_win();
+//	if(focused_win)
+//	{
+//        focused_win->grab_input(enabled);
+//    }
 }
 }
 }

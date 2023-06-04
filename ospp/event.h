@@ -56,7 +56,13 @@ enum class events : uint8_t
 	finger_motion,
 
 	clipboard_update,
-	drop_file
+	drop_file,
+
+    display_orientation,
+    display_connected,
+    display_disconnected,
+    display_moved,
+    display_content_scale_changed
 };
 
 enum class state : uint8_t
@@ -128,6 +134,11 @@ struct key_event
 	bool system{};	  /**< Is the System key pressed? */
 };
 
+struct display_event
+{
+
+};
+
 struct event
 {
 	drop_event drop;
@@ -140,6 +151,7 @@ struct event
 		key_event key;
 		mouse_motion_event motion;
 		quit_event quit;
+        display_event display;
 	};
 	events type;
 };

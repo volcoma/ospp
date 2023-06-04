@@ -87,6 +87,11 @@ inline void set_position(const point& pos, const window& relative_to) noexcept
 {
 	SDL_WarpMouseInWindow(to_win_impl(relative_to).get_impl(), float(pos.x), float(pos.y));
 }
+
+inline void capture(bool enabled) noexcept
+{
+	SDL_CaptureMouse(enabled ? SDL_TRUE : SDL_FALSE);
+}
 } // namespace sdl
 } // namespace detail
 } // namespace mouse

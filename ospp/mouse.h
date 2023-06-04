@@ -26,5 +26,7 @@ auto get_position(const window& relative_to) noexcept -> point;
 
 void set_position(const point& pos) noexcept;
 void set_position(const point& pos, const window& relative_to) noexcept;
+
+void capture(bool enabled);
 } // namespace mouse
 } // namespace os

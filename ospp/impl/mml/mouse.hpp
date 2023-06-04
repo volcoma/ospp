@@ -85,6 +85,11 @@ inline void set_position(const point& pos, const window& relative_to) noexcept
 {
 	::mml::mouse::set_position({{pos.x, pos.y}}, to_win_impl(relative_to).get_impl());
 }
+
+inline void capture(bool /*enabled*/)
+{
+
+}
 } // namespace mml
 } // namespace detail
 } // namespace mouse

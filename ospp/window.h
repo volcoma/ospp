@@ -106,4 +106,6 @@ public:
 private:
 	std::shared_ptr<void> impl_;
 };
+
+window get_window_by_id();
 } // namespace os
