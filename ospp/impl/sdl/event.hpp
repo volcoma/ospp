@@ -90,7 +90,6 @@ inline auto to_event(const SDL_Event& e) -> event
 			ev.type = events::display_moved;
 			break;
 		case SDL_EVENT_DISPLAY_SCALE_CHANGED:
-        e.display.
 			ev.type = events::display_content_scale_changed;
 			break;
 		case SDL_EVENT_KEY_DOWN:
