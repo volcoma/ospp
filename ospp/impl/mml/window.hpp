@@ -239,7 +239,13 @@ public:
 
 	void raise() noexcept
 	{
+        request_focus();
 	}
+
+    auto is_minimized() const noexcept -> bool
+    {
+        return false;
+    }
 
 	void set_border(bool /*b*/) noexcept
 	{

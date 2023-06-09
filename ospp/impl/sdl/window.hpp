@@ -347,6 +347,11 @@ public:
 		SDL_RaiseWindow(impl_.get());
 	}
 
+	auto is_minimized() const noexcept -> bool
+	{
+		return (SDL_GetWindowFlags(impl_.get()) & SDL_WINDOW_MINIMIZED) != 0;
+	}
+
 	void set_border(bool b) noexcept
 	{
 		SDL_SetWindowBordered(impl_.get(), b ? SDL_TRUE : SDL_FALSE);
@@ -384,7 +389,7 @@ public:
 		SDL_SetWindowGrab(impl_.get(), b ? SDL_TRUE : SDL_FALSE);
 	}
 
-	bool is_input_grabbed() const noexcept
+	auto is_input_grabbed() const noexcept -> bool
 	{
 		return SDL_GetWindowGrab(impl_.get()) != SDL_FALSE;
 	}
@@ -397,7 +402,7 @@ public:
 		}
 	}
 
-	bool has_focus() const noexcept
+	auto has_focus() const noexcept -> bool
 	{
 		auto flags = SDL_GetWindowFlags(impl_.get());
 		return (flags & SDL_WINDOW_INPUT_FOCUS) != 0;

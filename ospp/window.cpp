@@ -159,7 +159,12 @@ void window::restore() noexcept
 
 void window::raise() noexcept
 {
-	this_impl->raise();
+    this_impl->raise();
+}
+
+auto window::is_minimized() const noexcept -> bool
+{
+    return this_impl->is_minimized();
 }
 
 void window::set_border(bool b) noexcept

@@ -395,6 +395,11 @@ public:
         glfwRequestWindowAttention(impl_.get());
 	}
 
+    auto is_minimized() const noexcept -> bool
+    {
+        return false;
+    }
+
 	void set_border(bool) noexcept
 	{
 	}
