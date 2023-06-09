@@ -4,6 +4,7 @@
 
 #include "cursor.hpp"
 #include "error.hpp"
+#include "hints.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -145,6 +146,13 @@ inline auto create_impl(const std::string& title, uint32_t width, uint32_t heigh
 
 	auto maximized = flags & window::maximized ? GLFW_TRUE : GLFW_FALSE;
 	glfwWindowHint(GLFW_MAXIMIZED, maximized);
+
+	auto on_top = flags & window::always_on_top ? GLFW_TRUE : GLFW_FALSE;
+	glfwWindowHint(GLFW_FLOATING, on_top);
+
+	auto passthrough = get_hint_value(HINT_MOUSE_FOCUS_CLICKTHROUGH);
+	glfwWindowHint(GLFW_MOUSE_PASSTHROUGH, passthrough);
+
 
 	GLFWmonitor* monitor = nullptr;
 	if(flags & window::fullscreen)
@@ -396,8 +404,8 @@ public:
 	}
 
     auto is_minimized() const noexcept -> bool
-    {
-        return false;
+	{
+		return glfwGetWindowAttrib(impl_.get(), GLFW_ICONIFIED) != 0;
     }
 
 	void set_border(bool) noexcept
