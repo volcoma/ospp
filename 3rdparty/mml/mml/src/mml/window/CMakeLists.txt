@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 3.14)
 
 set(INCROOT ${PROJECT_SOURCE_DIR}/include/mml/window)
 set(SRCROOT ${PROJECT_SOURCE_DIR}/src/mml/window)

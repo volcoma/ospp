@@ -8,7 +8,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake)
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
     cmake_minimum_required(VERSION 3.7.2)
 else()
-    cmake_minimum_required(VERSION 3.0.2)
+    cmake_minimum_required(VERSION 3.14)
 endif()
 
 # these options have to be set before CMake detects/configures the toolchain
