@@ -57,6 +57,10 @@ enum class events : uint8_t
 
 	clipboard_update,
 	drop_file,
+    drop_text,
+    drop_begin,
+    drop_complete,
+    drop_position,
 
     display_orientation,
     display_connected,
@@ -88,6 +92,8 @@ struct drop_event
 {
 	std::string file{};
 	uint32_t window_id{};
+    float x{};            /**< X coordinate, relative to window (not on begin) */
+    float y{};            /**< Y coordinate, relative to window (not on begin) */
 };
 
 struct text_input_event

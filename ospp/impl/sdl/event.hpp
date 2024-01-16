@@ -163,8 +163,19 @@ inline auto to_event(const SDL_Event& e) -> event
 			ev.type = events::clipboard_update;
 			break;
 		case SDL_EVENT_DROP_FILE:
-			ev.type = events::drop_file;
+            ev.type = events::drop_file;
+        case SDL_EVENT_DROP_TEXT:
+            ev.type = events::drop_text;
+        case SDL_EVENT_DROP_BEGIN:
+            ev.type = events::drop_begin;
+        case SDL_EVENT_DROP_COMPLETE:
+            ev.type = events::drop_complete;
+        case SDL_EVENT_DROP_POSITION:
+            ev.type = events::drop_position;
+
 			ev.drop.window_id = e.drop.windowID;
+            ev.drop.x = e.drop.x;
+            ev.drop.y = e.drop.y;
 			if(e.drop.file != nullptr)
 			{
 				ev.drop.file = e.drop.file;
