@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.14)
 
+set(OSPP_MAIN_PROJECT ON)
+if(DEFINED PROJECT_SOURCE_DIR)
+    set(OSPP_MAIN_PROJECT OFF)
+endif()
+
 project(ospp)
 include(CTest)
 
-option(BUILD_OSPP_SHARED "Build as a shared library." ON)
-option(BUILD_OSPP_TESTS "Build the tests" ON)
+option(BUILD_OSPP_SHARED "Build as a shared library." ${ITC_MAIN_PROJECT})
+option(BUILD_OSPP_TESTS "Build the tests" ${ITC_MAIN_PROJECT})
 
 set(BACKEND_TYPE "MML" CACHE STRING "Backend type chosen by the user at CMake configure time")
 set_property(CACHE BACKEND_TYPE PROPERTY STRINGS SDL GLFW MML)
@@ -34,8 +39,6 @@ endif()
 
 if(BUILD_OSPP_SHARED)
 	set(BUILD_SHARED_LIBS ON)
-else()
-	set(BUILD_SHARED_LIBS OFF)
 endif()
 
 
