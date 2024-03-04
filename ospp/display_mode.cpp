@@ -167,6 +167,11 @@ bounds get_bounds(int index)
 	return impl::get_display_bounds(index);
 }
 
+bounds get_usable_bounds(int index)
+{
+	return impl::get_display_usable_bounds(index);
+}
+
 std::string to_string(const mode& m)
 {
 	std::stringstream ss;

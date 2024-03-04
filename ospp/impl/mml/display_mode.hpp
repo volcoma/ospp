@@ -58,6 +58,13 @@ inline auto get_display_bounds(int index = 0) -> ::os::display::bounds
 	auto bounds = ::mml::video_bounds::get_display_bounds(index);
 	return from_impl(bounds);
 }
+
+inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
+{
+	auto bounds = get_display_bounds(index);
+	bounds.h -= 60;
+	return bounds;
+}
 } // namespace mml
 } // namespace detail
 } // namespace os

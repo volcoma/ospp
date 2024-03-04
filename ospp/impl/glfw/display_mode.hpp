@@ -100,13 +100,18 @@ inline auto get_display_bounds(int index = 0) -> ::os::display::bounds
 	int height{};
 	glfwGetMonitorWorkarea(monitor, &result.x, &result.y, &width, &height);
 
-	float xscale = 1.0f;
-	float yscale = 1.0f;
-	glfwGetMonitorContentScale(monitor, &xscale, &yscale);
-	result.w = static_cast<uint32_t>(float(width) / xscale);
-	result.h = static_cast<uint32_t>(float(height) / yscale);
+	// float xscale = 1.0f;
+	// float yscale = 1.0f;
+	// glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+	result.w = static_cast<uint32_t>(float(width));// / xscale);
+	result.h = static_cast<uint32_t>(float(height));// / yscale);
 
 	return result;
+}
+
+inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
+{
+	return get_display_bounds(index);
 }
 } // namespace glfw
 } // namespace detail

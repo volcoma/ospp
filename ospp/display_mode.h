@@ -32,6 +32,7 @@ auto get_desktop_mode(int index = 0) -> mode;
 auto get_closest_mode(const mode& to, int index = 0) -> mode;
 auto get_closest_mode(uint32_t width, uint32_t height, int index = 0) -> mode;
 auto get_bounds(int index = 0) -> bounds;
+auto get_usable_bounds(int index = 0) -> bounds;
 
 std::string to_string(const mode& m);
 std::string to_string(const bounds& b);

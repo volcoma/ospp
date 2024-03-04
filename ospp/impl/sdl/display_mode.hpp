@@ -100,6 +100,19 @@ inline auto get_display_bounds(int index = 0) -> ::os::display::bounds
 
 	return {};
 }
+
+inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
+{
+	auto display_id = to_display_id(index);
+
+	SDL_Rect rect{};
+	if(SDL_GetDisplayUsableBounds(display_id, &rect) == 0)
+	{
+		return {rect.x, rect.y, static_cast<uint32_t>(rect.w), static_cast<uint32_t>(rect.h)};
+	}
+
+	return {};
+}
 } // namespace sdl
 } // namespace detail
 } // namespace os

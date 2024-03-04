@@ -110,6 +110,16 @@ public:
 		, style_(get_impl_flags(flags))
 	{
 		id_ = register_window(this);
+
+
+		if(flags & window::minimized)
+		{
+			minimize();
+		}
+		if(flags & window::maximized)
+		{
+			maximize();
+		}
 	}
 
 	~window_impl()
@@ -198,6 +208,7 @@ public:
 		auto pos = impl_.get_position();
 		result.x = static_cast<int32_t>(pos[0]);
 		result.y = static_cast<int32_t>(pos[1]);
+		result.y += 38;
 		return result;
 	}
 
