@@ -197,7 +197,7 @@ cursor_grabbed_   (fullscreen_)
     // In windowed mode, adjust width and height so that window will have the requested client area
     if (!fullscreen_)
     {
-        RECT rectangle = {0, 0, width, height};
+		RECT rectangle = {0, 0, width, height};
         AdjustWindowRect(&rectangle, win32Style, false);
         width  = rectangle.right - rectangle.left;
         height = rectangle.bottom - rectangle.top;

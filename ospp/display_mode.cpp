@@ -24,6 +24,11 @@ auto get_available_displays_count() -> int
 	return impl::number_of_video_displays();
 }
 
+auto get_primary_display_index() -> int
+{
+	return impl::get_primary_display_index();
+}
+
 auto get_available_modes(int index) -> std::vector<mode>
 {
 	return impl::get_available_modes(index);
@@ -162,17 +167,17 @@ auto get_closest_mode(const mode& to, int index) -> mode
 	return closest;
 }
 
-bounds get_bounds(int index)
+auto get_bounds(int index) -> bounds
 {
 	return impl::get_display_bounds(index);
 }
 
-bounds get_usable_bounds(int index)
+auto get_usable_bounds(int index) -> bounds
 {
 	return impl::get_display_usable_bounds(index);
 }
 
-std::string to_string(const mode& m)
+auto to_string(const mode& m) -> std::string
 {
 	std::stringstream ss;
 	ss << "mode.w             = " << m.w << "\n";
@@ -184,7 +189,7 @@ std::string to_string(const mode& m)
 	return ss.str();
 }
 
-std::string to_string(const bounds& b)
+auto to_string(const bounds& b) -> std::string
 {
 	std::stringstream ss;
 	ss << "bounds.x = " << b.x << "\n";
@@ -207,10 +212,15 @@ void enumerate_caps()
 		std::cout << to_string(bounds) << std::endl;
 
 		std::cout << "--------------------------------------" << std::endl;
+		auto usable_bounds = get_usable_bounds(i);
+		std::cout << "usable_bounds" << std::endl;
+		std::cout << "--------------------------------------" << std::endl;
+		std::cout << to_string(usable_bounds) << std::endl;
+
+		std::cout << "--------------------------------------" << std::endl;
 		auto mode = get_desktop_mode(i);
 		std::cout << "mode" << std::endl;
 		std::cout << "--------------------------------------" << std::endl;
-
 		std::cout << to_string(mode) << std::endl;
 
 		std::cout << "--------------------------------------" << std::endl;

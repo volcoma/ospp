@@ -368,6 +368,11 @@ video_bounds video_mode_impl::get_display_bounds(int index)
 	return bounds;
 }
 
+video_bounds video_mode_impl::get_display_usable_bounds(int index)
+{
+	return get_display_bounds(index);
+}
+
 } // namespace priv
 
 } // namespace mml

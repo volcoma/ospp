@@ -232,7 +232,7 @@ inline void set_callbacks(GLFWwindow* window)
 								event ev{};
 								ev.type = events::drop_file;
 								ev.drop.window_id = impl->get_id();
-								ev.drop.file = paths[i];
+								ev.drop.data = paths[i];
 								push_event(std::move(ev));
 							}
 						});

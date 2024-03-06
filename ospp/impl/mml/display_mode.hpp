@@ -20,6 +20,7 @@ inline auto from_impl(const ::mml::video_mode& mode) -> ::os::display::mode
 	result.h = mode.height;
 	result.bpp = mode.bits_per_pixel;
 	result.refresh_rate = mode.refresh_rate;
+	result.display_scale = mode.display_scale;
 	return result;
 }
 
@@ -32,6 +33,11 @@ inline auto from_impl(const ::mml::video_bounds& bounds) -> ::os::display::bound
 inline int number_of_video_displays()
 {
 	return ::mml::get_number_of_displays();
+}
+
+inline int get_primary_display_index()
+{
+	return 0;
 }
 
 inline auto get_available_modes(int index = 0) -> std::vector<::os::display::mode>
@@ -61,9 +67,8 @@ inline auto get_display_bounds(int index = 0) -> ::os::display::bounds
 
 inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
 {
-	auto bounds = get_display_bounds(index);
-	bounds.h -= 60;
-	return bounds;
+	auto bounds = ::mml::video_bounds::get_display_usable_bounds(index);
+	return from_impl(bounds);
 }
 } // namespace mml
 } // namespace detail

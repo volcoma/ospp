@@ -22,6 +22,8 @@ public:
     static std::vector<video_mode> get_desktop_modes(int index = 0);
     static video_mode get_desktop_mode(int index = 0);
     static video_bounds get_display_bounds(int index = 0);
+	static video_bounds get_display_usable_bounds(int index = 0);
+
 };
 
 } // namespace priv

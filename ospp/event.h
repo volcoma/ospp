@@ -90,7 +90,8 @@ struct window_event
 
 struct drop_event
 {
-	std::string file{};
+	std::string source{};	/**< The source app that sent this drop event, or empty if that isn't available */
+	std::string data{};
 	uint32_t window_id{};
     float x{};            /**< X coordinate, relative to window (not on begin) */
     float y{};            /**< Y coordinate, relative to window (not on begin) */

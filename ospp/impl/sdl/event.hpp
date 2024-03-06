@@ -178,9 +178,15 @@ inline auto to_event(const SDL_Event& e) -> event
             ev.drop.y = e.drop.y;
 			if(e.drop.file != nullptr)
 			{
-				ev.drop.file = e.drop.file;
+				ev.drop.data = e.drop.file;
 				SDL_free(e.drop.file);
 			}
+
+			// if(e.drop.source != nullptr)
+			// {
+			// 	ev.drop.source = e.drop.source;
+			// 	SDL_free(e.drop.source);
+			// }
 			break;
 		default:
 			if(e.type >= SDL_EVENT_WINDOW_FIRST && e.type <= SDL_EVENT_WINDOW_LAST)

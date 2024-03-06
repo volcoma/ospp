@@ -19,62 +19,62 @@ namespace sdl
 #if defined(SDL_ENABLE_SYSWM_WINDOWS)
 namespace
 {
-void set_process_dpi_aware()
-{
+// void set_process_dpi_aware()
+// {
 
-	// Try SetProcessDpiAwareness first
-	HINSTANCE shCoreDll = LoadLibraryW(L"Shcore.dll");
+// 	// Try SetProcessDpiAwareness first
+// 	HINSTANCE shCoreDll = LoadLibraryW(L"Shcore.dll");
 
-	if(shCoreDll)
-	{
-		enum ProcessDpiAwareness
-		{
-			ProcessDpiUnaware = 0,
-			ProcessSystemDpiAware = 1,
-			ProcessPerMonitorDpiAware = 2
-		};
+// 	if(shCoreDll)
+// 	{
+// 		enum ProcessDpiAwareness
+// 		{
+// 			ProcessDpiUnaware = 0,
+// 			ProcessSystemDpiAware = 1,
+// 			ProcessPerMonitorDpiAware = 2
+// 		};
 
-		typedef HRESULT(WINAPI * SetProcessDpiAwarenessFuncType)(ProcessDpiAwareness);
-		SetProcessDpiAwarenessFuncType SetProcessDpiAwarenessFunc =
-			reinterpret_cast<SetProcessDpiAwarenessFuncType>(
-				GetProcAddress(shCoreDll, "SetProcessDpiAwareness"));
+// 		typedef HRESULT(WINAPI * SetProcessDpiAwarenessFuncType)(ProcessDpiAwareness);
+// 		SetProcessDpiAwarenessFuncType SetProcessDpiAwarenessFunc =
+// 			reinterpret_cast<SetProcessDpiAwarenessFuncType>(
+// 				GetProcAddress(shCoreDll, "SetProcessDpiAwareness"));
 
-		if(SetProcessDpiAwarenessFunc)
-		{
-			// We only check for E_INVALIDARG because we would get
-			// E_ACCESSDENIED if the DPI was already set previously
-			// and S_OK means the call was successful
-			if(SetProcessDpiAwarenessFunc(ProcessSystemDpiAware) == E_INVALIDARG)
-			{
-			}
-			else
-			{
-				FreeLibrary(shCoreDll);
-				return;
-			}
-		}
+// 		if(SetProcessDpiAwarenessFunc)
+// 		{
+// 			// We only check for E_INVALIDARG because we would get
+// 			// E_ACCESSDENIED if the DPI was already set previously
+// 			// and S_OK means the call was successful
+// 			if(SetProcessDpiAwarenessFunc(ProcessSystemDpiAware) == E_INVALIDARG)
+// 			{
+// 			}
+// 			else
+// 			{
+// 				FreeLibrary(shCoreDll);
+// 				return;
+// 			}
+// 		}
 
-		FreeLibrary(shCoreDll);
-	}
+// 		FreeLibrary(shCoreDll);
+// 	}
 
-	// Fall back to SetProcessDPIAware if SetProcessDpiAwareness
-	// is not available on this system
-	HINSTANCE user32Dll = LoadLibraryW(L"user32.dll");
+// 	// Fall back to SetProcessDPIAware if SetProcessDpiAwareness
+// 	// is not available on this system
+// 	HINSTANCE user32Dll = LoadLibraryW(L"user32.dll");
 
-	if(user32Dll)
-	{
-		typedef BOOL(WINAPI * SetProcessDPIAwareFuncType)(void);
-		SetProcessDPIAwareFuncType SetProcessDPIAwareFunc =
-			reinterpret_cast<SetProcessDPIAwareFuncType>(GetProcAddress(user32Dll, "SetProcessDPIAware"));
+// 	if(user32Dll)
+// 	{
+// 		typedef BOOL(WINAPI * SetProcessDPIAwareFuncType)(void);
+// 		SetProcessDPIAwareFuncType SetProcessDPIAwareFunc =
+// 			reinterpret_cast<SetProcessDPIAwareFuncType>(GetProcAddress(user32Dll, "SetProcessDPIAware"));
 
-		if(SetProcessDPIAwareFunc)
-		{
-			SetProcessDPIAwareFunc();
-		}
+// 		if(SetProcessDPIAwareFunc)
+// 		{
+// 			SetProcessDPIAwareFunc();
+// 		}
 
-		FreeLibrary(user32Dll);
-	}
-}
+// 		FreeLibrary(user32Dll);
+// 	}
+// }
 } // namespace
 #endif
 
@@ -163,11 +163,11 @@ inline auto get_impl_flags(uint32_t flags) -> uint32_t
 		result |= SDL_WINDOW_MAXIMIZED;
 	}
 
-#if defined(SDL_ENABLE_SYSWM_WINDOWS)
-	// due to sdl's current lack of dpi awarenes on windows
-	// we have to implement it ourselves
-	set_process_dpi_aware();
-#endif
+// #if defined(SDL_ENABLE_SYSWM_WINDOWS)
+// 	// due to sdl's current lack of dpi awarenes on windows
+// 	// we have to implement it ourselves
+// 	set_process_dpi_aware();
+// #endif
 
 	return result;
 }

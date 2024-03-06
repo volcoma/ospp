@@ -42,6 +42,12 @@ inline auto number_of_video_displays() -> int
 	return result;
 }
 
+inline auto get_primary_display_index() -> int
+{
+	return 0;
+}
+
+
 inline auto get_available_modes(int index = 0) -> std::vector<::os::display::mode>
 {
 	int mointor_count{0};
@@ -100,18 +106,37 @@ inline auto get_display_bounds(int index = 0) -> ::os::display::bounds
 	int height{};
 	glfwGetMonitorWorkarea(monitor, &result.x, &result.y, &width, &height);
 
-	// float xscale = 1.0f;
-	// float yscale = 1.0f;
-	// glfwGetMonitorContentScale(monitor, &xscale, &yscale);
-	result.w = static_cast<uint32_t>(float(width));// / xscale);
-	result.h = static_cast<uint32_t>(float(height));// / yscale);
+#ifdef _WIN32
+	height += 60;
+#endif
+
+	float xscale = 1.0f;
+	float yscale = 1.0f;
+	glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+	result.w = static_cast<uint32_t>(float(width) / xscale);
+	result.h = static_cast<uint32_t>(float(height) / yscale);
 
 	return result;
 }
 
 inline auto get_display_usable_bounds(int index = 0) -> ::os::display::bounds
 {
-	return get_display_bounds(index);
+	int mointor_count{0};
+	auto monitors = glfwGetMonitors(&mointor_count);
+	auto monitor = monitors[index];
+
+	::os::display::bounds result{};
+	int width{};
+	int height{};
+	glfwGetMonitorWorkarea(monitor, &result.x, &result.y, &width, &height);
+
+	float xscale = 1.0f;
+	float yscale = 1.0f;
+	glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+	result.w = static_cast<uint32_t>(float(width) / xscale);
+	result.h = static_cast<uint32_t>(float(height) / yscale);
+
+	return result;
 }
 } // namespace glfw
 } // namespace detail

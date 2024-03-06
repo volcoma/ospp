@@ -20,7 +20,7 @@ inline auto from_impl(const SDL_DisplayMode& mode) -> ::os::display::mode
 	result.h = static_cast<uint32_t>(mode.screen_h);
 	result.refresh_rate = static_cast<uint32_t>(mode.refresh_rate);
 	result.bpp = SDL_BITSPERPIXEL(mode.format);
-    result.display_scale = mode.display_scale;
+	result.display_scale = mode.display_scale;
 	return result;
 }
 
@@ -39,6 +39,22 @@ inline auto to_display_id(int display_index) -> SDL_DisplayID
 	return display_id;
 }
 
+inline auto to_display_index(SDL_DisplayID display_id) -> int
+{
+	int count = 0;
+	auto displays = SDL_GetDisplays(&count);
+
+	for(int display_index = 0; display_index < count; ++display_index)
+	{
+		if(display_id == displays[display_index])
+		{
+			return display_index;
+		}
+	}
+
+	return 0;
+}
+
 } // namespace
 
 inline auto number_of_video_displays() -> int
@@ -52,6 +68,17 @@ inline auto number_of_video_displays() -> int
 	}
 	SDL_free(displays);
 	return result;
+}
+
+inline auto get_primary_display_index() -> int
+{
+	auto id = SDL_GetPrimaryDisplay();
+	if(id == 0)
+	{
+		OS_SDL_ERROR_HANDLER(0);
+	}
+
+	return to_display_index(id);
 }
 
 inline auto get_available_modes(int index = 0) -> std::vector<::os::display::mode>

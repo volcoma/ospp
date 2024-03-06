@@ -22,11 +22,13 @@ struct MML_WINDOW_API video_mode
     unsigned int height {};
     unsigned int bits_per_pixel {};
     unsigned int refresh_rate {};
+	float display_scale{1.0f};
 };
 
 struct MML_WINDOW_API video_bounds
 {
     static video_bounds get_display_bounds(int index);
+	static video_bounds get_display_usable_bounds(int index);
 
     int x {};
     int y {};

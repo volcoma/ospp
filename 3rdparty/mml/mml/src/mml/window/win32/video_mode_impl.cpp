@@ -15,6 +15,8 @@ struct monitor_data
 {
     WCHAR adapterName[CCHDEVICENAME] {};
     HMONITOR handle{};
+
+	MONITORINFOEX mi;
 };
 
 BOOL WINAPI callback(HMONITOR handle,
@@ -22,18 +24,91 @@ BOOL WINAPI callback(HMONITOR handle,
         LPRECT /*rect*/,
         LPARAM data)
 {
-    MONITORINFOEX mi;
-    ZeroMemory(&mi, sizeof(mi));
-    mi.cbSize = sizeof(mi);
+	monitor_data* monitor = (monitor_data*) data;
+	ZeroMemory(&monitor->mi, sizeof(monitor->mi));
+	monitor->mi.cbSize = sizeof(monitor->mi);
 
-    if (GetMonitorInfo(handle, (MONITORINFO*) &mi))
+	if (GetMonitorInfo(handle, (MONITORINFO*) &monitor->mi))
     {
-        monitor_data* monitor = (monitor_data*) data;
-        if (wcscmp(mi.szDevice, monitor->adapterName) == 0)
+		if (wcscmp(monitor->mi.szDevice, monitor->adapterName) == 0)
             monitor->handle = handle;
     }
 
     return TRUE;
+}
+
+video_bounds get_display_bounds_impl(int index, bool usable)
+{
+	video_bounds bounds{};
+
+	int disp_count{};
+
+	DISPLAY_DEVICE adapter;
+	DWORD adapter_index = 0;
+
+	for(;;adapter_index++)
+	{
+		ZeroMemory(&adapter, sizeof(adapter));
+		adapter.cb = sizeof(adapter);
+
+		if (!EnumDisplayDevices(nullptr, adapter_index, &adapter, 0))
+			break;
+
+		if (!(adapter.StateFlags & DISPLAY_DEVICE_ACTIVE))
+			continue;
+
+		DWORD display_index = 0;
+		for(;;display_index++)
+		{
+			DISPLAY_DEVICE display;
+			ZeroMemory(&display, sizeof(display));
+			display.cb = sizeof(display);
+
+			if (!EnumDisplayDevices(adapter.DeviceName, display_index, &display, 0))
+				break;
+
+			if (!(display.StateFlags & DISPLAY_DEVICE_ACTIVE))
+				continue;
+
+			if(index == disp_count)
+			{
+				DEVMODE win32Mode;
+				win32Mode.dmSize = sizeof(win32Mode);
+				win32Mode.dmDriverExtra = 0;
+				EnumDisplaySettings(adapter.DeviceName, ENUM_CURRENT_SETTINGS, &win32Mode);
+
+				RECT rect;
+				rect.left   = win32Mode.dmPosition.x;
+				rect.top    = win32Mode.dmPosition.y;
+				rect.right  = win32Mode.dmPosition.x + win32Mode.dmPelsWidth;
+				rect.bottom = win32Mode.dmPosition.y + win32Mode.dmPelsHeight;
+
+				monitor_data monitor;
+
+				wcscpy_s(monitor.adapterName, adapter.DeviceName);
+				EnumDisplayMonitors(nullptr, &rect, callback, (LPARAM)&monitor);
+
+
+				auto usedRect = usable ? monitor.mi.rcWork : monitor.mi.rcMonitor;
+
+				bounds.x = usedRect.left;
+				bounds.y = usedRect.top;
+				bounds.width = usedRect.right - usedRect.left;
+				bounds.height = usedRect.bottom - usedRect.top;
+
+				break;
+			}
+
+			disp_count++;
+		}
+
+		if(bounds.width != 0 && bounds.height != 0)
+		{
+			break;
+		}
+	}
+
+	return bounds;
 }
 
 int video_mode_impl::get_number_of_displays()
@@ -192,8 +267,25 @@ video_mode video_mode_impl::get_desktop_mode(int index)
                 win32Mode.dmDriverExtra = 0;
                 EnumDisplaySettings(adapter.DeviceName, ENUM_CURRENT_SETTINGS, &win32Mode);
 
-                mode.width = win32Mode.dmPelsWidth;
-                mode.height = win32Mode.dmPelsHeight;
+
+				RECT rect;
+				rect.left   = win32Mode.dmPosition.x;
+				rect.top    = win32Mode.dmPosition.y;
+				rect.right  = win32Mode.dmPosition.x + win32Mode.dmPelsWidth;
+				rect.bottom = win32Mode.dmPosition.y + win32Mode.dmPelsHeight;
+
+				monitor_data monitor;
+
+				wcscpy_s(monitor.adapterName, adapter.DeviceName);
+				EnumDisplayMonitors(nullptr, &rect, callback, (LPARAM)&monitor);
+
+
+				int monitor_height = monitor.mi.rcMonitor.bottom - monitor.mi.rcMonitor.top;
+				int work_height = monitor.mi.rcWork.bottom - monitor.mi.rcWork.top;
+
+				mode.display_scale = monitor_height / work_height;
+				mode.width = monitor.mi.rcMonitor.right - monitor.mi.rcMonitor.left;
+				mode.height = monitor.mi.rcMonitor.bottom - monitor.mi.rcMonitor.top;
                 mode.bits_per_pixel = win32Mode.dmBitsPerPel;
                 mode.refresh_rate = win32Mode.dmDisplayFrequency;
 
@@ -214,77 +306,12 @@ video_mode video_mode_impl::get_desktop_mode(int index)
 
 video_bounds video_mode_impl::get_display_bounds(int index)
 {
-    video_bounds bounds{};
+	return get_display_bounds_impl(index, false);
+}
 
-    int disp_count{};
-
-    DISPLAY_DEVICE adapter;
-    DWORD adapter_index = 0;
-
-    for(;;adapter_index++)
-    {
-        ZeroMemory(&adapter, sizeof(adapter));
-        adapter.cb = sizeof(adapter);
-
-        if (!EnumDisplayDevices(nullptr, adapter_index, &adapter, 0))
-            break;
-
-        if (!(adapter.StateFlags & DISPLAY_DEVICE_ACTIVE))
-            continue;
-
-        DWORD display_index = 0;
-        for(;;display_index++)
-        {
-            DISPLAY_DEVICE display;
-            ZeroMemory(&display, sizeof(display));
-            display.cb = sizeof(display);
-
-            if (!EnumDisplayDevices(adapter.DeviceName, display_index, &display, 0))
-                break;
-
-            if (!(display.StateFlags & DISPLAY_DEVICE_ACTIVE))
-                continue;
-
-            if(index == disp_count)
-            {
-                DEVMODE win32Mode;
-                win32Mode.dmSize = sizeof(win32Mode);
-                win32Mode.dmDriverExtra = 0;
-                EnumDisplaySettings(adapter.DeviceName, ENUM_CURRENT_SETTINGS, &win32Mode);
-
-                RECT rect;
-                rect.left   = win32Mode.dmPosition.x;
-                rect.top    = win32Mode.dmPosition.y;
-                rect.right  = win32Mode.dmPosition.x + win32Mode.dmPelsWidth;
-                rect.bottom = win32Mode.dmPosition.y + win32Mode.dmPelsHeight;
-
-                monitor_data monitor;
-
-                wcscpy_s(monitor.adapterName, adapter.DeviceName);
-                EnumDisplayMonitors(nullptr, &rect, callback, (LPARAM)&monitor);
-
-                MONITORINFO mi{};
-                mi.cbSize = { sizeof(mi) };
-                GetMonitorInfo(monitor.handle, &mi);
-
-                bounds.x = mi.rcMonitor.left;
-                bounds.y = mi.rcMonitor.top;
-                bounds.width = mi.rcMonitor.right - mi.rcMonitor.left;
-                bounds.height = mi.rcMonitor.bottom - mi.rcMonitor.top;
-
-                break;
-            }
-
-            disp_count++;
-        }
-
-        if(bounds.width != 0 && bounds.height != 0)
-        {
-            break;
-        }
-    }
-
-    return bounds;
+video_bounds video_mode_impl::get_display_usable_bounds(int index)
+{
+	return get_display_bounds_impl(index, true);
 }
 
 } // namespace priv

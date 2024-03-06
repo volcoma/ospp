@@ -81,4 +81,9 @@ video_bounds video_bounds::get_display_bounds(int index)
     return priv::video_mode_impl::get_display_bounds(index);
 }
 
+video_bounds video_bounds::get_display_usable_bounds(int index)
+{
+	return priv::video_mode_impl::get_display_usable_bounds(index);
+}
+
 } // namespace mml
