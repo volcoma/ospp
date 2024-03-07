@@ -10,7 +10,7 @@ file(GLOB libsrc "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
 
 message( STATUS "--------------------------------" )
 if("${OSPP_BACKEND_TYPE}" STREQUAL "SDL")
-	message( STATUS "SDL WINDOW backend selected." )
+    message( STATUS "SDL WINDOW backend selected." )
 	file(GLOB impl_src "${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*.h"
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*.cpp"
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*.hpp"
@@ -35,7 +35,7 @@ elseif("${OSPP_BACKEND_TYPE}" STREQUAL "MML")
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/mml/*.cc")
 
 else()
-	message( FATAL_ERROR "No backend type was selected." )
+    message( FATAL_ERROR "No backend type was selected." )
 endif()
 message( STATUS "--------------------------------" )
 
