@@ -11,8 +11,8 @@ include(CTest)
 option(BUILD_OSPP_SHARED "Build as a shared library." ${ITC_MAIN_PROJECT})
 option(BUILD_OSPP_TESTS "Build the tests" ${ITC_MAIN_PROJECT})
 
-set(BACKEND_TYPE "MML" CACHE STRING "Backend type chosen by the user at CMake configure time")
-set_property(CACHE BACKEND_TYPE PROPERTY STRINGS SDL GLFW MML)
+set(OSPP_BACKEND_TYPE "MML" CACHE STRING "Backend type chosen by the user at CMake configure time")
+set_property(CACHE OSPP_BACKEND_TYPE PROPERTY STRINGS SDL GLFW MML)
 
 if(BUILD_OSPP_TESTS)
 	if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)

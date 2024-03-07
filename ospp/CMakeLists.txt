@@ -9,7 +9,7 @@ file(GLOB libsrc "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
                  "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 
 message( STATUS "--------------------------------" )
-if("${BACKEND_TYPE}" STREQUAL "SDL")
+if("${OSPP_BACKEND_TYPE}" STREQUAL "SDL")
 	message( STATUS "SDL WINDOW backend selected." )
 	file(GLOB impl_src "${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*.h"
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*.cpp"
@@ -17,7 +17,7 @@ if("${BACKEND_TYPE}" STREQUAL "SDL")
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*.c"
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/sdl/*.cc")
 
-elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
+elseif("${OSPP_BACKEND_TYPE}" STREQUAL "GLFW")
 	message( STATUS "GLFW WINDOW backend selected." )
 	file(GLOB impl_src "${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/*.h"
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/*.cpp"
@@ -25,7 +25,7 @@ elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/*.c"
 					"${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/*.cc")
 
-elseif("${BACKEND_TYPE}" STREQUAL "MML")
+elseif("${OSPP_BACKEND_TYPE}" STREQUAL "MML")
 
 	message( STATUS "MML WINDOW backend selected." )
 	file(GLOB impl_src "${CMAKE_CURRENT_SOURCE_DIR}/impl/mml/*.h"
@@ -43,7 +43,7 @@ list(APPEND libsrc ${impl_src})
 
 add_library(${target_name} ${libsrc})
 
-if("${BACKEND_TYPE}" STREQUAL "SDL")
+if("${OSPP_BACKEND_TYPE}" STREQUAL "SDL")
 	target_compile_definitions(${target_name} PRIVATE SDL_BACKEND)
 	if(BUILD_SHARED_LIBS)
 		target_link_libraries(${target_name} PRIVATE SDL3-shared)
@@ -51,7 +51,7 @@ if("${BACKEND_TYPE}" STREQUAL "SDL")
 		target_link_libraries(${target_name} PRIVATE SDL3-static)
 	endif()
 
-elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
+elseif("${OSPP_BACKEND_TYPE}" STREQUAL "GLFW")
 	target_compile_definitions(${target_name} PRIVATE GLFW_BACKEND)
 	if(WIN32)
 		target_compile_definitions(${target_name} PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
@@ -65,7 +65,7 @@ elseif("${BACKEND_TYPE}" STREQUAL "GLFW")
 	target_link_libraries(${target_name} PRIVATE glfw)
 
 
-elseif("${BACKEND_TYPE}" STREQUAL "MML")
+elseif("${OSPP_BACKEND_TYPE}" STREQUAL "MML")
 	target_compile_definitions(${target_name} PRIVATE MML_BACKEND)
 
 	target_link_libraries(${target_name} PRIVATE mml-window)
