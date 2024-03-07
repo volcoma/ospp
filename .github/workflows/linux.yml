@@ -32,5 +32,5 @@ jobs:
         sudo apt-get install libudev-dev
     - name: Build
       run: |
-        cmake --preset linux-${{matrix.config.cc}} -DBACKEND_TYPE=${{matrix.backend}}
+        cmake --preset linux-${{matrix.config.cc}} -DOSPP_BACKEND_TYPE=${{matrix.backend}}
         cmake --build --preset linux-${{matrix.config.cc}}-release
