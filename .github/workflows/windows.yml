@@ -35,5 +35,5 @@ jobs:
         version: 12.2.0
     - name: Build
       run: |
-        cmake --preset windows-${{matrix.config.arch}}-${{matrix.config.cc}} -DBACKEND_TYPE=${{matrix.backend}}
+        cmake --preset windows-${{matrix.config.arch}}-${{matrix.config.cc}} -DOSPP_BACKEND_TYPE=${{matrix.backend}}
         cmake --build --preset windows-${{matrix.config.arch}}-${{matrix.config.cc}}-release
