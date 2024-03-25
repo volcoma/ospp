@@ -23,7 +23,7 @@ jobs:
         brew update
         brew install cmake ninja
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: true
     - name: Select Xcode

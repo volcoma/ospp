@@ -23,7 +23,7 @@ jobs:
         sudo apt-get update -o Acquire::Retries=10
         sudo apt-get install -o Acquire::Retries=10 -y cmake ninja-build ${{matrix.config.cc}} ${{matrix.config.cxx}}
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: true
     - name: Install Dependencies
