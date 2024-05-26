@@ -8,8 +8,8 @@ endif()
 project(ospp)
 include(CTest)
 
-option(BUILD_OSPP_SHARED "Build as a shared library." ${ITC_MAIN_PROJECT})
-option(BUILD_OSPP_TESTS "Build the tests" ${ITC_MAIN_PROJECT})
+option(BUILD_OSPP_SHARED "Build as a shared library." ${OSPP_MAIN_PROJECT})
+option(BUILD_OSPP_TESTS "Build the tests" ${OSPP_MAIN_PROJECT})
 
 set(OSPP_BACKEND_TYPE "MML" CACHE STRING "Backend type chosen by the user at CMake configure time")
 set_property(CACHE OSPP_BACKEND_TYPE PROPERTY STRINGS SDL GLFW MML)

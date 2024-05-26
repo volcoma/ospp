@@ -28,5 +28,6 @@ void set_position(const point& pos) noexcept;
 void set_position(const point& pos, const window& relative_to) noexcept;
 
 void capture(bool enabled);
+void disable(bool val);
 } // namespace mouse
 } // namespace os

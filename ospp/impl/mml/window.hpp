@@ -208,7 +208,6 @@ public:
 		auto pos = impl_.get_position();
 		result.x = static_cast<int32_t>(pos[0]);
 		result.y = static_cast<int32_t>(pos[1]);
-		result.y += 38;
 		return result;
 	}
 

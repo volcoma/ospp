@@ -68,14 +68,27 @@ inline auto get_position() noexcept -> point
 	return {int32_t(x), int32_t(y)};
 }
 
-inline point get_position(const window& relative_to) noexcept
+inline auto get_position_impl(SDL_Window* relative_to) noexcept -> point
 {
 	point relative_pos{};
 	auto global_pos = get_position();
-	auto window_pos = to_win_impl(relative_to).get_position();
-	relative_pos.x = global_pos.x - window_pos.x;
-	relative_pos.y = global_pos.y - window_pos.y;
+
+	int window_x{};
+	int window_y{};
+	SDL_GetWindowPosition(relative_to, &window_x, &window_y);
+	relative_pos.x = global_pos.x - window_x;
+	relative_pos.y = global_pos.y - window_y;
 	return relative_pos;
+}
+
+inline void set_position_impl(const point& pos, SDL_Window* relative_to) noexcept
+{
+	SDL_WarpMouseInWindow(relative_to, float(pos.x), float(pos.y));
+}
+
+inline point get_position(const window& relative_to) noexcept
+{
+	return get_position_impl(to_win_impl(relative_to).get_impl());
 }
 
 inline void set_position(const point& pos) noexcept
@@ -85,13 +98,61 @@ inline void set_position(const point& pos) noexcept
 
 inline void set_position(const point& pos, const window& relative_to) noexcept
 {
-	SDL_WarpMouseInWindow(to_win_impl(relative_to).get_impl(), float(pos.x), float(pos.y));
+	set_position_impl(pos, to_win_impl(relative_to).get_impl());
+}
+
+inline auto mouse_pos_while_relative() -> point&
+{
+	static point p{};
+	return p;
+}
+
+
+inline auto mouse_pos_on_relative_start() -> point&
+{
+	static point p{};
+	return p;
 }
 
 inline void capture(bool enabled) noexcept
 {
 	SDL_CaptureMouse(enabled ? SDL_TRUE : SDL_FALSE);
 }
+
+inline void disable(bool val) noexcept
+{
+	// Get the window that currently has keyboard focus
+	auto window = SDL_GetKeyboardFocus();
+
+	if (window)
+	{
+		// Grab the input, confining the cursor to the window
+		SDL_SetWindowGrab(window, val ? SDL_TRUE : SDL_FALSE);
+
+		static bool relative = SDL_GetRelativeMouseMode();
+
+		bool is_different = relative != val;
+
+		if(val && is_different)
+		{
+			auto mouse_window_pos = get_position_impl(window);
+			mouse_pos_while_relative() = mouse_window_pos;
+			mouse_pos_on_relative_start() = mouse_window_pos;
+		}
+
+		if(!val && is_different)
+		{
+			set_position_impl(mouse_pos_on_relative_start(), window);
+		}
+
+		relative = val;
+	}
+
+	// Set relative mouse mode
+	SDL_SetRelativeMouseMode(val ? SDL_TRUE : SDL_FALSE);
+}
+
+
 } // namespace sdl
 } // namespace detail
 } // namespace mouse

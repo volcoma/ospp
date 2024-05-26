@@ -138,10 +138,23 @@ inline auto to_event(const SDL_Event& e) -> event
 		case SDL_EVENT_MOUSE_MOTION:
 			ev.type = events::mouse_motion;
 			ev.motion.window_id = e.motion.windowID;
+
 			ev.motion.x = int32_t(e.motion.x);
 			ev.motion.y = int32_t(e.motion.y);
-			ev.motion.raw_x = int32_t(e.motion.x);
-			ev.motion.raw_y = int32_t(e.motion.y);
+
+			if (SDL_GetRelativeMouseMode())
+			{
+				auto& pos = mouse::detail::sdl::mouse_pos_while_relative();
+				pos.x += e.motion.xrel;
+				pos.y += e.motion.yrel;
+				ev.motion.x = int32_t(pos.x);
+				ev.motion.y = int32_t(pos.y);
+
+			}
+
+			ev.motion.raw_x = int32_t(ev.motion.x);
+			ev.motion.raw_y = int32_t(ev.motion.y);
+
 			break;
 		case SDL_EVENT_MOUSE_WHEEL:
 			ev.type = events::mouse_wheel;
@@ -181,12 +194,6 @@ inline auto to_event(const SDL_Event& e) -> event
 				ev.drop.data = e.drop.file;
 				SDL_free(e.drop.file);
 			}
-
-			// if(e.drop.source != nullptr)
-			// {
-			// 	ev.drop.source = e.drop.source;
-			// 	SDL_free(e.drop.source);
-			// }
 			break;
 		default:
 			if(e.type >= SDL_EVENT_WINDOW_FIRST && e.type <= SDL_EVENT_WINDOW_LAST)

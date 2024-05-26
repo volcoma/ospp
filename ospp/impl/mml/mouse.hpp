@@ -90,6 +90,11 @@ inline void capture(bool /*enabled*/)
 {
 
 }
+
+inline void disable(bool /*val*/)
+{
+
+}
 } // namespace mml
 } // namespace detail
 } // namespace mouse

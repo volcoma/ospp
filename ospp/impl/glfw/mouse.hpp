@@ -108,11 +108,16 @@ inline void set_position(const point& pos) noexcept
 
 inline void capture(bool enabled)
 {
-//    auto& focused_win = os::detail::glfw::get_focused_win();
-//	if(focused_win)
-//	{
-//        focused_win->grab_input(enabled);
-//    }
+
+}
+
+inline void disable(bool enabled)
+{
+	auto& focused_win = os::detail::glfw::get_focused_win();
+	if(focused_win)
+	{
+		focused_win->grab_input(enabled);
+	}
 }
 }
 }

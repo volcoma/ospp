@@ -447,6 +447,7 @@ public:
 
 	void grab_input(bool b) noexcept
 	{
+		input_grabbed_ = b;
 		glfwSetInputMode(impl_.get(), GLFW_CURSOR, b ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 	}
 
@@ -472,6 +473,10 @@ public:
 
 	void show_cursor(bool show) noexcept
 	{
+		if(input_grabbed_)
+		{
+			return;
+		}
 		glfwSetInputMode(impl_.get(), GLFW_CURSOR, show ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
 
@@ -490,6 +495,7 @@ private:
 	area max_size_{};
 	point pos_before_fullscreen_{};
 	area size_before_fullscreen_{};
+	bool input_grabbed_{};
 
 	std::string title_{};
 	std::unique_ptr<GLFWwindow, window_deleter> impl_;

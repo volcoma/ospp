@@ -47,5 +47,11 @@ void capture(bool enabled)
     impl::capture(enabled);
 }
 
+void disable(bool val)
+{
+	impl::disable(val);
+}
+
+
 } // namespace mouse
 } // namespace os
