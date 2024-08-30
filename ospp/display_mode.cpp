@@ -174,7 +174,13 @@ auto get_bounds(int index) -> bounds
 
 auto get_usable_bounds(int index) -> bounds
 {
-	return impl::get_display_usable_bounds(index);
+	auto usable = impl::get_display_usable_bounds(index);
+	if(usable.w == 0 || usable.h == 0)
+	{
+		return get_bounds(index);
+	}
+
+	return usable;
 }
 
 auto to_string(const mode& m) -> std::string
