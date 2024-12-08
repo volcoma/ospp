@@ -10,10 +10,11 @@ jobs:
       matrix:
         config:
         # https://github.com/actions/virtual-environments/tree/main/images/macos
-        - { os: "macos-12", xcode: "14.0", arch: "x64" }
-        - { os: "macos-12", xcode: "14.1", arch: "x64" }
-        - { os: "macos-12", xcode: "14.2", arch: "x64" }
-        
+        # - { os: "macos-12", xcode: "14.0", arch: "x64" }
+        # - { os: "macos-12", xcode: "14.1", arch: "x64" }
+        # - { os: "macos-12", xcode: "14.2", arch: "x64" }
+        - { os: "macos-14", xcode: "16.0", arch: "x64" }
+        - { os: "macos-15", xcode: "16.0", arch: "x64" }
         backend: ["SDL", "GLFW"]
         #"MML" not supported yet
     #name: "xcode-${{matrix.config.xcode}}"
